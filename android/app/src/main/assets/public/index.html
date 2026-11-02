@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>Spendy — Budget & Expense Tracker</title>
+    <meta name="description" content="Smart budget and expense tracker with insights, saving plans, and monthly financial stories." />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/png" href="/icon.png" />
+    <link rel="apple-touch-icon" href="/icon.png" />
+    
+    <!-- iOS / Safari Mobile App Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Spendy" />
+    <meta name="theme-color" content="#1b4332" />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>#loading{z-index:9999;background:#f8f7f2;justify-content:center;align-items:center;transition:opacity .3s;display:flex;position:fixed;inset:0}#loading.hidden{opacity:0;pointer-events:none}.loader-logo{border-radius:20px;justify-content:center;align-items:center;width:64px;height:64px;animation:1.5s ease-in-out infinite pulse;display:flex;overflow:hidden;box-shadow:0 10px 25px -5px #1b43324d}.loader-logo img{object-fit:cover;width:100%;height:100%}@keyframes pulse{0%,to{opacity:1;transform:scale(1)}50%{opacity:.85;transform:scale(1.08)}}</style>
+    <script type="module" crossorigin src="/assets/index-BLbz1LII.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BGw2ZJcL.css">
+  </head>
+  <body>
+    <div id="loading">
+      <div class="loader-logo">
+        <img src="/icon.png" alt="Spendy" />
+      </div>
+    </div>
+    <div id="root"></div>
+    <script>
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const l = document.getElementById('loading');
+          if (l) { l.classList.add('hidden'); setTimeout(() => l.remove(), 300); }
+        }, 400);
+      });
+    </script>
+  </body>
+</html>
