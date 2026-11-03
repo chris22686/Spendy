@@ -67,6 +67,8 @@ export const SAMPLE_BUDGETS = [
   { id: 'b8', category: 'utilities',     limit: 120,  period: 'monthly' },
 ];
 
+export const DEFAULT_GROUPS = ['Essentials', 'Lifestyle', 'Subscriptions', 'Finance', 'Other'];
+
 // ─── Default Income Sources ────────────────────────────────────────────────────
 export const DEFAULT_INCOME_SOURCES = [
   { id: 'inc-1', name: 'Primary Salary (1st Paycheck)', amount: 1500, frequency: 'bi-weekly', icon: '💼', color: '#1b4332' },
@@ -112,6 +114,29 @@ function reducer(state, action) {
       return { ...state, categories: state.categories.map(c => c.id === action.payload.id ? action.payload : c) };
     case 'DELETE_CATEGORY':
       return { ...state, categories: state.categories.filter(c => c.id !== action.payload) };
+    case 'ADD_GROUP': {
+      const g = action.payload?.trim();
+      const current = state.categoryGroups || DEFAULT_GROUPS;
+      if (!g || current.includes(g)) return state;
+      return { ...state, categoryGroups: [...current, g] };
+    }
+    case 'UPDATE_GROUP': {
+      const { oldName, newName } = action.payload;
+      const cleanNew = newName?.trim();
+      if (!cleanNew || cleanNew === oldName) return state;
+      const currentGroups = state.categoryGroups || DEFAULT_GROUPS;
+      const updatedGroups = currentGroups.map(g => g === oldName ? cleanNew : g);
+      const updatedCategories = state.categories.map(c => c.group === oldName ? { ...c, group: cleanNew } : c);
+      return { ...state, categoryGroups: updatedGroups, categories: updatedCategories };
+    }
+    case 'DELETE_GROUP': {
+      const groupToDelete = action.payload;
+      const currentGroups = state.categoryGroups || DEFAULT_GROUPS;
+      const updatedGroups = currentGroups.filter(g => g !== groupToDelete);
+      const fallbackGroup = updatedGroups[0] || 'Other';
+      const updatedCategories = state.categories.map(c => c.group === groupToDelete ? { ...c, group: fallbackGroup } : c);
+      return { ...state, categoryGroups: updatedGroups, categories: updatedCategories };
+    }
     case 'SET_BUDGET': {
       const exists = state.budgets.find(b => b.id === action.payload.id);
       if (exists) return { ...state, budgets: state.budgets.map(b => b.id === action.payload.id ? action.payload : b) };
@@ -147,6 +172,7 @@ function reducer(state, action) {
       return {
         expenses: SAMPLE_EXPENSES,
         categories: DEFAULT_CATEGORIES,
+        categoryGroups: DEFAULT_GROUPS,
         budgets: SAMPLE_BUDGETS,
         incomeSources: DEFAULT_INCOME_SOURCES,
         monthlyIncome: Math.round(calculateMonthlyIncomeFromSources(DEFAULT_INCOME_SOURCES)),
@@ -155,6 +181,7 @@ function reducer(state, action) {
       return {
         expenses: [],
         categories: DEFAULT_CATEGORIES,
+        categoryGroups: DEFAULT_GROUPS,
         budgets: [],
         incomeSources: [],
         monthlyIncome: 0,
@@ -171,6 +198,9 @@ function loadState() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
+      if (!parsed.categoryGroups || !Array.isArray(parsed.categoryGroups) || parsed.categoryGroups.length === 0) {
+        parsed.categoryGroups = DEFAULT_GROUPS;
+      }
       if (!parsed.incomeSources) {
         if (parsed.monthlyIncome && parsed.monthlyIncome > 0) {
           parsed.incomeSources = [
@@ -196,6 +226,7 @@ function saveState(state) {
 const initialState = loadState() || {
   expenses: SAMPLE_EXPENSES,
   categories: DEFAULT_CATEGORIES,
+  categoryGroups: DEFAULT_GROUPS,
   budgets: SAMPLE_BUDGETS,
   incomeSources: DEFAULT_INCOME_SOURCES,
   monthlyIncome: Math.round(calculateMonthlyIncomeFromSources(DEFAULT_INCOME_SOURCES)),
