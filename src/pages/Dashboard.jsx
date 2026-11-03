@@ -13,9 +13,9 @@ import { format, eachDayOfInterval, subDays } from 'date-fns';
 
 const CHART_COLORS = ['#1b4332','#2d6a4f','#40916c','#52b788','#d97706','#0ea5e9','#e11d48','#7c3aed'];
 
-export default function Dashboard() {
+export default function Dashboard({ onOpenPaydayPrompt }) {
   const { state, dispatch } = useApp();
-  const { expenses, categories, budgets, monthlyIncome } = state;
+  const { expenses, categories, budgets, monthlyIncome, userName, paydaySettings } = state;
   const navigate = useNavigate();
   const [showReset, setShowReset] = useState(false);
   const [showIncomeModal, setShowIncomeModal] = useState(false);
@@ -77,7 +77,9 @@ export default function Dashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#14261c] tracking-tight">Dashboard</h1>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#14261c] tracking-tight">
+              {userName ? `Hi, ${userName}` : 'Dashboard'}
+            </h1>
             <span className="text-[11px] font-semibold text-[#1b4332] bg-[#eaf4ee] border border-[#cce3d5] px-2.5 py-0.5 rounded-full">
               Live
             </span>
@@ -86,6 +88,17 @@ export default function Dashboard() {
         </div>
         
         <div className="flex items-center gap-2 self-start sm:self-auto">
+          {paydaySettings?.isVariable && (
+            <button
+              onClick={onOpenPaydayPrompt}
+              className="flex items-center gap-1.5 px-3 py-2.5 bg-[#eaf4ee] hover:bg-[#d8edd0] border border-[#cce3d5] text-[#1b4332] rounded-xl text-xs font-bold shadow-2xs transition-all cursor-pointer"
+              title="Record paycheck"
+            >
+              <span>🎉</span>
+              <span>Payday Check-In</span>
+            </button>
+          )}
+
           <button
             onClick={() => setShowReset(true)}
             className="flex items-center gap-1.5 px-3 py-2.5 bg-[#ffffff] hover:bg-[#f8f7f2] border border-[#e7e4da] text-[#65776c] hover:text-[#991b1b] rounded-xl text-xs font-bold shadow-2xs transition-all cursor-pointer"

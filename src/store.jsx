@@ -185,6 +185,31 @@ function reducer(state, action) {
         budgets: [],
         incomeSources: [],
         monthlyIncome: 0,
+        userName: '',
+        onboardingComplete: false,
+        paydaySettings: null,
+      };
+    case 'COMPLETE_ONBOARDING':
+      return {
+        ...state,
+        userName: action.payload.userName || '',
+        onboardingComplete: true,
+        paydaySettings: action.payload.paydaySettings || null,
+        monthlyIncome: action.payload.monthlyIncome !== undefined ? action.payload.monthlyIncome : state.monthlyIncome,
+        incomeSources: action.payload.incomeSources || state.incomeSources,
+      };
+    case 'UPDATE_PAYDAY_SETTINGS':
+      return {
+        ...state,
+        paydaySettings: { ...(state.paydaySettings || {}), ...action.payload },
+      };
+    case 'RECORD_PAYCHECK_PROMPT_DISMISSED':
+      return {
+        ...state,
+        paydaySettings: {
+          ...(state.paydaySettings || {}),
+          lastPromptDate: action.payload,
+        },
       };
     default:
       return state;
@@ -230,6 +255,9 @@ const initialState = loadState() || {
   budgets: SAMPLE_BUDGETS,
   incomeSources: DEFAULT_INCOME_SOURCES,
   monthlyIncome: Math.round(calculateMonthlyIncomeFromSources(DEFAULT_INCOME_SOURCES)),
+  userName: '',
+  onboardingComplete: false,
+  paydaySettings: null,
 };
 
 // ─── Context ──────────────────────────────────────────────────────────────────
