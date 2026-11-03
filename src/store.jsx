@@ -67,6 +67,36 @@ export const SAMPLE_BUDGETS = [
   { id: 'b8', category: 'utilities',     limit: 120,  period: 'monthly' },
 ];
 
+// ─── Default Income Sources ────────────────────────────────────────────────────
+export const DEFAULT_INCOME_SOURCES = [
+  { id: 'inc-1', name: 'Primary Salary (1st Paycheck)', amount: 1500, frequency: 'bi-weekly', icon: '💼', color: '#1b4332' },
+  { id: 'inc-2', name: 'Second Salary (15th Paycheck)', amount: 1500, frequency: 'bi-weekly', icon: '🏦', color: '#2d6a4f' },
+];
+
+export const FREQUENCY_LABELS = {
+  monthly: 'Monthly',
+  'bi-weekly': 'Every 15 Days / Bi-Weekly',
+  weekly: 'Weekly',
+  one_time: 'One-Time / Transfer',
+};
+
+export function calculateMonthlyIncomeFromSources(sources) {
+  if (!Array.isArray(sources) || sources.length === 0) return 0;
+  return sources.reduce((sum, s) => {
+    const val = Number(s.amount) || 0;
+    switch (s.frequency) {
+      case 'weekly':
+        return sum + (val * 52) / 12;
+      case 'bi-weekly':
+        return sum + (val * 2);
+      case 'one_time':
+      case 'monthly':
+      default:
+        return sum + val;
+    }
+  }, 0);
+}
+
 // ─── Reducer ──────────────────────────────────────────────────────────────────
 function reducer(state, action) {
   switch (action.type) {
@@ -89,20 +119,44 @@ function reducer(state, action) {
     }
     case 'DELETE_BUDGET':
       return { ...state, budgets: state.budgets.filter(b => b.id !== action.payload) };
-    case 'SET_INCOME':
-      return { ...state, monthlyIncome: action.payload };
+    case 'SET_INCOME': {
+      const amt = Number(action.payload) || 0;
+      return { ...state, monthlyIncome: amt };
+    }
+    case 'SET_INCOME_SOURCES': {
+      const sources = action.payload || [];
+      const computed = calculateMonthlyIncomeFromSources(sources);
+      return { ...state, incomeSources: sources, monthlyIncome: Math.round(computed) };
+    }
+    case 'ADD_INCOME_SOURCE': {
+      const nextSources = [...(state.incomeSources || []), action.payload];
+      const computed = calculateMonthlyIncomeFromSources(nextSources);
+      return { ...state, incomeSources: nextSources, monthlyIncome: Math.round(computed) };
+    }
+    case 'UPDATE_INCOME_SOURCE': {
+      const nextSources = (state.incomeSources || []).map(s => s.id === action.payload.id ? action.payload : s);
+      const computed = calculateMonthlyIncomeFromSources(nextSources);
+      return { ...state, incomeSources: nextSources, monthlyIncome: Math.round(computed) };
+    }
+    case 'DELETE_INCOME_SOURCE': {
+      const nextSources = (state.incomeSources || []).filter(s => s.id !== action.payload);
+      const computed = calculateMonthlyIncomeFromSources(nextSources);
+      return { ...state, incomeSources: nextSources, monthlyIncome: Math.round(computed) };
+    }
     case 'RESET_DEMO_DATA':
       return {
         expenses: SAMPLE_EXPENSES,
         categories: DEFAULT_CATEGORIES,
         budgets: SAMPLE_BUDGETS,
-        monthlyIncome: 3000,
+        incomeSources: DEFAULT_INCOME_SOURCES,
+        monthlyIncome: Math.round(calculateMonthlyIncomeFromSources(DEFAULT_INCOME_SOURCES)),
       };
     case 'CLEAR_ALL_DATA':
       return {
         expenses: [],
         categories: DEFAULT_CATEGORIES,
         budgets: [],
+        incomeSources: [],
         monthlyIncome: 0,
       };
     default:
@@ -115,7 +169,20 @@ export const STORAGE_KEY = 'spendy_app_data';
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (!parsed.incomeSources) {
+        if (parsed.monthlyIncome && parsed.monthlyIncome > 0) {
+          parsed.incomeSources = [
+            { id: 'inc-legacy', name: 'Primary Salary / Income', amount: parsed.monthlyIncome, frequency: 'monthly', icon: '💼', color: '#1b4332' }
+          ];
+        } else {
+          parsed.incomeSources = DEFAULT_INCOME_SOURCES;
+          parsed.monthlyIncome = Math.round(calculateMonthlyIncomeFromSources(DEFAULT_INCOME_SOURCES));
+        }
+      }
+      return parsed;
+    }
   } catch {}
   return null;
 }
@@ -130,7 +197,8 @@ const initialState = loadState() || {
   expenses: SAMPLE_EXPENSES,
   categories: DEFAULT_CATEGORIES,
   budgets: SAMPLE_BUDGETS,
-  monthlyIncome: 3000,
+  incomeSources: DEFAULT_INCOME_SOURCES,
+  monthlyIncome: Math.round(calculateMonthlyIncomeFromSources(DEFAULT_INCOME_SOURCES)),
 };
 
 // ─── Context ──────────────────────────────────────────────────────────────────

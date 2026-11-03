@@ -4,6 +4,7 @@ import { useApp, formatMoney, getMonthExpenses, getWeekExpenses, getTotalSpent, 
 import StatCard from '../components/StatCard';
 import TransactionCard from '../components/TransactionCard';
 import ResetModal from '../components/ResetModal';
+import IncomeSourcesModal from '../components/IncomeSourcesModal';
 import { DollarSign, TrendingDown, Target, CreditCard, ArrowRight, Flame, Zap, Plus, RotateCcw } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell
@@ -17,6 +18,7 @@ export default function Dashboard() {
   const { expenses, categories, budgets, monthlyIncome } = state;
   const navigate = useNavigate();
   const [showReset, setShowReset] = useState(false);
+  const [showIncomeModal, setShowIncomeModal] = useState(false);
 
   const monthExp  = useMemo(() => getMonthExpenses(expenses), [expenses]);
   const weekExp   = useMemo(() => getWeekExpenses(expenses), [expenses]);
@@ -114,13 +116,15 @@ export default function Dashboard() {
           trend={-12}
           isHero={true}
         />
-        <StatCard
-          label="Monthly Income"
-          value={formatMoney(monthlyIncome)}
-          sub="Expected budget"
-          icon={DollarSign}
-          color="#2d6a4f"
-        />
+        <div onClick={() => setShowIncomeModal(true)} className="cursor-pointer transition-transform active:scale-98">
+          <StatCard
+            label="Monthly Income"
+            value={formatMoney(monthlyIncome)}
+            sub="Tap to manage sources"
+            icon={DollarSign}
+            color="#2d6a4f"
+          />
+        </div>
         <StatCard
           label="Net Savings"
           value={formatMoney(Math.max(0, savings))}
@@ -309,6 +313,10 @@ export default function Dashboard() {
       </div>
 
       <ResetModal isOpen={showReset} onClose={() => setShowReset(false)} />
+
+      {showIncomeModal && (
+        <IncomeSourcesModal onClose={() => setShowIncomeModal(false)} />
+      )}
     </div>
   );
 }

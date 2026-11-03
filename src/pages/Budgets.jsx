@@ -1,12 +1,14 @@
 import { useState, useMemo } from 'react';
 import { useApp, formatMoney, getMonthExpenses, getCategoryById } from '../store';
 import { v4 as uuidv4 } from 'uuid';
-import { Plus, Pencil, Trash2, X, AlertTriangle, CheckCircle, TrendingUp } from 'lucide-react';
+import { Plus, Pencil, Trash2, X, AlertTriangle, CheckCircle, TrendingUp, Settings2, Wallet } from 'lucide-react';
+import IncomeSourcesModal from '../components/IncomeSourcesModal';
 
 export default function Budgets() {
   const { state, dispatch } = useApp();
-  const { expenses, categories, budgets, monthlyIncome } = state;
+  const { expenses, categories, budgets, monthlyIncome, incomeSources } = state;
   const [showForm, setShowForm] = useState(false);
+  const [showIncomeModal, setShowIncomeModal] = useState(false);
   const [editBudget, setEditBudget] = useState(null);
   const [income, setIncome] = useState(monthlyIncome.toString());
 
@@ -46,26 +48,37 @@ export default function Budgets() {
       <div className="rounded-2xl bg-[#ffffff] border border-[#e7e4da] p-5 shadow-[0_2px_12px_rgba(27,67,50,0.03)]">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
-            <p className="text-sm font-bold text-[#14261c]">Monthly Expected Income</p>
-            <p className="text-xs text-[#6e8074] mt-0.5 font-medium">Used to calculate target limits & savings rate</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#7d8f84] text-sm font-bold">$</span>
-              <input
-                type="number"
-                value={income}
-                onChange={e => setIncome(e.target.value)}
-                onBlur={() => dispatch({ type: 'SET_INCOME', payload: parseFloat(income) || 0 })}
-                className="w-36 bg-[#f8f7f2] border border-[#e4dfd3] rounded-xl pl-7 pr-3 py-2 text-sm font-bold text-[#14261c] text-right focus:outline-none focus:border-[#1b4332]"
-              />
+            <div className="flex items-center gap-2">
+              <Wallet size={18} className="text-[#1b4332]" />
+              <p className="text-sm font-bold text-[#14261c]">Monthly Expected Income</p>
             </div>
+            <p className="text-xs text-[#6e8074] mt-0.5 font-medium">
+              {incomeSources && incomeSources.length > 0
+                ? `${incomeSources.length} income sources configured (salary, 15-day pay, transfers)`
+                : 'Used to calculate target limits & savings rate'}
+            </p>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
             <button
-              onClick={() => dispatch({ type: 'SET_INCOME', payload: parseFloat(income) || 0 })}
-              className="px-4 py-2 bg-[#1b4332] hover:bg-[#245740] rounded-xl text-xs font-bold text-white shadow-xs transition-colors cursor-pointer"
+              onClick={() => setShowIncomeModal(true)}
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-[#eaf4ee] hover:bg-[#d9ede0] border border-[#cde2d6] rounded-xl text-xs font-bold text-[#1b4332] transition-colors cursor-pointer"
             >
-              Update
+              <Settings2 size={14} />
+              <span>Manage Categories / Sources</span>
             </button>
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#7d8f84] text-sm font-bold">$</span>
+                <input
+                  type="number"
+                  value={monthlyIncome}
+                  readOnly
+                  onClick={() => setShowIncomeModal(true)}
+                  className="w-32 bg-[#f8f7f2] border border-[#e4dfd3] rounded-xl pl-7 pr-3 py-2 text-sm font-bold text-[#14261c] text-right cursor-pointer focus:outline-none"
+                  title="Click to manage income categories"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -177,6 +190,10 @@ export default function Budgets() {
           }}
           onClose={() => setShowForm(false)}
         />
+      )}
+
+      {showIncomeModal && (
+        <IncomeSourcesModal onClose={() => setShowIncomeModal(false)} />
       )}
     </div>
   );
