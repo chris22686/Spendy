@@ -165,7 +165,7 @@ function ExpenseModal({ expense, categories, onSave, onClose }) {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-bold text-[#55695e] mb-1.5 block uppercase tracking-wider">Amount ($)</label>
+              <label className="text-xs font-bold text-[#55695e] mb-1.5 block uppercase tracking-wider">Amount (€)</label>
               <input type="number" value={form.amount} onChange={e => set('amount', parseFloat(e.target.value)||0)}
                 className="w-full bg-[#f8f7f2] border border-[#e4dfd3] rounded-xl px-4 py-2.5 text-sm text-[#14261c] focus:outline-none focus:border-[#1b4332]" />
             </div>

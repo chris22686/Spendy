@@ -83,7 +83,7 @@ export default function AddExpense() {
         <div className="rounded-3xl bg-gradient-to-br from-[#133928] via-[#1b4332] to-[#2d6a4f] border border-[#2d6a4f]/50 p-6 sm:p-8 text-center text-white shadow-xl shadow-[#1b4332]/20 relative overflow-hidden">
           <p className="text-xs font-bold text-[#a0cfb2] uppercase tracking-wider mb-2">Total Amount Spent</p>
           <div className="flex items-center justify-center gap-1 sm:gap-2">
-            <span className="text-3xl sm:text-4xl font-light text-[#86bfa0]">$</span>
+            <span className="text-3xl sm:text-4xl font-light text-[#86bfa0]">€</span>
             <input
               type="number"
               value={form.amount}

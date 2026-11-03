@@ -219,7 +219,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
                 </linearGradient>
               </defs>
               <XAxis dataKey="date" tick={{ fill: '#7d8e84', fontSize: 10 }} tickLine={false} axisLine={false} interval={6} />
-              <YAxis tick={{ fill: '#7d8e84', fontSize: 10 }} tickLine={false} axisLine={false} tickFormatter={v => `$${v}`} />
+              <YAxis tick={{ fill: '#7d8e84', fontSize: 10 }} tickLine={false} axisLine={false} tickFormatter={v => `€${v}`} />
               <Tooltip content={<CustomTooltip />} />
               <Area type="monotone" dataKey="total" stroke="#1b4332" strokeWidth={2.5} fill="url(#forestGrad)" dot={false} />
             </AreaChart>

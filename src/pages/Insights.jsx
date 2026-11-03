@@ -193,7 +193,7 @@ export default function Insights() {
           </div>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={topCats} layout="vertical" margin={{ left: 10, right: 20, top: 0, bottom: 0 }}>
-              <XAxis type="number" tick={{ fill: '#7d8e84', fontSize: 10 }} tickLine={false} axisLine={false} tickFormatter={v => `$${v}`} />
+              <XAxis type="number" tick={{ fill: '#7d8e84', fontSize: 10 }} tickLine={false} axisLine={false} tickFormatter={v => `€${v}`} />
               <YAxis type="category" dataKey="name" tick={{ fill: '#55695e', fontSize: 11, fontWeight: 600 }} tickLine={false} axisLine={false} width={100} />
               <Tooltip content={<CustomTooltip />} />
               <Bar dataKey="amount" radius={[0, 6, 6, 0]}>
@@ -219,7 +219,7 @@ export default function Insights() {
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#e7e4da" />
             <XAxis dataKey="day" tick={{ fill: '#7d8e84', fontSize: 10 }} tickLine={false} axisLine={false} />
-            <YAxis tick={{ fill: '#7d8e84', fontSize: 10 }} tickLine={false} axisLine={false} tickFormatter={v => `$${v}`} />
+            <YAxis tick={{ fill: '#7d8e84', fontSize: 10 }} tickLine={false} axisLine={false} tickFormatter={v => `€${v}`} />
             <Tooltip content={<CustomTooltip />} />
             <Area type="monotone" dataKey="total" stroke="#1b4332" strokeWidth={2.5} fill="url(#insightsGrad)" dot={{ fill: '#1b4332', r: 3 }} activeDot={{ r: 5 }} />
           </AreaChart>
@@ -233,7 +233,7 @@ export default function Insights() {
           <BarChart data={monthlyBreakdown} margin={{ top: 5, right: 5, bottom: 0, left: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e7e4da" />
             <XAxis dataKey="month" tick={{ fill: '#7d8e84', fontSize: 11 }} tickLine={false} axisLine={false} />
-            <YAxis tick={{ fill: '#7d8e84', fontSize: 10 }} tickLine={false} axisLine={false} tickFormatter={v => `$${v}`} />
+            <YAxis tick={{ fill: '#7d8e84', fontSize: 10 }} tickLine={false} axisLine={false} tickFormatter={v => `€${v}`} />
             <Tooltip content={<CustomTooltip />} />
             <Bar dataKey="total" fill="#2d6a4f" radius={[6, 6, 0, 0]} />
           </BarChart>

@@ -113,10 +113,10 @@ export default function PaydayPromptModal({ onClose }) {
 
           <div>
             <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">
-              Exact Amount Deposited ($)
+              Exact Amount Deposited (€)
             </label>
             <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7d8f84] text-base font-bold">$</span>
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7d8f84] text-base font-bold">€</span>
               <input
                 type="number"
                 step="any"

@@ -68,7 +68,7 @@ export default function Budgets() {
             </button>
             <div className="flex items-center gap-2">
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#7d8f84] text-sm font-bold">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#7d8f84] text-sm font-bold">€</span>
                 <input
                   type="number"
                   value={monthlyIncome}
@@ -222,7 +222,7 @@ function BudgetModal({ initial, categories, onSave, onClose }) {
             </select>
           </div>
           <div>
-            <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">Budget Limit ($)</label>
+            <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">Budget Limit (€)</label>
             <input
               type="number"
               value={form.limit}

@@ -150,10 +150,10 @@ export default function IncomeSourcesModal({ onClose }) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1 block">
-                    Amount ($)
+                    Amount (€)
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#7d8f84] text-sm font-bold">$</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#7d8f84] text-sm font-bold">€</span>
                     <input
                       type="number"
                       step="any"

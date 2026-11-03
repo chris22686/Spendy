@@ -312,13 +312,13 @@ export default function OnboardingModal({ onComplete }) {
               <div>
                 <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">
                   {paySchedule === 'twice_month'
-                    ? 'Estimated Amount per 15-day Paycheck ($)'
+                    ? 'Estimated Amount per 15-day Paycheck (€)'
                     : paySchedule === 'weekly'
-                    ? 'Estimated Weekly Paycheck ($)'
-                    : 'Estimated Monthly Salary ($)'}
+                    ? 'Estimated Weekly Paycheck (€)'
+                    : 'Estimated Monthly Salary (€)'}
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7d8f84] text-base font-bold">$</span>
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7d8f84] text-base font-bold">€</span>
                   <input
                     type="number"
                     step="any"

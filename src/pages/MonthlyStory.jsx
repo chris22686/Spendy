@@ -158,7 +158,7 @@ export default function MonthlyStory() {
           <ResponsiveContainer width="100%" height={210}>
             <BarChart data={dailySpend} margin={{ top: 5, right: 5, bottom: 0, left: 0 }}>
               <XAxis dataKey="label" tick={{ fill: '#7d8e84', fontSize: 9 }} tickLine={false} axisLine={false} interval={4} />
-              <YAxis tick={{ fill: '#7d8e84', fontSize: 10 }} tickLine={false} axisLine={false} tickFormatter={v => `$${v}`} />
+              <YAxis tick={{ fill: '#7d8e84', fontSize: 10 }} tickLine={false} axisLine={false} tickFormatter={v => `€${v}`} />
               <Tooltip
                 contentStyle={{ background: '#ffffff', border: '1px solid #d5ded7', borderRadius: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
                 formatter={(v) => [formatMoney(v), 'Spent']}
