@@ -25,7 +25,7 @@ export default function BottomNav() {
 
   return (
     <>
-      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-[#ffffff]/98 backdrop-blur-md border-t border-[#e5e1d5] px-2 sm:px-4 py-2 flex items-center justify-around shadow-[0_-4px_20px_rgba(27,67,50,0.06)] md:hidden">
+      <nav className="bottom-nav-safe fixed bottom-0 left-0 right-0 z-40 bg-[#ffffff]/98 backdrop-blur-md border-t border-[#e5e1d5] px-2 sm:px-4 pt-2 flex items-center justify-around shadow-[0_-4px_20px_rgba(27,67,50,0.06)] md:hidden">
         {mainNav.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.to;
@@ -88,7 +88,7 @@ export default function BottomNav() {
 
       {showMore && (
         <div className="fixed inset-0 z-50 bg-[#000000]/40 backdrop-blur-xs flex flex-col justify-end md:hidden animate-fade-in">
-          <div className="bg-[#ffffff] rounded-t-3xl border-t border-[#e4dfd3] p-5 pb-8 space-y-4 shadow-2xl max-h-[85vh] overflow-y-auto">
+          <div className="bg-[#ffffff] rounded-t-3xl border-t border-[#e4dfd3] sheet-safe p-5 space-y-4 shadow-2xl max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-2 border-b border-[#f1ede3]">
               <div>
                 <h3 className="text-base font-extrabold text-[#14261c]">More Tools & Pages</h3>

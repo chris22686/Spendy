@@ -32,6 +32,38 @@
   }
 }
 
+/* ─── iPhone / Android safe areas (notch, Dynamic Island, home indicator) ───
+   Unlayered on purpose so these win over Tailwind padding utilities. */
+.status-bar-cover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: env(safe-area-inset-top, 0px);
+  background-color: #f8f7f2;
+  z-index: 45;
+  pointer-events: none;
+}
+
+@media (max-width: 767px) {
+  .status-bar-cover {
+    height: max(env(safe-area-inset-top, 0px), 48px);
+  }
+
+  .app-main {
+    padding-top: calc(max(env(safe-area-inset-top, 0px), 48px) + 0.75rem);
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6.5rem);
+  }
+}
+
+.bottom-nav-safe {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
+}
+
+.sheet-safe {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 2rem);
+}
+
 @layer utilities {
   .bg-cream {
     background-color: #f8f7f2;
