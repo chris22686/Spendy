@@ -1,0 +1,44 @@
+{
+  "name": "Spendy Official Repo",
+  "identifier": "com.spendy.repo",
+  "subtitle": "Personal Budget & Expense Tracker",
+  "description": "Official Feather & AltStore source repository for Spendy iOS.",
+  "iconURL": "https://raw.githubusercontent.com/chris22686/Spendy/main/public/icon.png",
+  "website": "https://github.com/chris22686/Spendy",
+  "tintColor": "#1b4332",
+  "featuredApps": [
+    "com.spendy.app"
+  ],
+  "apps": [
+    {
+      "name": "Spendy",
+      "bundleIdentifier": "com.spendy.app",
+      "developerName": "Chris",
+      "subtitle": "Smart Budget & Expense Tracker",
+      "localizedDescription": "Spendy — Personal Budget, Categories, Savings Plan & Monthly Expense Tracker.",
+      "iconURL": "https://raw.githubusercontent.com/chris22686/Spendy/main/public/icon.png",
+      "tintColor": "#1b4332",
+      "category": "finance",
+      "version": "1.0.1",
+      "versionDate": "2026-11-03T02:05:00Z",
+      "versionDescription": "Fixed iPhone status bar & notch safe-area overlap.",
+      "downloadURL": "https://github.com/chris22686/Spendy/releases/download/latest/Spendy.ipa",
+      "size": 3500000,
+      "versions": [
+        {
+          "version": "1.0.1",
+          "date": "2026-11-03T02:05:00Z",
+          "localizedDescription": "Fixed iPhone status bar & notch safe-area overlap.",
+          "downloadURL": "https://github.com/chris22686/Spendy/releases/download/latest/Spendy.ipa",
+          "size": 3500000,
+          "minOSVersion": "14.0"
+        }
+      ],
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": {}
+      }
+    }
+  ],
+  "news": []
+}

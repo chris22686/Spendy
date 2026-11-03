@@ -3,7 +3,12 @@ name: Build iOS IPA
 on:
   push:
     branches: [ main, master ]
+    paths-ignore:
+      - 'repo.json'
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -53,3 +58,34 @@ jobs:
           name: Spendy-iOS-IPA
           path: build/Spendy.ipa
           retention-days: 14
+
+      - name: Update Feather Repo JSON & Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          IPA_SIZE=$(stat -f%z build/Spendy.ipa)
+          BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          node -e '
+            const fs = require("fs");
+            const repo = JSON.parse(fs.readFileSync("repo.json", "utf8"));
+            const size = Number(process.argv[1]);
+            const date = process.argv[2];
+            repo.apps[0].size = size;
+            repo.apps[0].versionDate = date;
+            repo.apps[0].versions[0].size = size;
+            repo.apps[0].versions[0].date = date;
+            fs.writeFileSync("repo.json", JSON.stringify(repo, null, 2) + "\n");
+          ' "$IPA_SIZE" "$BUILD_DATE"
+
+          if gh release view latest >/dev/null 2>&1; then
+            gh release upload latest build/Spendy.ipa repo.json --clobber
+          else
+            gh release create latest build/Spendy.ipa repo.json \
+              --title "Spendy Latest iOS Build" \
+              --notes "Direct IPA download and Feather repository source."
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add repo.json
+          git diff --staged --quiet || (git commit -m "Update Feather repo.json [skip ci]" && git push origin HEAD:main)
