@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp, formatMoney } from '../store';
 import { v4 as uuidv4 } from 'uuid';
-import { CheckCircle, RefreshCw, Calendar, Tag, FileText, ChevronLeft, Plus, ArrowRight, X } from 'lucide-react';
+import { CheckCircle, RefreshCw, Calendar, Tag, FileText, ChevronLeft, Plus, ArrowRight, X, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function AddExpense() {
@@ -20,13 +20,21 @@ export default function AddExpense() {
     recurring: false,
   });
   const [saved, setSaved] = useState(false);
+  const [showDuplicateNotice, setShowDuplicateNotice] = useState(false);
   const [toastInfo, setToastInfo] = useState(null);
   const [errors, setErrors] = useState({});
+
+  const isSubmittingRef = useRef(false);
+  const lastSubmitTimeRef = useRef(0);
   const toastTimeoutRef = useRef(null);
+  const resetTimeoutRef = useRef(null);
+  const duplicateNoticeTimeoutRef = useRef(null);
 
   useEffect(() => {
     return () => {
       if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+      if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
+      if (duplicateNoticeTimeoutRef.current) clearTimeout(duplicateNoticeTimeoutRef.current);
     };
   }, []);
 
@@ -45,8 +53,29 @@ export default function AddExpense() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const now = Date.now();
+
+    // Guard against rapid multi-clicks or spam taps
+    if (isSubmittingRef.current || saved || (now - lastSubmitTimeRef.current < 2000)) {
+      setShowDuplicateNotice(true);
+      if (duplicateNoticeTimeoutRef.current) clearTimeout(duplicateNoticeTimeoutRef.current);
+      duplicateNoticeTimeoutRef.current = setTimeout(() => {
+        setShowDuplicateNotice(false);
+      }, 2500);
+      try {
+        if (typeof navigator !== 'undefined' && navigator.vibrate) {
+          navigator.vibrate([60, 40, 60]);
+        }
+      } catch (_) {}
+      return;
+    }
+
     const errs = validate();
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+
+    isSubmittingRef.current = true;
+    lastSubmitTimeRef.current = now;
+    setShowDuplicateNotice(false);
 
     const amountNum = parseFloat(form.amount);
     const newExpense = {
@@ -78,8 +107,10 @@ export default function AddExpense() {
     setToastInfo(savedData);
     setSaved(true);
 
-    setTimeout(() => {
+    if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
+    resetTimeoutRef.current = setTimeout(() => {
       setSaved(false);
+      isSubmittingRef.current = false;
       setForm({ description: '', amount: '', category: 'food', date: today, notes: '', recurring: false });
     }, 1800);
 
@@ -339,10 +370,10 @@ export default function AddExpense() {
         <button
           type="submit"
           disabled={saved}
-          className={`w-full py-4 font-extrabold rounded-2xl transition-all shadow-lg text-sm flex items-center justify-center gap-2 cursor-pointer ${
+          className={`w-full py-4 font-extrabold rounded-2xl transition-all shadow-lg text-sm flex items-center justify-center gap-2 ${
             saved
-              ? 'bg-[#2d6a4f] text-white shadow-[#2d6a4f]/30 scale-[1.01]'
-              : 'bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white shadow-[#1b4332]/25'
+              ? 'bg-[#2d6a4f] text-white shadow-[#2d6a4f]/30 scale-[1.01] pointer-events-none select-none'
+              : 'bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white shadow-[#1b4332]/25 cursor-pointer'
           }`}
         >
           {saved ? (
@@ -357,6 +388,19 @@ export default function AddExpense() {
             </>
           )}
         </button>
+
+        {showDuplicateNotice && (
+          <div
+            role="alert"
+            className="flex items-center gap-3 p-3.5 rounded-2xl bg-[#fffbeb] border border-[#f59e0b]/50 text-[#92400e] text-xs font-semibold shadow-sm animate-in fade-in slide-in-from-top-1 duration-200"
+          >
+            <AlertCircle size={18} className="text-[#d97706] shrink-0" />
+            <div>
+              <p className="font-bold text-[#78350f]">Expense already saved!</p>
+              <p className="text-[11px] text-[#92400e] mt-0.5">Rapid clicks were blocked so duplicate entries aren't added.</p>
+            </div>
+          </div>
+        )}
       </form>
     </div>
   );

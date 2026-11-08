@@ -102,8 +102,25 @@ export function calculateMonthlyIncomeFromSources(sources) {
 // ─── Reducer ──────────────────────────────────────────────────────────────────
 function reducer(state, action) {
   switch (action.type) {
-    case 'ADD_EXPENSE':
-      return { ...state, expenses: [action.payload, ...state.expenses] };
+    case 'ADD_EXPENSE': {
+      const newExp = action.payload;
+      const now = Date.now();
+      // Guard against rapid multi-click duplicates (same details within 3 seconds)
+      const isDuplicate = state.expenses.some(e =>
+        e.description === newExp.description &&
+        Number(e.amount) === Number(newExp.amount) &&
+        e.category === newExp.category &&
+        e.date === newExp.date &&
+        e._createdAt && (now - e._createdAt < 3000)
+      );
+      if (isDuplicate) {
+        return state;
+      }
+      return {
+        ...state,
+        expenses: [{ ...newExp, _createdAt: now }, ...state.expenses],
+      };
+    }
     case 'UPDATE_EXPENSE':
       return { ...state, expenses: state.expenses.map(e => e.id === action.payload.id ? action.payload : e) };
     case 'DELETE_EXPENSE':
