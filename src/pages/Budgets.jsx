@@ -205,15 +205,8 @@ function BudgetModal({ initial, categories, onSave, onClose }) {
 
   useEffect(() => {
     document.body.dataset.modalOpen = 'true';
-    const keepTop = () => {
-      if (window.scrollY !== 0) {
-        window.scrollTo(0, 0);
-      }
-    };
-    window.addEventListener('scroll', keepTop, { passive: true });
     return () => {
       delete document.body.dataset.modalOpen;
-      window.removeEventListener('scroll', keepTop);
     };
   }, []);
 

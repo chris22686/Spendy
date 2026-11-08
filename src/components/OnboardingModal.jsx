@@ -22,18 +22,11 @@ export default function OnboardingModal({ onComplete }) {
   const [isVariable, setIsVariable] = useState(true);
   const [error, setError] = useState('');
 
-  // Prevent background scroll and window jumping while modal is active
+  // Prevent background scroll while modal is active
   useEffect(() => {
     document.body.dataset.modalOpen = 'true';
-    const keepTop = () => {
-      if (window.scrollY !== 0) {
-        window.scrollTo(0, 0);
-      }
-    };
-    window.addEventListener('scroll', keepTop, { passive: true });
     return () => {
       delete document.body.dataset.modalOpen;
-      window.removeEventListener('scroll', keepTop);
     };
   }, []);
 

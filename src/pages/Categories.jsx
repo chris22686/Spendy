@@ -25,7 +25,7 @@ export default function Categories() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-28 sm:pb-12">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#ffffff] p-5 rounded-3xl border border-[#e7e4da] shadow-xs">
         <div>
           <div className="flex items-center gap-2">
@@ -151,15 +151,8 @@ function CategoryModal({ initial, groups, onSave, onClose }) {
 
   useEffect(() => {
     document.body.dataset.modalOpen = 'true';
-    const keepTop = () => {
-      if (window.scrollY !== 0) {
-        window.scrollTo(0, 0);
-      }
-    };
-    window.addEventListener('scroll', keepTop, { passive: true });
     return () => {
       delete document.body.dataset.modalOpen;
-      window.removeEventListener('scroll', keepTop);
     };
   }, []);
 
@@ -171,38 +164,40 @@ function CategoryModal({ initial, groups, onSave, onClose }) {
   return (
     <div className="fixed inset-0 bg-[#000000]/50 backdrop-blur-xs z-50 overflow-y-auto px-4 modal-backdrop-safe flex flex-col items-center justify-start sm:justify-center">
       <div
-        className="my-auto w-full max-w-lg bg-[#ffffff] border border-[#e4dfd3] rounded-3xl p-5 sm:p-6 shadow-2xl modal-card-safe overflow-y-auto"
+        className="my-auto w-full max-w-lg bg-[#ffffff] border border-[#e4dfd3] rounded-3xl shadow-2xl flex flex-col modal-card-safe overflow-hidden animate-in fade-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between mb-4 sm:mb-5">
+        {/* Fixed Header */}
+        <div className="shrink-0 p-4 sm:p-5 border-b border-[#eeebe2] flex items-center justify-between bg-[#fbfaf6]">
           <h2 className="text-base sm:text-lg font-bold text-[#14261c]">{initial ? 'Edit Category' : 'Create New Category'}</h2>
-          <button onClick={onClose} className="text-[#7d8f84] hover:text-[#14261c] p-1 cursor-pointer"><X size={18}/></button>
+          <button onClick={onClose} className="text-[#7d8f84] hover:text-[#14261c] p-1.5 rounded-xl hover:bg-[#eae6db] transition-colors cursor-pointer"><X size={18}/></button>
         </div>
 
-        <div className="flex items-center gap-4 p-4 rounded-2xl bg-[#f8f7f2] border border-[#e7e4da] mb-5">
-          <div
-            className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 shadow-xs"
-            style={{ backgroundColor: form.color + '22', border: `1px solid ${form.color}44` }}
-          >
-            {form.icon}
-          </div>
-          <div>
-            <p className="font-extrabold text-[#14261c]">{form.name || 'Category Name'}</p>
-            <div className="flex items-center gap-2 mt-1">
-              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: form.color }} />
-              <span className="text-xs text-[#718578] font-semibold">{form.group}</span>
+        {/* Scrollable Form Content */}
+        <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-4">
+          <div className="flex items-center gap-4 p-3.5 rounded-2xl bg-[#f8f7f2] border border-[#e7e4da]">
+            <div
+              className="w-13 h-13 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 shadow-xs"
+              style={{ backgroundColor: form.color + '22', border: `1px solid ${form.color}44` }}
+            >
+              {form.icon}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-extrabold text-[#14261c] truncate">{form.name || 'Category Name'}</p>
+              <div className="flex items-center gap-2 mt-1">
+                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: form.color }} />
+                <span className="text-xs text-[#718578] font-semibold">{form.group}</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="space-y-4">
           <div>
             <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">Category Name</label>
             <input
               value={form.name}
               onChange={e => { set('name', e.target.value); setErrors({}); }}
               placeholder="e.g. Coffee, Groceries, Fitness..."
-              className={`w-full bg-[#f8f7f2] border ${errors.name ? 'border-[#dc2626]' : 'border-[#e4dfd3]'} rounded-xl px-4 py-2.5 text-sm text-[#14261c] focus:outline-none focus:border-[#1b4332]`}
+              className={`w-full bg-[#f8f7f2] border ${errors.name ? 'border-[#dc2626]' : 'border-[#e4dfd3]'} rounded-xl px-4 py-2.5 text-base sm:text-sm text-[#14261c] focus:outline-none focus:border-[#1b4332]`}
             />
             {errors.name && <p className="text-[#dc2626] text-xs mt-1 font-medium">{errors.name}</p>}
           </div>
@@ -229,13 +224,13 @@ function CategoryModal({ initial, groups, onSave, onClose }) {
 
           <div>
             <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">Choose Icon</label>
-            <div className="grid grid-cols-10 gap-1.5 max-h-32 overflow-y-auto p-1.5 bg-[#f8f7f2] rounded-xl border border-[#e4dfd3]">
+            <div className="grid grid-cols-6 sm:grid-cols-10 gap-2 p-2 bg-[#f8f7f2] rounded-xl border border-[#e4dfd3]">
               {AVAILABLE_ICONS.map(icon => (
                 <button
                   key={icon}
                   type="button"
                   onClick={() => set('icon', icon)}
-                  className={`w-8 h-8 rounded-lg text-lg flex items-center justify-center transition-all cursor-pointer ${
+                  className={`w-9 h-9 rounded-lg text-lg flex items-center justify-center transition-all cursor-pointer ${
                     form.icon === icon
                       ? 'bg-[#1b4332] text-white shadow-xs scale-105'
                       : 'hover:bg-[#eae6db]'
@@ -255,7 +250,7 @@ function CategoryModal({ initial, groups, onSave, onClose }) {
                   key={color}
                   type="button"
                   onClick={() => set('color', color)}
-                  className="w-7 h-7 rounded-full transition-transform hover:scale-115 flex items-center justify-center shadow-xs cursor-pointer"
+                  className="w-8 h-8 rounded-full transition-transform hover:scale-115 flex items-center justify-center shadow-xs cursor-pointer"
                   style={{ backgroundColor: color }}
                 >
                   {form.color === color && <Check size={14} className="text-white stroke-[3]" />}
@@ -265,9 +260,10 @@ function CategoryModal({ initial, groups, onSave, onClose }) {
           </div>
         </div>
 
-        <div className="flex gap-3 mt-6">
-          <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-[#e4dfd3] text-sm font-semibold text-[#65776c] hover:bg-[#f8f7f2]">Cancel</button>
-          <button onClick={handleSave} className="flex-1 px-4 py-2.5 rounded-xl bg-[#1b4332] hover:bg-[#245740] text-sm font-bold text-white shadow-md shadow-[#1b4332]/25">
+        {/* Fixed Footer */}
+        <div className="shrink-0 p-4 border-t border-[#eeebe2] bg-[#fbfaf6] flex gap-3">
+          <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-[#e4dfd3] text-sm font-semibold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer">Cancel</button>
+          <button onClick={handleSave} className="flex-1 px-4 py-2.5 rounded-xl bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-sm font-bold text-white shadow-md shadow-[#1b4332]/25 cursor-pointer">
             {initial ? 'Save Changes' : 'Create Category'}
           </button>
         </div>
@@ -285,15 +281,8 @@ function GroupsModal({ groups, categories, onClose }) {
 
   useEffect(() => {
     document.body.dataset.modalOpen = 'true';
-    const keepTop = () => {
-      if (window.scrollY !== 0) {
-        window.scrollTo(0, 0);
-      }
-    };
-    window.addEventListener('scroll', keepTop, { passive: true });
     return () => {
       delete document.body.dataset.modalOpen;
-      window.removeEventListener('scroll', keepTop);
     };
   }, []);
 
