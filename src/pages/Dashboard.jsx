@@ -119,7 +119,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
       </div>
 
       {/* Top Spending Hero Card + Supporting Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         <StatCard
           label="Total Monthly Spending"
           value={formatMoney(monthTotal)}
@@ -138,14 +138,6 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
             color="#2d6a4f"
           />
         </div>
-        <StatCard
-          label="Net Savings"
-          value={formatMoney(Math.max(0, savings))}
-          sub={`${savingsPct}% of total income`}
-          icon={Target}
-          color="#40916c"
-          trend={8}
-        />
         <StatCard
           label="Spent This Week"
           value={formatMoney(weekTotal)}
