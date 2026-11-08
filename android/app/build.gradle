@@ -7,9 +7,8 @@ android {
         applicationId "com.spendy.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        // Auto-increment on CI so each new APK installs as an update
-        versionCode (System.getenv("GITHUB_RUN_NUMBER") ?: "1").toInteger()
-        versionName "1.0." + (System.getenv("GITHUB_RUN_NUMBER") ?: "0")
+        versionCode 1
+        versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -17,19 +16,7 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
-    // Fixed test signing key so every build can update the previous install
-    signingConfigs {
-        spendyTest {
-            storeFile file('spendy-test.keystore')
-            storePassword 'spendytest'
-            keyAlias 'spendy'
-            keyPassword 'spendytest'
-        }
-    }
     buildTypes {
-        debug {
-            signingConfig signingConfigs.spendyTest
-        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
