@@ -74,7 +74,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl sm:text-3xl font-extrabold text-[#14261c] tracking-tight">
@@ -84,24 +84,24 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
               Live
             </span>
           </div>
-          <p className="text-[#65776c] text-sm mt-0.5 font-medium">{format(new Date(), 'MMMM yyyy')} overview</p>
+          <p className="text-[#65776c] text-xs sm:text-sm mt-0.5 font-medium">{format(new Date(), 'MMMM yyyy')} overview</p>
         </div>
         
-        <div className="flex items-center gap-2 self-start sm:self-auto">
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
           {paydaySettings?.isVariable && (
             <button
               onClick={onOpenPaydayPrompt}
-              className="flex items-center gap-1.5 px-3 py-2.5 bg-[#eaf4ee] hover:bg-[#d8edd0] border border-[#cce3d5] text-[#1b4332] rounded-xl text-xs font-bold shadow-2xs transition-all cursor-pointer"
+              className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-2 sm:py-2.5 bg-[#eaf4ee] hover:bg-[#d8edd0] border border-[#cce3d5] text-[#1b4332] rounded-xl text-xs font-bold shadow-2xs transition-all cursor-pointer"
               title="Record paycheck"
             >
               <span>🎉</span>
-              <span>Payday Check-In</span>
+              <span className="truncate">Payday Check-In</span>
             </button>
           )}
 
           <button
             onClick={() => setShowReset(true)}
-            className="flex items-center gap-1.5 px-3 py-2.5 bg-[#ffffff] hover:bg-[#f8f7f2] border border-[#e7e4da] text-[#65776c] hover:text-[#991b1b] rounded-xl text-xs font-bold shadow-2xs transition-all cursor-pointer"
+            className="flex items-center justify-center gap-1.5 px-3 py-2 sm:py-2.5 bg-[#ffffff] hover:bg-[#f8f7f2] border border-[#e7e4da] text-[#65776c] hover:text-[#991b1b] rounded-xl text-xs font-bold shadow-2xs transition-all cursor-pointer"
             title="Reset or clear data"
           >
             <RotateCcw size={14} />
@@ -110,7 +110,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
           
           <button
             onClick={() => navigate('/add')}
-            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white rounded-xl text-sm font-bold shadow-md shadow-[#1b4332]/25 transition-all cursor-pointer"
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white rounded-xl text-xs sm:text-sm font-bold shadow-md shadow-[#1b4332]/25 transition-all cursor-pointer"
           >
             <Plus size={16} strokeWidth={2.8} />
             <span>Add Expense</span>
@@ -119,7 +119,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
       </div>
 
       {/* Top Spending Hero Card + Supporting Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
         <StatCard
           label="Total Monthly Spending"
           value={formatMoney(monthTotal)}
@@ -269,17 +269,17 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
             {formatMoney(weekTotal)} total
           </span>
         </div>
-        <div className="grid grid-cols-7 gap-2 sm:gap-3">
+        <div className="grid grid-cols-7 gap-1 sm:gap-2 md:gap-3">
           {weeklyData.map((d, i) => {
             const max = Math.max(...weeklyData.map(x => x.total), 1);
             const pct = (d.total / max) * 100;
             const isToday = i === weeklyData.length - 1;
             return (
-              <div key={i} className="flex flex-col items-center gap-2">
-                <span className={`text-[11px] font-bold ${d.total > 0 ? 'text-[#1b4332]' : 'text-[#a3b3a8]'}`}>
-                  {d.total > 0 ? `$${Math.round(d.total)}` : '—'}
+              <div key={i} className="flex flex-col items-center gap-1.5 sm:gap-2">
+                <span className={`text-[9px] sm:text-[11px] font-bold truncate max-w-full ${d.total > 0 ? 'text-[#1b4332]' : 'text-[#a3b3a8]'}`}>
+                  {d.total > 0 ? `€${Math.round(d.total)}` : '—'}
                 </span>
-                <div className="w-full flex flex-col justify-end h-24 bg-[#f3efe5] rounded-xl overflow-hidden p-0.5">
+                <div className="w-full flex flex-col justify-end h-20 sm:h-24 bg-[#f3efe5] rounded-xl overflow-hidden p-0.5">
                   <div
                     className={`w-full rounded-lg transition-all duration-500 ${
                       isToday
@@ -289,7 +289,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
                     style={{ height: `${pct}%`, minHeight: d.total > 0 ? '8px' : '0' }}
                   />
                 </div>
-                <span className={`text-xs font-bold ${isToday ? 'text-[#1b4332]' : 'text-[#7d8f84]'}`}>
+                <span className={`text-[10px] sm:text-xs font-bold ${isToday ? 'text-[#1b4332]' : 'text-[#7d8f84]'}`}>
                   {d.day}
                 </span>
               </div>

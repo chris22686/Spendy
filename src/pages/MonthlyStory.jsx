@@ -102,21 +102,21 @@ export default function MonthlyStory() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div className="text-center p-3.5 rounded-2xl bg-white/5 border border-white/10">
-            <p className="text-xl sm:text-2xl font-extrabold text-[#fecaca]">{formatMoney(totalSpent)}</p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4">
+          <div className="text-center p-3 sm:p-3.5 rounded-2xl bg-white/5 border border-white/10">
+            <p className="text-lg sm:text-2xl font-extrabold text-[#fecaca] truncate">{formatMoney(totalSpent)}</p>
             <p className="text-xs text-[#a0cfb2] font-semibold mt-1">Total Spent</p>
           </div>
-          <div className="text-center p-3.5 rounded-2xl bg-white/5 border border-white/10">
-            <p className="text-xl sm:text-2xl font-extrabold text-[#bbf7d0]">{formatMoney(savings)}</p>
+          <div className="text-center p-3 sm:p-3.5 rounded-2xl bg-white/5 border border-white/10">
+            <p className="text-lg sm:text-2xl font-extrabold text-[#bbf7d0] truncate">{formatMoney(savings)}</p>
             <p className="text-xs text-[#a0cfb2] font-semibold mt-1">Net Saved</p>
           </div>
-          <div className="text-center p-3.5 rounded-2xl bg-white/5 border border-white/10">
-            <p className="text-xl sm:text-2xl font-extrabold text-[#ffffff]">{monthExp.length}</p>
+          <div className="text-center p-3 sm:p-3.5 rounded-2xl bg-white/5 border border-white/10">
+            <p className="text-lg sm:text-2xl font-extrabold text-[#ffffff] truncate">{monthExp.length}</p>
             <p className="text-xs text-[#a0cfb2] font-semibold mt-1">Transactions</p>
           </div>
-          <div className="text-center p-3.5 rounded-2xl bg-white/5 border border-white/10">
-            <p className="text-xl sm:text-2xl font-extrabold text-[#99f6e4]">
+          <div className="text-center p-3 sm:p-3.5 rounded-2xl bg-white/5 border border-white/10">
+            <p className="text-lg sm:text-2xl font-extrabold text-[#99f6e4] truncate">
               {monthlyIncome > 0 ? ((savings / monthlyIncome) * 100).toFixed(1) : 0}%
             </p>
             <p className="text-xs text-[#a0cfb2] font-semibold mt-1">Savings Rate</p>
@@ -124,7 +124,7 @@ export default function MonthlyStory() {
         </div>
       </div>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <HighlightCard
           icon={<Flame size={20} className="text-[#dc2626]" />}
           label="Peak Outflow Day"

@@ -1,17 +1,31 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp, formatMoney } from '../store';
-import { DollarSign, Check, X, Calendar, Sparkles } from 'lucide-react';
+import { Check, X, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function PaydayPromptModal({ onClose }) {
   const { state, dispatch } = useApp();
-  const { incomeSources = [], paydaySettings, userName } = state;
+  const { incomeSources = [], userName } = state;
 
   const [exactAmount, setExactAmount] = useState('');
   const [selectedSourceId, setSelectedSourceId] = useState(incomeSources[0]?.id || '');
   const [error, setError] = useState('');
 
   const todayStr = format(new Date(), 'yyyy-MM-dd');
+
+  useEffect(() => {
+    document.body.dataset.modalOpen = 'true';
+    const keepTop = () => {
+      if (window.scrollY !== 0) {
+        window.scrollTo(0, 0);
+      }
+    };
+    window.addEventListener('scroll', keepTop, { passive: true });
+    return () => {
+      delete document.body.dataset.modalOpen;
+      window.removeEventListener('scroll', keepTop);
+    };
+  }, []);
 
   const handleConfirm = (e) => {
     e.preventDefault();
@@ -50,11 +64,13 @@ export default function PaydayPromptModal({ onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-[#000000]/55 backdrop-blur-xs z-[85] flex items-center justify-center p-4">
-      <div className="bg-[#ffffff] border border-[#e4dfd3] rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-        
+    <div className="fixed inset-0 bg-[#000000]/60 backdrop-blur-xs z-[85] overflow-y-auto px-4 modal-backdrop-safe flex flex-col items-center justify-start sm:justify-center">
+      <div
+        className="my-auto w-full max-w-md bg-[#ffffff] border border-[#e4dfd3] rounded-3xl shadow-2xl overflow-hidden flex flex-col modal-card-safe animate-in fade-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Banner */}
-        <div className="bg-gradient-to-br from-[#133928] via-[#1b4332] to-[#2d6a4f] p-5 text-white flex items-center justify-between">
+        <div className="shrink-0 bg-gradient-to-br from-[#133928] via-[#1b4332] to-[#2d6a4f] p-4 sm:p-5 text-white flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-white/15 flex items-center justify-center text-xl shadow-xs">
               🎉
@@ -68,14 +84,14 @@ export default function PaydayPromptModal({ onClose }) {
           </div>
           <button
             onClick={handleSkip}
-            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer"
           >
             <X size={16} />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleConfirm} className="p-5 space-y-4">
+        <form onSubmit={handleConfirm} className="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1">
           <div className="p-3 bg-[#eaf4ee] rounded-2xl border border-[#cde2d6] text-xs text-[#1b4332]">
             <p className="font-bold flex items-center gap-1.5 mb-0.5">
               <Sparkles size={14} />
@@ -100,7 +116,7 @@ export default function PaydayPromptModal({ onClose }) {
               <select
                 value={selectedSourceId}
                 onChange={(e) => setSelectedSourceId(e.target.value)}
-                className="w-full bg-[#f8f7f2] border border-[#dcd7cb] rounded-xl px-3 py-2.5 text-sm font-semibold text-[#14261c] focus:outline-none focus:border-[#1b4332]"
+                className="w-full bg-[#f8f7f2] border border-[#dcd7cb] rounded-xl px-3 py-2.5 text-base sm:text-sm font-semibold text-[#14261c] focus:outline-none focus:border-[#1b4332]"
               >
                 {incomeSources.map((s) => (
                   <option key={s.id} value={s.id}>
@@ -126,7 +142,7 @@ export default function PaydayPromptModal({ onClose }) {
                   setExactAmount(e.target.value);
                   setError('');
                 }}
-                autoFocus
+                onFocus={() => window.scrollTo(0, 0)}
                 className="w-full bg-[#f8f7f2] border border-[#dcd7cb] rounded-xl pl-9 pr-4 py-2.5 text-base font-bold text-[#14261c] focus:outline-none focus:border-[#1b4332]"
               />
             </div>
@@ -136,7 +152,7 @@ export default function PaydayPromptModal({ onClose }) {
             <button
               type="button"
               onClick={handleSkip}
-              className="flex-1 py-2.5 rounded-xl border border-[#e4dfd3] text-xs font-bold text-[#65776c] hover:bg-[#f8f7f2]"
+              className="flex-1 py-2.5 rounded-xl border border-[#e4dfd3] text-xs font-bold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer"
             >
               Skip for Now
             </button>

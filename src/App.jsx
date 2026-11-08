@@ -67,7 +67,7 @@ function AppContent() {
         <div className="flex min-h-screen bg-[#f8f7f2] text-[#17261f]">
           <div className="status-bar-cover md:hidden" />
           <Sidebar />
-          <main className="app-main flex-1 w-full md:ml-20 lg:ml-64 p-4 sm:p-6 lg:p-8 pb-24 md:pb-8 max-w-[1400px] mx-auto transition-all">
+          <main className="app-main flex-1 w-full md:ml-20 lg:ml-64 max-w-[1400px] mx-auto transition-[margin] duration-200">
             <Routes>
               <Route path="/"           element={<Dashboard onOpenPaydayPrompt={() => setShowPaydayPrompt(true)} />} />
               <Route path="/expenses"   element={<Expenses />} />

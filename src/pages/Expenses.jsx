@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useApp, formatMoney } from '../store';
 import TransactionCard from '../components/TransactionCard';
 import { Search, X, Plus } from 'lucide-react';
@@ -52,40 +52,42 @@ export default function Expenses() {
         </button>
       </div>
 
-      <div className="flex flex-wrap gap-3">
-        <div className="relative flex-1 min-w-[200px]">
+      <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
+        <div className="relative flex-1 min-w-0">
           <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7d8f84]" />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search transactions..."
-            className="w-full bg-[#ffffff] border border-[#e7e4da] rounded-xl pl-10 pr-4 py-2.5 text-sm text-[#14261c] placeholder-[#94a399] focus:outline-none focus:border-[#1b4332] shadow-2xs"
+            className="w-full bg-[#ffffff] border border-[#e7e4da] rounded-xl pl-10 pr-9 py-2.5 text-base sm:text-sm text-[#14261c] placeholder-[#94a399] focus:outline-none focus:border-[#1b4332] shadow-2xs"
           />
           {search && (
-            <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#809186] hover:text-[#1b4332]">
+            <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#809186] hover:text-[#1b4332] cursor-pointer">
               <X size={15} />
             </button>
           )}
         </div>
 
-        <select
-          value={catFilter}
-          onChange={e => setCat(e.target.value)}
-          className="bg-[#ffffff] border border-[#e7e4da] rounded-xl px-3.5 py-2.5 text-sm font-medium text-[#14261c] focus:outline-none focus:border-[#1b4332] cursor-pointer shadow-2xs"
-        >
-          <option value="all">All Categories</option>
-          {categories.map(c => <option key={c.id} value={c.id}>{c.icon} {c.name}</option>)}
-        </select>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <select
+            value={catFilter}
+            onChange={e => setCat(e.target.value)}
+            className="flex-1 sm:flex-initial bg-[#ffffff] border border-[#e7e4da] rounded-xl px-3 sm:px-3.5 py-2.5 text-base sm:text-sm font-medium text-[#14261c] focus:outline-none focus:border-[#1b4332] cursor-pointer shadow-2xs"
+          >
+            <option value="all">All Categories</option>
+            {categories.map(c => <option key={c.id} value={c.id}>{c.icon} {c.name}</option>)}
+          </select>
 
-        <select
-          value={sortBy}
-          onChange={e => setSort(e.target.value)}
-          className="bg-[#ffffff] border border-[#e7e4da] rounded-xl px-3.5 py-2.5 text-sm font-medium text-[#14261c] focus:outline-none focus:border-[#1b4332] cursor-pointer shadow-2xs"
-        >
-          <option value="date">Sort by: Date</option>
-          <option value="amount">Sort by: Amount</option>
-          <option value="name">Sort by: Name</option>
-        </select>
+          <select
+            value={sortBy}
+            onChange={e => setSort(e.target.value)}
+            className="flex-1 sm:flex-initial bg-[#ffffff] border border-[#e7e4da] rounded-xl px-3 sm:px-3.5 py-2.5 text-base sm:text-sm font-medium text-[#14261c] focus:outline-none focus:border-[#1b4332] cursor-pointer shadow-2xs"
+          >
+            <option value="date">Sort: Date</option>
+            <option value="amount">Sort: Amount</option>
+            <option value="name">Sort: Name</option>
+          </select>
+        </div>
       </div>
 
       {filtered.length === 0 ? (
@@ -150,42 +152,79 @@ function ExpenseModal({ expense, categories, onSave, onClose }) {
   const [form, setForm] = useState({ ...expense });
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
+  useEffect(() => {
+    document.body.dataset.modalOpen = 'true';
+    const keepTop = () => {
+      if (window.scrollY !== 0) {
+        window.scrollTo(0, 0);
+      }
+    };
+    window.addEventListener('scroll', keepTop, { passive: true });
+    return () => {
+      delete document.body.dataset.modalOpen;
+      window.removeEventListener('scroll', keepTop);
+    };
+  }, []);
+
   return (
-    <div className="fixed inset-0 bg-[#000000]/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-      <div className="bg-[#ffffff] border border-[#e4dfd3] rounded-3xl p-6 w-full max-w-md shadow-2xl">
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-bold text-[#14261c]">Edit Expense</h2>
-          <button onClick={onClose} className="text-[#7d8f84] hover:text-[#14261c] p-1"><X size={18}/></button>
+    <div className="fixed inset-0 bg-[#000000]/50 backdrop-blur-xs z-50 overflow-y-auto px-4 modal-backdrop-safe flex flex-col items-center justify-start sm:justify-center">
+      <div
+        className="my-auto w-full max-w-md bg-[#ffffff] border border-[#e4dfd3] rounded-3xl p-5 sm:p-6 shadow-2xl modal-card-safe overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-4 sm:mb-5">
+          <h2 className="text-base sm:text-lg font-bold text-[#14261c]">Edit Expense</h2>
+          <button onClick={onClose} className="text-[#7d8f84] hover:text-[#14261c] p-1 cursor-pointer"><X size={18}/></button>
         </div>
         <div className="space-y-4">
           <div>
             <label className="text-xs font-bold text-[#55695e] mb-1.5 block uppercase tracking-wider">Description</label>
-            <input value={form.description} onChange={e => set('description', e.target.value)}
-              className="w-full bg-[#f8f7f2] border border-[#e4dfd3] rounded-xl px-4 py-2.5 text-sm text-[#14261c] focus:outline-none focus:border-[#1b4332]" />
+            <input
+              value={form.description}
+              onChange={e => set('description', e.target.value)}
+              onFocus={() => window.scrollTo(0, 0)}
+              className="w-full bg-[#f8f7f2] border border-[#e4dfd3] rounded-xl px-4 py-2.5 text-base sm:text-sm text-[#14261c] focus:outline-none focus:border-[#1b4332]"
+            />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="text-xs font-bold text-[#55695e] mb-1.5 block uppercase tracking-wider">Amount (€)</label>
-              <input type="number" value={form.amount} onChange={e => set('amount', parseFloat(e.target.value)||0)}
-                className="w-full bg-[#f8f7f2] border border-[#e4dfd3] rounded-xl px-4 py-2.5 text-sm text-[#14261c] focus:outline-none focus:border-[#1b4332]" />
+              <input
+                type="number"
+                value={form.amount}
+                onChange={e => set('amount', parseFloat(e.target.value)||0)}
+                onFocus={() => window.scrollTo(0, 0)}
+                className="w-full bg-[#f8f7f2] border border-[#e4dfd3] rounded-xl px-4 py-2.5 text-base sm:text-sm text-[#14261c] focus:outline-none focus:border-[#1b4332]"
+              />
             </div>
             <div>
               <label className="text-xs font-bold text-[#55695e] mb-1.5 block uppercase tracking-wider">Date</label>
-              <input type="date" value={form.date} onChange={e => set('date', e.target.value)}
-                className="w-full bg-[#f8f7f2] border border-[#e4dfd3] rounded-xl px-4 py-2.5 text-sm text-[#14261c] focus:outline-none focus:border-[#1b4332]" />
+              <input
+                type="date"
+                value={form.date}
+                onChange={e => set('date', e.target.value)}
+                className="w-full bg-[#f8f7f2] border border-[#e4dfd3] rounded-xl px-4 py-2.5 text-base sm:text-sm text-[#14261c] focus:outline-none focus:border-[#1b4332]"
+              />
             </div>
           </div>
           <div>
             <label className="text-xs font-bold text-[#55695e] mb-1.5 block uppercase tracking-wider">Category</label>
-            <select value={form.category} onChange={e => set('category', e.target.value)}
-              className="w-full bg-[#f8f7f2] border border-[#e4dfd3] rounded-xl px-4 py-2.5 text-sm text-[#14261c] focus:outline-none focus:border-[#1b4332]">
+            <select
+              value={form.category}
+              onChange={e => set('category', e.target.value)}
+              className="w-full bg-[#f8f7f2] border border-[#e4dfd3] rounded-xl px-4 py-2.5 text-base sm:text-sm text-[#14261c] focus:outline-none focus:border-[#1b4332]"
+            >
               {categories.map(c => <option key={c.id} value={c.id}>{c.icon} {c.name}</option>)}
             </select>
           </div>
           <div>
             <label className="text-xs font-bold text-[#55695e] mb-1.5 block uppercase tracking-wider">Notes (optional)</label>
-            <input value={form.notes||''} onChange={e => set('notes', e.target.value)}
-              className="w-full bg-[#f8f7f2] border border-[#e4dfd3] rounded-xl px-4 py-2.5 text-sm text-[#14261c] focus:outline-none focus:border-[#1b4332]" />
+            <input
+              value={form.notes||''}
+              onChange={e => set('notes', e.target.value)}
+              onFocus={() => window.scrollTo(0, 0)}
+              className="w-full bg-[#f8f7f2] border border-[#e4dfd3] rounded-xl px-4 py-2.5 text-base sm:text-sm text-[#14261c] focus:outline-none focus:border-[#1b4332]"
+            />
           </div>
           <label className="flex items-center gap-3 cursor-pointer py-1">
             <div className={`w-11 h-6 rounded-full transition-colors relative ${form.recurring ? 'bg-[#1b4332]' : 'bg-[#d8d3c5]'}`}
@@ -196,8 +235,8 @@ function ExpenseModal({ expense, categories, onSave, onClose }) {
           </label>
         </div>
         <div className="flex gap-3 mt-6">
-          <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-[#e4dfd3] text-sm font-semibold text-[#65776c] hover:bg-[#f8f7f2]">Cancel</button>
-          <button onClick={() => onSave(form)} className="flex-1 px-4 py-2.5 rounded-xl bg-[#1b4332] hover:bg-[#245740] text-sm font-bold text-white shadow-md shadow-[#1b4332]/25">Save Changes</button>
+          <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-[#e4dfd3] text-sm font-semibold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer">Cancel</button>
+          <button onClick={() => onSave(form)} className="flex-1 px-4 py-2.5 rounded-xl bg-[#1b4332] hover:bg-[#245740] text-sm font-bold text-white shadow-md shadow-[#1b4332]/25 cursor-pointer">Save Changes</button>
         </div>
       </div>
     </div>

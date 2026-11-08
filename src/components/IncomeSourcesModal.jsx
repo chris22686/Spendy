@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp, formatMoney, FREQUENCY_LABELS, calculateMonthlyIncomeFromSources } from '../store';
 import { v4 as uuidv4 } from 'uuid';
-import { Plus, Pencil, Trash2, X, Wallet, DollarSign, Calendar, Sparkles } from 'lucide-react';
+import { Plus, Pencil, Trash2, X, Wallet, Sparkles } from 'lucide-react';
 
 const INCOME_ICONS = ['💼', '🏦', '💸', '💰', '💵', '🤝', '📈', '🎁', '🧑‍💻', '🏠', '⚡', '📦'];
 const INCOME_COLORS = ['#1b4332', '#2d6a4f', '#40916c', '#52b788', '#059669', '#0d9488', '#0284c7', '#4f46e5', '#7c3aed', '#c026d3', '#d97706'];
@@ -20,6 +20,20 @@ export default function IncomeSourcesModal({ onClose }) {
   const [icon, setIcon] = useState('💼');
   const [color, setColor] = useState('#1b4332');
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    document.body.dataset.modalOpen = 'true';
+    const keepTop = () => {
+      if (window.scrollY !== 0) {
+        window.scrollTo(0, 0);
+      }
+    };
+    window.addEventListener('scroll', keepTop, { passive: true });
+    return () => {
+      delete document.body.dataset.modalOpen;
+      window.removeEventListener('scroll', keepTop);
+    };
+  }, []);
 
   const openNewForm = () => {
     setEditingSource(null);
@@ -71,6 +85,9 @@ export default function IncomeSourcesModal({ onClose }) {
     }
 
     setShowForm(false);
+    setEditingSource(null);
+    setName('');
+    setAmount('');
   };
 
   const handleDelete = (id) => {
@@ -80,17 +97,19 @@ export default function IncomeSourcesModal({ onClose }) {
   const totalCalculated = Math.round(calculateMonthlyIncomeFromSources(sources));
 
   return (
-    <div className="fixed inset-0 bg-[#000000]/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-      <div className="bg-[#ffffff] border border-[#e4dfd3] rounded-3xl w-full max-w-xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-        
+    <div className="fixed inset-0 bg-[#000000]/55 backdrop-blur-xs z-50 overflow-y-auto px-4 modal-backdrop-safe flex flex-col items-center justify-start sm:justify-center">
+      <div
+        className="my-auto w-full max-w-xl bg-[#ffffff] border border-[#e4dfd3] rounded-3xl shadow-2xl overflow-hidden flex flex-col modal-card-safe animate-in fade-in zoom-in-95 duration-150"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="p-5 border-b border-[#eeebe2] flex items-center justify-between bg-[#fbfaf6]">
+        <div className="shrink-0 p-4 sm:p-5 border-b border-[#eeebe2] flex items-center justify-between bg-[#fbfaf6]">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-[#1b4332]/10 border border-[#1b4332]/20 flex items-center justify-center text-[#1b4332]">
               <Wallet size={20} />
             </div>
             <div>
-              <h2 className="text-lg font-extrabold text-[#14261c] leading-tight">Expected Income Categories</h2>
+              <h2 className="text-base sm:text-lg font-extrabold text-[#14261c] leading-tight">Expected Income Categories</h2>
               <p className="text-xs text-[#6e8074] font-medium">Split your salary, 15-day paychecks, transfers & freelance</p>
             </div>
           </div>
@@ -103,18 +122,18 @@ export default function IncomeSourcesModal({ onClose }) {
         </div>
 
         {/* Total Monthly Banner */}
-        <div className="px-5 py-3.5 bg-[#eaf4ee] border-b border-[#cde2d6] flex items-center justify-between">
+        <div className="shrink-0 px-4 sm:px-5 py-3 bg-[#eaf4ee] border-b border-[#cde2d6] flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Sparkles size={16} className="text-[#1b4332]" />
             <span className="text-xs font-bold text-[#1b4332] uppercase tracking-wider">Calculated Monthly Total:</span>
           </div>
-          <span className="text-xl font-extrabold text-[#1b4332]">{formatMoney(totalCalculated)}</span>
+          <span className="text-lg sm:text-xl font-extrabold text-[#1b4332]">{formatMoney(totalCalculated)}</span>
         </div>
 
         {/* Content Body */}
-        <div className="p-5 overflow-y-auto space-y-4 flex-1">
+        <div className="p-4 sm:p-5 overflow-y-auto space-y-4 flex-1">
           {showForm ? (
-            <form onSubmit={handleSave} className="bg-[#f8f7f2] border border-[#e4dfd3] rounded-2xl p-4.5 space-y-4">
+            <form onSubmit={handleSave} className="bg-[#f8f7f2] border border-[#e4dfd3] rounded-2xl p-4 sm:p-4.5 space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-extrabold text-[#14261c]">
                   {editingSource ? 'Edit Income Category' : 'Add New Income Source'}
@@ -122,7 +141,7 @@ export default function IncomeSourcesModal({ onClose }) {
                 <button
                   type="button"
                   onClick={() => setShowForm(false)}
-                  className="text-xs font-bold text-[#6e8074] hover:text-[#14261c]"
+                  className="text-xs font-bold text-[#6e8074] hover:text-[#14261c] cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -143,7 +162,8 @@ export default function IncomeSourcesModal({ onClose }) {
                   placeholder="e.g. 15th Paycheck, Side Gig, Mom sent money"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-[#ffffff] border border-[#dcd7cb] rounded-xl px-3.5 py-2.5 text-sm font-semibold text-[#14261c] focus:outline-none focus:border-[#1b4332]"
+                  onFocus={() => window.scrollTo(0, 0)}
+                  className="w-full bg-[#ffffff] border border-[#dcd7cb] rounded-xl px-3.5 py-2.5 text-base sm:text-sm font-semibold text-[#14261c] focus:outline-none focus:border-[#1b4332]"
                 />
               </div>
 
@@ -160,7 +180,8 @@ export default function IncomeSourcesModal({ onClose }) {
                       placeholder="0.00"
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
-                      className="w-full bg-[#ffffff] border border-[#dcd7cb] rounded-xl pl-7 pr-3 py-2 text-sm font-bold text-[#14261c] focus:outline-none focus:border-[#1b4332]"
+                      onFocus={() => window.scrollTo(0, 0)}
+                      className="w-full bg-[#ffffff] border border-[#dcd7cb] rounded-xl pl-7 pr-3 py-2 text-base sm:text-sm font-bold text-[#14261c] focus:outline-none focus:border-[#1b4332]"
                     />
                   </div>
                 </div>
@@ -172,7 +193,7 @@ export default function IncomeSourcesModal({ onClose }) {
                   <select
                     value={frequency}
                     onChange={(e) => setFrequency(e.target.value)}
-                    className="w-full bg-[#ffffff] border border-[#dcd7cb] rounded-xl px-3 py-2 text-sm font-semibold text-[#14261c] focus:outline-none focus:border-[#1b4332]"
+                    className="w-full bg-[#ffffff] border border-[#dcd7cb] rounded-xl px-3 py-2 text-base sm:text-sm font-semibold text-[#14261c] focus:outline-none focus:border-[#1b4332]"
                   >
                     <option value="bi-weekly">Every 15 Days (Bi-Weekly × 2)</option>
                     <option value="monthly">Monthly (Once a month)</option>
@@ -193,7 +214,7 @@ export default function IncomeSourcesModal({ onClose }) {
                       key={ic}
                       type="button"
                       onClick={() => setIcon(ic)}
-                      className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg transition-transform ${
+                      className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg transition-transform cursor-pointer ${
                         icon === ic ? 'bg-[#1b4332] text-white scale-110 shadow-xs' : 'hover:bg-[#f1efe8]'
                       }`}
                     >
@@ -215,7 +236,7 @@ export default function IncomeSourcesModal({ onClose }) {
                       type="button"
                       onClick={() => setColor(c)}
                       style={{ backgroundColor: c }}
-                      className={`w-7 h-7 rounded-full transition-transform ${
+                      className={`w-7 h-7 rounded-full transition-transform cursor-pointer ${
                         color === c ? 'ring-2 ring-offset-2 ring-[#1b4332] scale-110' : 'opacity-80 hover:opacity-100'
                       }`}
                     />
@@ -227,13 +248,13 @@ export default function IncomeSourcesModal({ onClose }) {
                 <button
                   type="button"
                   onClick={() => setShowForm(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-[#65776c] hover:bg-[#ece8df]"
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-[#65776c] hover:bg-[#ece8df] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-[#1b4332] hover:bg-[#245740] text-white rounded-xl text-xs font-bold shadow-xs transition-colors"
+                  className="px-5 py-2 bg-[#1b4332] hover:bg-[#245740] text-white rounded-xl text-xs font-bold shadow-xs transition-colors cursor-pointer"
                 >
                   {editingSource ? 'Save Changes' : 'Add Source'}
                 </button>
@@ -308,7 +329,7 @@ export default function IncomeSourcesModal({ onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-[#eeebe2] bg-[#fbfaf6] flex justify-end">
+        <div className="shrink-0 p-4 border-t border-[#eeebe2] bg-[#fbfaf6] flex justify-end">
           <button
             onClick={onClose}
             className="px-6 py-2.5 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white rounded-xl text-sm font-bold shadow-md shadow-[#1b4332]/25 transition-all cursor-pointer"

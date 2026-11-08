@@ -1,10 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp } from '../store';
 import { RotateCcw, Trash2, X, CheckCircle } from 'lucide-react';
 
 export default function ResetModal({ isOpen, onClose }) {
   const { dispatch } = useApp();
   const [successMsg, setSuccessMsg] = useState('');
+
+  useEffect(() => {
+    if (!isOpen) return;
+    document.body.dataset.modalOpen = 'true';
+    const keepTop = () => {
+      if (window.scrollY !== 0) {
+        window.scrollTo(0, 0);
+      }
+    };
+    window.addEventListener('scroll', keepTop, { passive: true });
+    return () => {
+      delete document.body.dataset.modalOpen;
+      window.removeEventListener('scroll', keepTop);
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -27,15 +42,18 @@ export default function ResetModal({ isOpen, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-[#000000]/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fade-in">
-      <div className="bg-[#ffffff] border border-[#e4dfd3] rounded-3xl p-6 w-full max-w-md shadow-2xl space-y-5">
+    <div className="fixed inset-0 bg-[#000000]/50 backdrop-blur-xs z-50 overflow-y-auto px-4 modal-backdrop-safe flex flex-col items-center justify-start sm:justify-center animate-fade-in">
+      <div
+        className="my-auto w-full max-w-md bg-[#ffffff] border border-[#e4dfd3] rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 sm:space-y-5 modal-card-safe overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-xl bg-[#fee2e2] text-[#991b1b] flex items-center justify-center">
               <RotateCcw size={20} className="stroke-[2.5]" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-[#14261c]">Data Management</h2>
+              <h2 className="text-base sm:text-lg font-bold text-[#14261c]">Data Management</h2>
               <p className="text-xs text-[#718578]">Reset or clear your app records</p>
             </div>
           </div>
@@ -54,7 +72,7 @@ export default function ResetModal({ isOpen, onClose }) {
         <div className="space-y-3">
           <button
             onClick={handleClearAll}
-            className="w-full flex items-start gap-3.5 p-4 rounded-2xl border border-[#fee2e2] bg-[#fffbfb] hover:bg-[#fef2f2] transition-colors text-left group cursor-pointer"
+            className="w-full flex items-start gap-3.5 p-3.5 sm:p-4 rounded-2xl border border-[#fee2e2] bg-[#fffbfb] hover:bg-[#fef2f2] transition-colors text-left group cursor-pointer"
           >
             <div className="w-9 h-9 rounded-xl bg-[#fee2e2] text-[#b91c1c] flex items-center justify-center shrink-0 mt-0.5">
               <Trash2 size={18} />
@@ -69,7 +87,7 @@ export default function ResetModal({ isOpen, onClose }) {
 
           <button
             onClick={handleResetDemo}
-            className="w-full flex items-start gap-3.5 p-4 rounded-2xl border border-[#e8e4da] bg-[#f8f7f2] hover:bg-[#f0ede4] transition-colors text-left group cursor-pointer"
+            className="w-full flex items-start gap-3.5 p-3.5 sm:p-4 rounded-2xl border border-[#e8e4da] bg-[#f8f7f2] hover:bg-[#f0ede4] transition-colors text-left group cursor-pointer"
           >
             <div className="w-9 h-9 rounded-xl bg-[#eaf4ee] text-[#1b4332] flex items-center justify-center shrink-0 mt-0.5">
               <RotateCcw size={18} />

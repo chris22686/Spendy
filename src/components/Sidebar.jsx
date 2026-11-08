@@ -22,9 +22,9 @@ export default function Sidebar() {
 
   return (
     <>
-      <aside className="hidden md:flex fixed left-0 top-0 h-full w-20 lg:w-64 bg-[#ffffff] border-r border-[#e7e4da] flex-col z-50 shadow-[2px_0_12px_rgba(27,67,50,0.02)]">
+      <aside className="hidden md:flex fixed left-0 top-0 h-full w-20 lg:w-64 bg-[#ffffff] border-r border-[#e7e4da] flex-col z-40 shadow-[2px_0_12px_rgba(27,67,50,0.02)] pt-[env(safe-area-inset-top,0px)] pb-[env(safe-area-inset-bottom,0px)] pl-[env(safe-area-inset-left,0px)]">
         {/* Logo */}
-        <div className="flex items-center gap-3 px-5 py-6 border-b border-[#ece8de]">
+        <div className="flex items-center gap-3 px-4 lg:px-5 py-5 lg:py-6 border-b border-[#ece8de]">
           <div className="w-10 h-10 rounded-2xl overflow-hidden flex items-center justify-center flex-shrink-0 shadow-sm shadow-[#1b4332]/30">
             <img src="/icon.png" alt="Spendy Logo" className="w-full h-full object-cover" />
           </div>
@@ -35,14 +35,15 @@ export default function Sidebar() {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 py-5 px-3 space-y-1.5 overflow-y-auto">
+        <nav className="flex-1 py-4 lg:py-5 px-2.5 lg:px-3 space-y-1.5 overflow-y-auto">
           {NAV.map(({ to, icon: Icon, label }) => (
             <NavLink
               key={to}
               to={to}
               end={to === '/'}
+              title={label}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3.5 py-3 rounded-xl transition-all duration-150 group
+                `flex items-center justify-center lg:justify-start gap-3 px-3 py-3 rounded-xl transition-all duration-150 group
                 ${isActive
                   ? 'bg-[#eaf3ed] text-[#143928] font-semibold shadow-sm'
                   : 'text-[#63756a] hover:text-[#143928] hover:bg-[#f3f1ea]'
@@ -72,13 +73,13 @@ export default function Sidebar() {
         </nav>
 
         {/* Reset Data & User Footer */}
-        <div className="p-3.5 border-t border-[#ece8de] space-y-2">
+        <div className="p-3 lg:p-3.5 border-t border-[#ece8de] space-y-2">
           <button
             onClick={() => setShowReset(true)}
             className="w-full flex items-center justify-center lg:justify-start gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-[#718578] hover:text-[#991b1b] hover:bg-[#fee2e2]/60 transition-colors cursor-pointer"
             title="Reset or clear data"
           >
-            <RotateCcw size={15} />
+            <RotateCcw size={16} />
             <span className="hidden lg:block">Reset Data</span>
           </button>
 

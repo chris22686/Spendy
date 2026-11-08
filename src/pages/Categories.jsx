@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp } from '../store';
 import { v4 as uuidv4 } from 'uuid';
 import { Plus, Pencil, Trash2, X, Check, Tag, FolderPlus, Layers, AlertCircle } from 'lucide-react';
@@ -73,15 +73,15 @@ export default function Categories() {
               No categories in this group. Tap "+ Add Category" to assign one here.
             </div>
           ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {cats.map(cat => (
                 <div
                   key={cat.id}
                   onClick={() => { setEditCat(cat); setShowForm(true); }}
-                  className="flex items-center gap-3.5 p-4 rounded-2xl bg-[#ffffff] border border-[#e8e4da] hover:border-[#cbd7cf] hover:shadow-[0_4px_16px_rgba(27,67,50,0.05)] transition-all cursor-pointer group"
+                  className="flex items-center gap-3 sm:gap-3.5 p-3 sm:p-4 rounded-2xl bg-[#ffffff] border border-[#e8e4da] hover:border-[#cbd7cf] hover:shadow-[0_4px_16px_rgba(27,67,50,0.05)] transition-all cursor-pointer group"
                 >
                   <div
-                    className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 shadow-xs"
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center text-xl sm:text-2xl flex-shrink-0 shadow-xs"
                     style={{ backgroundColor: (cat.color || '#1b4332') + '18', border: `1px solid ${(cat.color || '#1b4332')}33` }}
                   >
                     {cat.icon}
@@ -149,17 +149,34 @@ function CategoryModal({ initial, groups, onSave, onClose }) {
   const [errors, setErrors] = useState({});
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
+  useEffect(() => {
+    document.body.dataset.modalOpen = 'true';
+    const keepTop = () => {
+      if (window.scrollY !== 0) {
+        window.scrollTo(0, 0);
+      }
+    };
+    window.addEventListener('scroll', keepTop, { passive: true });
+    return () => {
+      delete document.body.dataset.modalOpen;
+      window.removeEventListener('scroll', keepTop);
+    };
+  }, []);
+
   const handleSave = () => {
     if (!form.name.trim()) { setErrors({ name: 'Name is required' }); return; }
     onSave(form);
   };
 
   return (
-    <div className="fixed inset-0 bg-[#000000]/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-      <div className="bg-[#ffffff] border border-[#e4dfd3] rounded-3xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-bold text-[#14261c]">{initial ? 'Edit Category' : 'Create New Category'}</h2>
-          <button onClick={onClose} className="text-[#7d8f84] hover:text-[#14261c] p-1"><X size={18}/></button>
+    <div className="fixed inset-0 bg-[#000000]/50 backdrop-blur-xs z-50 overflow-y-auto px-4 modal-backdrop-safe flex flex-col items-center justify-start sm:justify-center">
+      <div
+        className="my-auto w-full max-w-lg bg-[#ffffff] border border-[#e4dfd3] rounded-3xl p-5 sm:p-6 shadow-2xl modal-card-safe overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-4 sm:mb-5">
+          <h2 className="text-base sm:text-lg font-bold text-[#14261c]">{initial ? 'Edit Category' : 'Create New Category'}</h2>
+          <button onClick={onClose} className="text-[#7d8f84] hover:text-[#14261c] p-1 cursor-pointer"><X size={18}/></button>
         </div>
 
         <div className="flex items-center gap-4 p-4 rounded-2xl bg-[#f8f7f2] border border-[#e7e4da] mb-5">
@@ -266,6 +283,20 @@ function GroupsModal({ groups, categories, onClose }) {
   const [editedName, setEditedName] = useState('');
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    document.body.dataset.modalOpen = 'true';
+    const keepTop = () => {
+      if (window.scrollY !== 0) {
+        window.scrollTo(0, 0);
+      }
+    };
+    window.addEventListener('scroll', keepTop, { passive: true });
+    return () => {
+      delete document.body.dataset.modalOpen;
+      window.removeEventListener('scroll', keepTop);
+    };
+  }, []);
+
   const handleAdd = (e) => {
     e.preventDefault();
     const clean = newGroupName.trim();
@@ -320,8 +351,11 @@ function GroupsModal({ groups, categories, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-[#000000]/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-      <div className="bg-[#ffffff] border border-[#e4dfd3] rounded-3xl w-full max-w-md shadow-2xl flex flex-col max-h-[85vh] overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 bg-[#000000]/50 backdrop-blur-xs z-50 overflow-y-auto px-4 modal-backdrop-safe flex flex-col items-center justify-start sm:justify-center">
+      <div
+        className="my-auto w-full max-w-md bg-[#ffffff] border border-[#e4dfd3] rounded-3xl shadow-2xl flex flex-col modal-card-safe overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+        onClick={(e) => e.stopPropagation()}
+      >
         
         {/* Header */}
         <div className="p-5 border-b border-[#eeebe2] flex items-center justify-between bg-[#fbfaf6]">

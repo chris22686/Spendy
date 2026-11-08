@@ -1,16 +1,42 @@
 @import "tailwindcss";
 
 @layer base {
+  :root {
+    --sat: env(safe-area-inset-top, 0px);
+    --sab: env(safe-area-inset-bottom, 0px);
+    --sal: env(safe-area-inset-left, 0px);
+    --sar: env(safe-area-inset-right, 0px);
+  }
+
   * {
     box-sizing: border-box;
   }
   
+  html, body {
+    width: 100%;
+    min-height: 100%;
+    overflow-x: hidden;
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
     margin: 0;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     background-color: #f8f7f2;
     color: #17261f;
+  }
+
+  body[data-modal-open="true"] {
+    overflow: hidden !important;
+  }
+
+  /* Prevent iOS Safari auto-zoom when tapping inputs */
+  @media (max-width: 767px) {
+    input, select, textarea {
+      font-size: 16px !important;
+    }
   }
 
   ::-webkit-scrollbar {
@@ -32,36 +58,53 @@
   }
 }
 
-/* ─── iPhone / Android safe areas (notch, Dynamic Island, home indicator) ───
-   Unlayered on purpose so these win over Tailwind padding utilities. */
+/* ─── iPhone / Android / iPad Safe Areas ─── */
 .status-bar-cover {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: env(safe-area-inset-top, 0px);
+  height: var(--sat, env(safe-area-inset-top, 0px));
   background-color: #f8f7f2;
   z-index: 45;
   pointer-events: none;
 }
 
 @media (max-width: 767px) {
-  .status-bar-cover {
-    height: max(env(safe-area-inset-top, 0px), 48px);
-  }
-
   .app-main {
-    padding-top: calc(max(env(safe-area-inset-top, 0px), 48px) + 0.75rem);
-    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6.5rem);
+    padding-top: calc(var(--sat, env(safe-area-inset-top, 0px)) + 1rem) !important;
+    padding-bottom: calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 6.5rem) !important;
+    padding-left: calc(var(--sal, env(safe-area-inset-left, 0px)) + 1rem) !important;
+    padding-right: calc(var(--sar, env(safe-area-inset-right, 0px)) + 1rem) !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .app-main {
+    padding-top: calc(var(--sat, env(safe-area-inset-top, 0px)) + 1.25rem) !important;
+    padding-bottom: calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 2.5rem) !important;
+    padding-left: calc(var(--sal, env(safe-area-inset-left, 0px)) + 1.5rem) !important;
+    padding-right: calc(var(--sar, env(safe-area-inset-right, 0px)) + 1.5rem) !important;
   }
 }
 
 .bottom-nav-safe {
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
+  padding-bottom: max(var(--sab, env(safe-area-inset-bottom, 0px)), 0.5rem);
 }
 
 .sheet-safe {
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 2rem);
+  padding-bottom: calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 1.75rem);
+}
+
+.modal-backdrop-safe {
+  padding-top: calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px) !important;
+  padding-bottom: calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 12px) !important;
+  padding-left: max(var(--sal, env(safe-area-inset-left, 0px)), 1rem) !important;
+  padding-right: max(var(--sar, env(safe-area-inset-right, 0px)), 1rem) !important;
+}
+
+.modal-card-safe {
+  max-height: calc(100dvh - var(--sat, env(safe-area-inset-top, 0px)) - var(--sab, env(safe-area-inset-bottom, 0px)) - 24px) !important;
 }
 
 @layer utilities {

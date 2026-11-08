@@ -223,10 +223,19 @@ function loadState() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed.expenses)) {
+        parsed.expenses = SAMPLE_EXPENSES;
+      }
+      if (!Array.isArray(parsed.categories) || parsed.categories.length === 0) {
+        parsed.categories = DEFAULT_CATEGORIES;
+      }
       if (!parsed.categoryGroups || !Array.isArray(parsed.categoryGroups) || parsed.categoryGroups.length === 0) {
         parsed.categoryGroups = DEFAULT_GROUPS;
       }
-      if (!parsed.incomeSources) {
+      if (!Array.isArray(parsed.budgets)) {
+        parsed.budgets = SAMPLE_BUDGETS;
+      }
+      if (!parsed.incomeSources || !Array.isArray(parsed.incomeSources) || parsed.incomeSources.length === 0) {
         if (parsed.monthlyIncome && parsed.monthlyIncome > 0) {
           parsed.incomeSources = [
             { id: 'inc-legacy', name: 'Primary Salary / Income', amount: parsed.monthlyIncome, frequency: 'monthly', icon: '💼', color: '#1b4332' }

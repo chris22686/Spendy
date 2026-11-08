@@ -96,17 +96,17 @@ export default function SavingPlan() {
             <p className="text-xs text-[#a0cfb2] font-medium">Personalized targets reducing non-essential spending</p>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-white/10 pt-5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 border-t border-white/10 pt-5">
           <div className="p-3 bg-white/5 rounded-2xl border border-white/10 text-center">
-            <p className="text-2xl sm:text-3xl font-extrabold text-[#99f6e4]">{formatMoney(projectedMonthly)}</p>
+            <p className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#99f6e4] truncate">{formatMoney(projectedMonthly)}</p>
             <p className="text-xs text-[#a0cfb2] font-semibold mt-1">Projected Monthly Savings</p>
           </div>
           <div className="p-3 bg-white/5 rounded-2xl border border-white/10 text-center">
-            <p className="text-2xl sm:text-3xl font-extrabold text-[#fef08a]">{formatMoney(projectedYearly)}</p>
+            <p className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#fef08a] truncate">{formatMoney(projectedYearly)}</p>
             <p className="text-xs text-[#a0cfb2] font-semibold mt-1">Projected Annual Savings</p>
           </div>
           <div className="p-3 bg-white/5 rounded-2xl border border-white/10 text-center">
-            <p className="text-2xl sm:text-3xl font-extrabold text-[#bbf7d0]">{formatMoney(plan.dailySaving.toFixed(2))}</p>
+            <p className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#bbf7d0] truncate">{formatMoney(plan.dailySaving.toFixed(2))}</p>
             <p className="text-xs text-[#a0cfb2] font-semibold mt-1">Daily Stash Target</p>
           </div>
         </div>

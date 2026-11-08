@@ -103,16 +103,16 @@ export default function Insights() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         {[
           { label: 'Total Spent',    value: formatMoney(totalSpent), color: '#991b1b', bg: 'bg-[#fef2f2]', icon: TrendingDown },
           { label: 'Net Saved',      value: formatMoney(savings), color: '#1b4332', bg: 'bg-[#eaf4ee]', icon: TrendingUp },
           { label: 'Active Categories', value: catTotals.length, color: '#2d6a4f', bg: 'bg-[#f0f7f3]', icon: null },
           { label: 'Transactions',   value: monthExp.length, color: '#15803d', bg: 'bg-[#edf7f0]', icon: null },
         ].map(({ label, value, color }) => (
-          <div key={label} className="rounded-2xl bg-[#ffffff] border border-[#e7e4da] p-4 shadow-xs">
-            <p className="text-xs text-[#6e8074] mb-1 font-bold uppercase tracking-wider">{label}</p>
-            <p className="text-2xl font-extrabold" style={{ color }}>{value}</p>
+          <div key={label} className="rounded-2xl bg-[#ffffff] border border-[#e7e4da] p-3 sm:p-4 shadow-xs">
+            <p className="text-[10px] sm:text-xs text-[#6e8074] mb-1 font-bold uppercase tracking-wider">{label}</p>
+            <p className="text-lg sm:text-2xl font-extrabold truncate" style={{ color }}>{value}</p>
           </div>
         ))}
       </div>

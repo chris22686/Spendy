@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp } from '../store';
-import { Sparkles, ArrowRight, User, DollarSign, Calendar, Check, HelpCircle } from 'lucide-react';
+import { ArrowRight, User, Check, Sparkles } from 'lucide-react';
 
 export default function OnboardingModal({ onComplete }) {
   const { dispatch } = useApp();
@@ -12,7 +12,7 @@ export default function OnboardingModal({ onComplete }) {
   const [userName, setUserName] = useState('');
 
   // Step 2: Pay Schedule
-  // Options: 'monthly_1' (Once a month), 'twice_month' (Every 15 days / 1st & 15th), 'weekly' (Every week), 'biweekly' (Every 2 weeks)
+  // Options: 'twice_month' (Every 15 days), 'monthly_1' (Once a month), 'weekly' (Every week)
   const [paySchedule, setPaySchedule] = useState('twice_month');
   const [payDay1, setPayDay1] = useState('1');
   const [payDay2, setPayDay2] = useState('15');
@@ -21,6 +21,21 @@ export default function OnboardingModal({ onComplete }) {
   const [baseAmount, setBaseAmount] = useState('');
   const [isVariable, setIsVariable] = useState(true);
   const [error, setError] = useState('');
+
+  // Prevent background scroll and window jumping while modal is active
+  useEffect(() => {
+    document.body.dataset.modalOpen = 'true';
+    const keepTop = () => {
+      if (window.scrollY !== 0) {
+        window.scrollTo(0, 0);
+      }
+    };
+    window.addEventListener('scroll', keepTop, { passive: true });
+    return () => {
+      delete document.body.dataset.modalOpen;
+      window.removeEventListener('scroll', keepTop);
+    };
+  }, []);
 
   const handleNextFromStep1 = (e) => {
     e?.preventDefault();
@@ -116,27 +131,29 @@ export default function OnboardingModal({ onComplete }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-[#000000]/60 backdrop-blur-sm z-[90] flex items-center justify-center p-4">
-      <div className="bg-[#ffffff] border border-[#e4dfd3] rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200">
-        
+    <div className="fixed inset-0 bg-[#000000]/65 backdrop-blur-sm z-[90] overflow-y-auto px-4 modal-backdrop-safe flex flex-col items-center justify-start sm:justify-center">
+      <div
+        className="my-auto w-full max-w-lg bg-[#ffffff] border border-[#e4dfd3] rounded-3xl shadow-2xl overflow-hidden flex flex-col modal-card-safe animate-in fade-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Top Progress & Banner */}
-        <div className="bg-gradient-to-r from-[#133928] via-[#1b4332] to-[#2d6a4f] p-6 text-white text-center relative">
-          <div className="w-12 h-12 mx-auto rounded-2xl bg-white/15 flex items-center justify-center mb-3 text-2xl shadow-inner">
+        <div className="shrink-0 bg-gradient-to-r from-[#133928] via-[#1b4332] to-[#2d6a4f] p-4 sm:p-6 text-white text-center relative">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 mx-auto rounded-2xl bg-white/15 flex items-center justify-center mb-2 sm:mb-3 text-xl sm:text-2xl shadow-inner">
             {step === 1 ? '👋' : step === 2 ? '🗓️' : '💰'}
           </div>
-          <h2 className="text-xl font-black tracking-tight">
+          <h2 className="text-lg sm:text-xl font-black tracking-tight">
             {step === 1 && 'Welcome to Spendy!'}
             {step === 2 && 'How often do you get paid?'}
             {step === 3 && 'Salary & Variable Pay'}
           </h2>
-          <p className="text-xs text-white/80 mt-1 font-medium">
+          <p className="text-xs text-white/80 mt-1 font-medium max-w-sm mx-auto">
             {step === 1 && "Let's personalize your budgeting experience in 3 quick steps."}
             {step === 2 && 'Set your pay schedule so Spendy can notify you on payday.'}
             {step === 3 && 'Tailored tracking for fixed or fluctuating paychecks.'}
           </p>
 
           {/* Dots Indicator */}
-          <div className="flex justify-center items-center gap-2 mt-4">
+          <div className="flex justify-center items-center gap-2 mt-3 sm:mt-4">
             {[1, 2, 3].map((s) => (
               <span
                 key={s}
@@ -148,8 +165,8 @@ export default function OnboardingModal({ onComplete }) {
           </div>
         </div>
 
-        {/* Form Body */}
-        <div className="p-6 space-y-5">
+        {/* Form Body - Scrollable if screen height shrinks with keyboard */}
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-5 overflow-y-auto flex-1">
           {error && (
             <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold">
               {error}
@@ -172,14 +189,14 @@ export default function OnboardingModal({ onComplete }) {
                       setUserName(e.target.value);
                       setError('');
                     }}
+                    onFocus={() => window.scrollTo(0, 0)}
                     placeholder="e.g. Alex, Chris, Stefan..."
-                    autoFocus
-                    className="w-full bg-[#f8f7f2] border border-[#dcd7cb] rounded-2xl pl-11 pr-4 py-3 text-base font-bold text-[#14261c] focus:outline-none focus:border-[#1b4332]"
+                    className="w-full bg-[#f8f7f2] border border-[#dcd7cb] rounded-2xl pl-11 pr-4 py-3 text-base font-bold text-[#14261c] focus:outline-none focus:border-[#1b4332] transition-colors"
                   />
                 </div>
               </div>
 
-              <div className="pt-3">
+              <div className="pt-2">
                 <button
                   type="submit"
                   className="w-full py-3.5 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white rounded-2xl text-sm font-extrabold shadow-md shadow-[#1b4332]/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
@@ -193,7 +210,7 @@ export default function OnboardingModal({ onComplete }) {
 
           {/* ── STEP 2: Pay Schedule ── */}
           {step === 2 && (
-            <div className="space-y-4">
+            <div className="space-y-3.5 sm:space-y-4">
               <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider block">
                 Select your payday schedule:
               </label>
@@ -222,19 +239,19 @@ export default function OnboardingModal({ onComplete }) {
                   <div
                     key={opt.id}
                     onClick={() => setPaySchedule(opt.id)}
-                    className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-center gap-3.5 ${
+                    className={`p-3 sm:p-3.5 rounded-2xl border transition-all cursor-pointer flex items-center gap-3 ${
                       paySchedule === opt.id
                         ? 'border-[#1b4332] bg-[#eaf4ee]'
                         : 'border-[#e4dfd3] bg-[#f8f7f2] hover:bg-[#ece8df]'
                     }`}
                   >
-                    <span className="text-2xl">{opt.icon}</span>
+                    <span className="text-xl sm:text-2xl">{opt.icon}</span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-[#14261c]">{opt.title}</p>
-                      <p className="text-xs text-[#6e8074]">{opt.desc}</p>
+                      <p className="text-xs sm:text-sm font-bold text-[#14261c]">{opt.title}</p>
+                      <p className="text-[11px] sm:text-xs text-[#6e8074]">{opt.desc}</p>
                     </div>
                     {paySchedule === opt.id && (
-                      <div className="w-5 h-5 rounded-full bg-[#1b4332] flex items-center justify-center text-white">
+                      <div className="w-5 h-5 rounded-full bg-[#1b4332] flex items-center justify-center text-white shrink-0">
                         <Check size={12} strokeWidth={3} />
                       </div>
                     )}
@@ -244,7 +261,7 @@ export default function OnboardingModal({ onComplete }) {
 
               {/* Day selection */}
               {paySchedule === 'twice_month' && (
-                <div className="p-3.5 bg-[#f8f7f2] rounded-2xl border border-[#e4dfd3] flex items-center justify-between gap-3 text-xs">
+                <div className="p-3 bg-[#f8f7f2] rounded-2xl border border-[#e4dfd3] flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 text-xs">
                   <span className="font-bold text-[#14261c]">Paycheck days:</span>
                   <div className="flex items-center gap-2">
                     <span>Day</span>
@@ -254,7 +271,8 @@ export default function OnboardingModal({ onComplete }) {
                       max="31"
                       value={payDay1}
                       onChange={(e) => setPayDay1(e.target.value)}
-                      className="w-12 bg-white border border-[#dcd7cb] rounded-lg px-2 py-1 text-center font-bold text-[#14261c]"
+                      onFocus={() => window.scrollTo(0, 0)}
+                      className="w-12 bg-white border border-[#dcd7cb] rounded-lg px-2 py-1.5 text-center font-bold text-[#14261c] text-base sm:text-xs"
                     />
                     <span>& Day</span>
                     <input
@@ -263,14 +281,15 @@ export default function OnboardingModal({ onComplete }) {
                       max="31"
                       value={payDay2}
                       onChange={(e) => setPayDay2(e.target.value)}
-                      className="w-12 bg-white border border-[#dcd7cb] rounded-lg px-2 py-1 text-center font-bold text-[#14261c]"
+                      onFocus={() => window.scrollTo(0, 0)}
+                      className="w-12 bg-white border border-[#dcd7cb] rounded-lg px-2 py-1.5 text-center font-bold text-[#14261c] text-base sm:text-xs"
                     />
                   </div>
                 </div>
               )}
 
               {paySchedule === 'monthly_1' && (
-                <div className="p-3.5 bg-[#f8f7f2] rounded-2xl border border-[#e4dfd3] flex items-center justify-between gap-3 text-xs">
+                <div className="p-3 bg-[#f8f7f2] rounded-2xl border border-[#e4dfd3] flex items-center justify-between gap-2 text-xs">
                   <span className="font-bold text-[#14261c]">Day of month you get paid:</span>
                   <div className="flex items-center gap-2">
                     <span>Day</span>
@@ -280,7 +299,8 @@ export default function OnboardingModal({ onComplete }) {
                       max="31"
                       value={payDay1}
                       onChange={(e) => setPayDay1(e.target.value)}
-                      className="w-14 bg-white border border-[#dcd7cb] rounded-lg px-2 py-1 text-center font-bold text-[#14261c]"
+                      onFocus={() => window.scrollTo(0, 0)}
+                      className="w-14 bg-white border border-[#dcd7cb] rounded-lg px-2 py-1.5 text-center font-bold text-[#14261c] text-base sm:text-xs"
                     />
                   </div>
                 </div>
@@ -290,7 +310,7 @@ export default function OnboardingModal({ onComplete }) {
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="px-4 py-3 rounded-2xl border border-[#e4dfd3] text-xs font-bold text-[#65776c] hover:bg-[#f8f7f2]"
+                  className="px-4 py-3 rounded-2xl border border-[#e4dfd3] text-xs font-bold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer"
                 >
                   Back
                 </button>
@@ -328,7 +348,7 @@ export default function OnboardingModal({ onComplete }) {
                       setBaseAmount(e.target.value);
                       setError('');
                     }}
-                    autoFocus
+                    onFocus={() => window.scrollTo(0, 0)}
                     className="w-full bg-[#f8f7f2] border border-[#dcd7cb] rounded-2xl pl-9 pr-4 py-3 text-base font-bold text-[#14261c] focus:outline-none focus:border-[#1b4332]"
                   />
                 </div>
@@ -337,7 +357,7 @@ export default function OnboardingModal({ onComplete }) {
               {/* Variable Paycheck Toggle */}
               <div
                 onClick={() => setIsVariable(!isVariable)}
-                className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-start gap-3 ${
+                className={`p-3.5 sm:p-4 rounded-2xl border transition-all cursor-pointer flex items-start gap-3 ${
                   isVariable
                     ? 'border-[#1b4332] bg-[#eaf4ee]'
                     : 'border-[#e4dfd3] bg-[#f8f7f2] hover:bg-[#ece8df]'
@@ -366,7 +386,7 @@ export default function OnboardingModal({ onComplete }) {
                 <button
                   type="button"
                   onClick={() => setStep(2)}
-                  className="px-4 py-3 rounded-2xl border border-[#e4dfd3] text-xs font-bold text-[#65776c] hover:bg-[#f8f7f2]"
+                  className="px-4 py-3 rounded-2xl border border-[#e4dfd3] text-xs font-bold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer"
                 >
                   Back
                 </button>

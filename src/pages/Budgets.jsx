@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useApp, formatMoney, getMonthExpenses, getCategoryById } from '../store';
 import { v4 as uuidv4 } from 'uuid';
 import { Plus, Pencil, Trash2, X, AlertTriangle, CheckCircle, TrendingUp, Settings2, Wallet } from 'lucide-react';
@@ -113,7 +113,7 @@ export default function Budgets() {
         </div>
       )}
 
-      <div className="grid sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {budgetsWithSpent.map(b => {
           const isOver    = b.pct >= 100;
           const isWarning = b.pct >= 80 && !isOver;
@@ -203,12 +203,29 @@ function BudgetModal({ initial, categories, onSave, onClose }) {
   const [form, setForm] = useState(initial || { category: categories[0]?.id || '', limit: '', period: 'monthly' });
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
+  useEffect(() => {
+    document.body.dataset.modalOpen = 'true';
+    const keepTop = () => {
+      if (window.scrollY !== 0) {
+        window.scrollTo(0, 0);
+      }
+    };
+    window.addEventListener('scroll', keepTop, { passive: true });
+    return () => {
+      delete document.body.dataset.modalOpen;
+      window.removeEventListener('scroll', keepTop);
+    };
+  }, []);
+
   return (
-    <div className="fixed inset-0 bg-[#000000]/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-      <div className="bg-[#ffffff] border border-[#e4dfd3] rounded-3xl p-6 w-full max-w-md shadow-2xl">
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-bold text-[#14261c]">{initial ? 'Edit' : 'New'} Budget</h2>
-          <button onClick={onClose} className="text-[#7d8f84] hover:text-[#14261c] p-1"><X size={18}/></button>
+    <div className="fixed inset-0 bg-[#000000]/50 backdrop-blur-xs z-50 overflow-y-auto px-4 modal-backdrop-safe flex flex-col items-center justify-start sm:justify-center">
+      <div
+        className="my-auto w-full max-w-md bg-[#ffffff] border border-[#e4dfd3] rounded-3xl p-5 sm:p-6 shadow-2xl modal-card-safe overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-4 sm:mb-5">
+          <h2 className="text-base sm:text-lg font-bold text-[#14261c]">{initial ? 'Edit' : 'New'} Budget</h2>
+          <button onClick={onClose} className="text-[#7d8f84] hover:text-[#14261c] p-1 cursor-pointer"><X size={18}/></button>
         </div>
         <div className="space-y-4">
           <div>
@@ -216,7 +233,7 @@ function BudgetModal({ initial, categories, onSave, onClose }) {
             <select
               value={form.category}
               onChange={e => set('category', e.target.value)}
-              className="w-full bg-[#f8f7f2] border border-[#e4dfd3] rounded-xl px-4 py-2.5 text-sm text-[#14261c] focus:outline-none focus:border-[#1b4332]"
+              className="w-full bg-[#f8f7f2] border border-[#e4dfd3] rounded-xl px-4 py-2.5 text-base sm:text-sm text-[#14261c] focus:outline-none focus:border-[#1b4332]"
             >
               {categories.map(c => <option key={c.id} value={c.id}>{c.icon} {c.name}</option>)}
             </select>
@@ -227,8 +244,9 @@ function BudgetModal({ initial, categories, onSave, onClose }) {
               type="number"
               value={form.limit}
               onChange={e => set('limit', e.target.value)}
+              onFocus={() => window.scrollTo(0, 0)}
               placeholder="0.00"
-              className="w-full bg-[#f8f7f2] border border-[#e4dfd3] rounded-xl px-4 py-2.5 text-sm text-[#14261c] focus:outline-none focus:border-[#1b4332]"
+              className="w-full bg-[#f8f7f2] border border-[#e4dfd3] rounded-xl px-4 py-2.5 text-base sm:text-sm text-[#14261c] focus:outline-none focus:border-[#1b4332]"
             />
           </div>
           <div>
@@ -250,8 +268,8 @@ function BudgetModal({ initial, categories, onSave, onClose }) {
           </div>
         </div>
         <div className="flex gap-3 mt-6">
-          <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-[#e4dfd3] text-sm font-semibold text-[#65776c] hover:bg-[#f8f7f2]">Cancel</button>
-          <button onClick={() => onSave({ ...form, limit: parseFloat(form.limit) || 0 })} className="flex-1 px-4 py-2.5 rounded-xl bg-[#1b4332] hover:bg-[#245740] text-sm font-bold text-white shadow-md shadow-[#1b4332]/25">
+          <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-[#e4dfd3] text-sm font-semibold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer">Cancel</button>
+          <button onClick={() => onSave({ ...form, limit: parseFloat(form.limit) || 0 })} className="flex-1 px-4 py-2.5 rounded-xl bg-[#1b4332] hover:bg-[#245740] text-sm font-bold text-white shadow-md shadow-[#1b4332]/25 cursor-pointer">
             {initial ? 'Save Changes' : 'Create Budget'}
           </button>
         </div>

@@ -91,7 +91,6 @@ export default function AddExpense() {
               placeholder="0.00"
               step="0.01"
               min="0"
-              autoFocus
               className="text-4xl sm:text-5xl font-extrabold text-white bg-transparent border-none outline-none w-56 text-center placeholder-white/30 focus:ring-0"
             />
           </div>
