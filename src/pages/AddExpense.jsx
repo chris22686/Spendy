@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useApp } from '../store';
+import { useApp, formatMoney } from '../store';
 import { v4 as uuidv4 } from 'uuid';
-import { CheckCircle, RefreshCw, Calendar, Tag, FileText, ChevronLeft, Plus } from 'lucide-react';
+import { CheckCircle, RefreshCw, Calendar, Tag, FileText, ChevronLeft, Plus, ArrowRight, X } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function AddExpense() {
@@ -20,7 +20,15 @@ export default function AddExpense() {
     recurring: false,
   });
   const [saved, setSaved] = useState(false);
+  const [toastInfo, setToastInfo] = useState(null);
   const [errors, setErrors] = useState({});
+  const toastTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    };
+  }, []);
 
   const set = (k, v) => {
     setForm(f => ({ ...f, [k]: v }));
@@ -40,22 +48,100 @@ export default function AddExpense() {
     const errs = validate();
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
 
+    const amountNum = parseFloat(form.amount);
+    const newExpense = {
+      ...form,
+      id: uuidv4(),
+      amount: amountNum,
+    };
+
     dispatch({
       type: 'ADD_EXPENSE',
-      payload: { ...form, id: uuidv4(), amount: parseFloat(form.amount) }
+      payload: newExpense,
     });
 
+    try {
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate([30, 40, 30]);
+      }
+    } catch (_) {}
+
+    const catObj = categories.find(c => c.id === form.category) || { name: 'Expense', icon: '💸', color: '#1b4332' };
+    const savedData = {
+      description: form.description,
+      amount: amountNum,
+      categoryName: catObj.name,
+      categoryIcon: catObj.icon,
+      categoryColor: catObj.color,
+    };
+
+    setToastInfo(savedData);
     setSaved(true);
+
     setTimeout(() => {
       setSaved(false);
       setForm({ description: '', amount: '', category: 'food', date: today, notes: '', recurring: false });
     }, 1800);
+
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    toastTimeoutRef.current = setTimeout(() => {
+      setToastInfo(null);
+    }, 4500);
   };
 
   const selectedCat = categories.find(c => c.id === form.category);
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6 pb-28 sm:pb-12">
+      {/* Viewport-fixed floating toast notification */}
+      {toastInfo && (
+        <aside
+          role="status"
+          aria-live="polite"
+          aria-label="Expense Saved Notification"
+          className="fixed top-4 left-3 right-3 sm:left-auto sm:right-6 sm:w-[380px] z-[999] bg-[#ffffff] border-2 border-[#2d6a4f] rounded-2xl p-4 shadow-2xl shadow-[#1b4332]/30 transition-all duration-300 animate-fade-in"
+          style={{ top: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}
+        >
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#eaf4ee] border border-[#a3d4b6] flex items-center justify-center text-xl shrink-0 shadow-xs">
+              {toastInfo.categoryIcon || '💸'}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5 text-xs font-black text-[#1b4332] uppercase tracking-wider">
+                <CheckCircle size={14} className="text-[#2d6a4f]" />
+                <span>Expense Added!</span>
+              </div>
+              <p className="text-sm font-bold text-[#14261c] truncate mt-0.5">
+                {toastInfo.description}
+              </p>
+              <p className="text-xs text-[#52685b] mt-0.5">
+                <span className="font-semibold text-[#991b1b]">-{formatMoney(toastInfo.amount)}</span> · {toastInfo.categoryName}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setToastInfo(null)}
+              className="p-1 text-[#8fa296] hover:text-[#1b4332] rounded-lg transition-colors cursor-pointer -mr-1 -mt-1"
+              title="Dismiss notification"
+            >
+              <X size={16} />
+            </button>
+          </div>
+
+          <div className="mt-3 pt-3 border-t border-[#f0ece1] flex items-center justify-between gap-2">
+            <span className="text-[11px] text-[#718578] font-medium">Logged in balances</span>
+            <button
+              type="button"
+              onClick={() => navigate('/expenses')}
+              className="text-xs font-bold text-white bg-[#1b4332] hover:bg-[#2d6a4f] px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all shadow-xs active:scale-95 cursor-pointer"
+            >
+              <span>View in Expenses</span>
+              <ArrowRight size={13} strokeWidth={2.5} />
+            </button>
+          </div>
+        </aside>
+      )}
+
       <div className="flex items-center gap-3">
         <button
           onClick={() => navigate(-1)}
@@ -69,13 +155,24 @@ export default function AddExpense() {
         </div>
       </div>
 
-      {saved && (
-        <div className="flex items-center gap-3 bg-[#eaf4ee] border border-[#a3d4b6] rounded-2xl px-5 py-4 text-[#1b4332] shadow-sm animate-fade-in">
-          <CheckCircle size={22} className="text-[#2d6a4f] shrink-0" />
-          <div>
-            <p className="font-bold text-sm text-[#143928]">Expense successfully logged!</p>
-            <p className="text-xs text-[#406e57] mt-0.5">Your balances and analytics have been updated.</p>
+      {toastInfo && (
+        <div className="flex items-center justify-between gap-3 bg-[#eaf4ee] border border-[#a3d4b6] rounded-2xl px-5 py-4 text-[#1b4332] shadow-sm animate-fade-in">
+          <div className="flex items-center gap-3 min-w-0">
+            <CheckCircle size={22} className="text-[#2d6a4f] shrink-0" />
+            <div className="min-w-0">
+              <p className="font-bold text-sm text-[#143928]">Expense successfully logged!</p>
+              <p className="text-xs text-[#406e57] mt-0.5 truncate">
+                Added <span className="font-bold">{toastInfo.description}</span> ({formatMoney(toastInfo.amount)}) to your balance.
+              </p>
+            </div>
           </div>
+          <button
+            type="button"
+            onClick={() => navigate('/expenses')}
+            className="text-xs font-bold text-[#1b4332] bg-[#ffffff] border border-[#a3d4b6] px-3 py-1.5 rounded-xl hover:bg-[#d8edd0] transition-colors shrink-0 cursor-pointer"
+          >
+            View
+          </button>
         </div>
       )}
 
@@ -233,7 +330,7 @@ export default function AddExpense() {
                 <p className="text-xs text-[#6e8074]">{selectedCat?.name} · {form.date}</p>
               </div>
               <span className="text-base font-extrabold text-[#991b1b]">
-                -${parseFloat(form.amount || 0).toFixed(2)}
+                -{formatMoney(parseFloat(form.amount || 0))}
               </span>
             </div>
           </div>
@@ -241,10 +338,24 @@ export default function AddExpense() {
 
         <button
           type="submit"
-          className="w-full py-3.5 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white font-extrabold rounded-2xl transition-all shadow-lg shadow-[#1b4332]/25 text-sm flex items-center justify-center gap-2 cursor-pointer"
+          disabled={saved}
+          className={`w-full py-4 font-extrabold rounded-2xl transition-all shadow-lg text-sm flex items-center justify-center gap-2 cursor-pointer ${
+            saved
+              ? 'bg-[#2d6a4f] text-white shadow-[#2d6a4f]/30 scale-[1.01]'
+              : 'bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white shadow-[#1b4332]/25'
+          }`}
         >
-          <Plus size={18} strokeWidth={2.8} />
-          <span>Save Expense</span>
+          {saved ? (
+            <>
+              <CheckCircle size={19} strokeWidth={2.8} className="animate-bounce text-[#a0cfb2]" />
+              <span>Expense Added Successfully! ✓</span>
+            </>
+          ) : (
+            <>
+              <Plus size={18} strokeWidth={2.8} />
+              <span>Save Expense</span>
+            </>
+          )}
         </button>
       </form>
     </div>
