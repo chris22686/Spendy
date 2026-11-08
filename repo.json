@@ -20,17 +20,17 @@
       "tintColor": "#1b4332",
       "category": "finance",
       "version": "1.0.1",
-      "versionDate": "2026-11-08T15:18:25Z",
+      "versionDate": "2026-11-08T15:33:04Z",
       "versionDescription": "Fixed iPhone status bar & notch safe-area overlap.",
       "downloadURL": "https://github.com/chris22686/Spendy/releases/download/latest/Spendy.ipa",
-      "size": 1880365,
+      "size": 1880276,
       "versions": [
         {
           "version": "1.0.1",
-          "date": "2026-11-08T15:18:25Z",
+          "date": "2026-11-08T15:33:04Z",
           "localizedDescription": "Fixed iPhone status bar & notch safe-area overlap.",
           "downloadURL": "https://github.com/chris22686/Spendy/releases/download/latest/Spendy.ipa",
-          "size": 1880365,
+          "size": 1880276,
           "minOSVersion": "14.0"
         }
       ],
