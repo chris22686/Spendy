@@ -19,12 +19,20 @@
       "iconURL": "https://raw.githubusercontent.com/chris22686/Spendy/main/public/icon.png",
       "tintColor": "#1b4332",
       "category": "finance",
-      "version": "1.0.1",
-      "versionDate": "2026-11-10T23:23:16Z",
-      "versionDescription": "Fixed iPhone status bar & notch safe-area overlap.",
-      "downloadURL": "https://github.com/chris22686/Spendy/releases/download/latest/Spendy.ipa",
-      "size": 1881885,
+      "version": "1.1.1",
+      "versionDate": "2026-11-10T23:56:53Z",
+      "versionDescription": "CI: unified Android+iOS build with auto-versioning, stable APK signing, and versioned releases for on-device updates",
+      "downloadURL": "https://github.com/chris22686/Spendy/releases/download/v1.1.1/Spendy.ipa",
+      "size": 1882610,
       "versions": [
+        {
+          "version": "1.1.1",
+          "date": "2026-11-10T23:56:53Z",
+          "localizedDescription": "CI: unified Android+iOS build with auto-versioning, stable APK signing, and versioned releases for on-device updates",
+          "downloadURL": "https://github.com/chris22686/Spendy/releases/download/v1.1.1/Spendy.ipa",
+          "size": 1882610,
+          "minOSVersion": "14.0"
+        },
         {
           "version": "1.0.1",
           "date": "2026-11-10T23:23:16Z",
