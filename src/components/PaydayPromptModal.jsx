@@ -39,6 +39,12 @@ export default function PaydayPromptModal({ onClose }) {
       }
     }
 
+    // Deposit amount into current balance
+    dispatch({
+      type: 'DEPOSIT_PAYCHECK',
+      payload: val,
+    });
+
     // Dismiss prompt for today
     dispatch({
       type: 'RECORD_PAYCHECK_PROMPT_DISMISSED',

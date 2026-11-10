@@ -5,7 +5,8 @@ import StatCard from '../components/StatCard';
 import TransactionCard from '../components/TransactionCard';
 import ResetModal from '../components/ResetModal';
 import IncomeSourcesModal from '../components/IncomeSourcesModal';
-import { DollarSign, TrendingDown, Target, CreditCard, ArrowRight, Flame, Zap, Plus, RotateCcw } from 'lucide-react';
+import AdjustBalanceModal from '../components/AdjustBalanceModal';
+import { DollarSign, TrendingDown, Target, CreditCard, ArrowRight, Flame, Zap, Plus, RotateCcw, Wallet } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
@@ -15,10 +16,11 @@ const CHART_COLORS = ['#1b4332','#2d6a4f','#40916c','#52b788','#d97706','#0ea5e9
 
 export default function Dashboard({ onOpenPaydayPrompt }) {
   const { state, dispatch } = useApp();
-  const { expenses, categories, budgets, monthlyIncome, userName, paydaySettings } = state;
+  const { expenses, categories, budgets, monthlyIncome, userName, paydaySettings, currentBalance = 0 } = state;
   const navigate = useNavigate();
   const [showReset, setShowReset] = useState(false);
   const [showIncomeModal, setShowIncomeModal] = useState(false);
+  const [showBalanceModal, setShowBalanceModal] = useState(false);
 
   const monthExp  = useMemo(() => getMonthExpenses(expenses), [expenses]);
   const weekExp   = useMemo(() => getWeekExpenses(expenses), [expenses]);
@@ -118,16 +120,25 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
         </div>
       </div>
 
-      {/* Top Spending Hero Card + Supporting Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+      {/* Top Balance Hero Card + Supporting Stat Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div onClick={() => setShowBalanceModal(true)} data-testid="current-balance-card" className="cursor-pointer transition-transform active:scale-98">
+          <StatCard
+            label="Current Balance"
+            value={formatMoney(currentBalance)}
+            sub="Tap to adjust funds"
+            icon={Wallet}
+            color="#1b4332"
+            isHero={true}
+          />
+        </div>
         <StatCard
           label="Total Monthly Spending"
           value={formatMoney(monthTotal)}
           sub="Updated today"
           icon={TrendingDown}
-          color="#1b4332"
+          color="#2d6a4f"
           trend={-12}
-          isHero={true}
         />
         <div onClick={() => setShowIncomeModal(true)} className="cursor-pointer transition-transform active:scale-98">
           <StatCard
@@ -135,7 +146,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
             value={formatMoney(monthlyIncome)}
             sub="Tap to manage sources"
             icon={DollarSign}
-            color="#2d6a4f"
+            color="#40916c"
           />
         </div>
         <StatCard
@@ -143,7 +154,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
           value={formatMoney(weekTotal)}
           sub="Past 7 days"
           icon={CreditCard}
-          color="#1b4332"
+          color="#52b788"
           trend={-5}
         />
       </div>
@@ -322,6 +333,8 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
       {showIncomeModal && (
         <IncomeSourcesModal onClose={() => setShowIncomeModal(false)} />
       )}
+
+      <AdjustBalanceModal isOpen={showBalanceModal} onClose={() => setShowBalanceModal(false)} />
     </div>
   );
 }

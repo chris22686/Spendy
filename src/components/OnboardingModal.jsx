@@ -1,23 +1,30 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '../store';
-import { ArrowRight, User, Check, Sparkles } from 'lucide-react';
+import { ArrowRight, User, Check, Sparkles, Wallet } from 'lucide-react';
 
 export default function OnboardingModal({ onComplete }) {
   const { dispatch } = useApp();
 
-  // Wizard steps: 1 = Name, 2 = Pay Frequency, 3 = Amount & Variance
+  // Wizard steps:
+  // 1 = Name
+  // 2 = Current Balance (The amount you have right now)
+  // 3 = Pay Frequency & Dates
+  // 4 = Typical Paycheck / Salary & Variance
   const [step, setStep] = useState(1);
 
   // Step 1: Name
   const [userName, setUserName] = useState('');
 
-  // Step 2: Pay Schedule
+  // Step 2: Current money you have right now
+  const [currentAmount, setCurrentAmount] = useState('');
+
+  // Step 3: Pay Schedule
   // Options: 'twice_month' (Every 15 days), 'monthly_1' (Once a month), 'weekly' (Every week)
   const [paySchedule, setPaySchedule] = useState('twice_month');
   const [payDay1, setPayDay1] = useState('1');
   const [payDay2, setPayDay2] = useState('15');
 
-  // Step 3: Income amount & variability
+  // Step 4: Income amount & variability
   const [baseAmount, setBaseAmount] = useState('');
   const [isVariable, setIsVariable] = useState(true);
   const [error, setError] = useState('');
@@ -40,9 +47,22 @@ export default function OnboardingModal({ onComplete }) {
     setStep(2);
   };
 
-  const handleNextFromStep2 = () => {
+  const handleNextFromStep2 = (e) => {
+    e?.preventDefault();
+    if (currentAmount.trim() !== '') {
+      const parsed = parseFloat(currentAmount);
+      if (isNaN(parsed) || parsed < 0) {
+        setError('Please enter a valid amount or leave blank for €0.00');
+        return;
+      }
+    }
     setError('');
     setStep(3);
+  };
+
+  const handleNextFromStep3 = () => {
+    setError('');
+    setStep(4);
   };
 
   const handleFinish = (e) => {
@@ -52,6 +72,10 @@ export default function OnboardingModal({ onComplete }) {
       setError('Please enter your typical or estimated salary amount');
       return;
     }
+
+    // Determine starting/current balance
+    const parsedCurrent = parseFloat(currentAmount);
+    const initialBalance = (!isNaN(parsedCurrent) && parsedCurrent >= 0) ? parsedCurrent : 0;
 
     // Generate income sources based on selection
     let generatedSources = [];
@@ -114,6 +138,8 @@ export default function OnboardingModal({ onComplete }) {
       type: 'COMPLETE_ONBOARDING',
       payload: {
         userName: userName.trim(),
+        currentBalance: initialBalance,
+        initialBalance: initialBalance,
         monthlyIncome: calculatedMonthly,
         incomeSources: generatedSources,
         paydaySettings,
@@ -132,22 +158,24 @@ export default function OnboardingModal({ onComplete }) {
         {/* Top Progress & Banner */}
         <div className="shrink-0 bg-gradient-to-r from-[#133928] via-[#1b4332] to-[#2d6a4f] p-4 sm:p-6 text-white text-center relative">
           <div className="w-10 h-10 sm:w-12 sm:h-12 mx-auto rounded-2xl bg-white/15 flex items-center justify-center mb-2 sm:mb-3 text-xl sm:text-2xl shadow-inner">
-            {step === 1 ? '👋' : step === 2 ? '🗓️' : '💰'}
+            {step === 1 ? '👋' : step === 2 ? '💳' : step === 3 ? '🗓️' : '💰'}
           </div>
           <h2 className="text-lg sm:text-xl font-black tracking-tight">
             {step === 1 && 'Welcome to Spendy!'}
-            {step === 2 && 'How often do you get paid?'}
-            {step === 3 && 'Salary & Variable Pay'}
+            {step === 2 && 'How much money do you have now?'}
+            {step === 3 && 'How often do you get paid?'}
+            {step === 4 && 'Salary & Variable Pay'}
           </h2>
           <p className="text-xs text-white/80 mt-1 font-medium max-w-sm mx-auto">
-            {step === 1 && "Let's personalize your budgeting experience in 3 quick steps."}
-            {step === 2 && 'Set your pay schedule so Spendy can notify you on payday.'}
-            {step === 3 && 'Tailored tracking for fixed or fluctuating paychecks.'}
+            {step === 1 && "Let's personalize your budgeting experience in 4 quick steps."}
+            {step === 2 && 'Enter your current funds across cash & bank accounts.'}
+            {step === 3 && 'Set your pay schedule so Spendy can notify you on payday.'}
+            {step === 4 && 'Forecast your monthly income and enable payday check-ins.'}
           </p>
 
           {/* Dots Indicator */}
           <div className="flex justify-center items-center gap-2 mt-3 sm:mt-4">
-            {[1, 2, 3].map((s) => (
+            {[1, 2, 3, 4].map((s) => (
               <span
                 key={s}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
@@ -158,7 +186,7 @@ export default function OnboardingModal({ onComplete }) {
           </div>
         </div>
 
-        {/* Form Body - Scrollable if screen height shrinks with keyboard */}
+        {/* Form Body */}
         <div className="p-4 sm:p-6 space-y-4 sm:space-y-5 overflow-y-auto flex-1">
           {error && (
             <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold">
@@ -201,8 +229,63 @@ export default function OnboardingModal({ onComplete }) {
             </form>
           )}
 
-          {/* ── STEP 2: Pay Schedule ── */}
+          {/* ── STEP 2: Current Balance / Money You Have Now ── */}
           {step === 2 && (
+            <form onSubmit={handleNextFromStep2} className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-2 block">
+                  Current Available Balance
+                </label>
+                <div className="rounded-3xl bg-gradient-to-br from-[#133928] via-[#1b4332] to-[#2d6a4f] border border-[#2d6a4f]/50 p-5 sm:p-6 text-center text-white shadow-xl shadow-[#1b4332]/20 relative overflow-hidden">
+                  <p className="text-[11px] font-bold text-[#a0cfb2] uppercase tracking-wider mb-2">
+                    Total Money You Have Right Now
+                  </p>
+                  <div className="flex items-center justify-center gap-1 sm:gap-2">
+                    <span className="text-3xl sm:text-4xl font-light text-[#86bfa0]">€</span>
+                    <input
+                      type="number"
+                      step="any"
+                      min="0"
+                      value={currentAmount}
+                      onChange={(e) => {
+                        setCurrentAmount(e.target.value);
+                        setError('');
+                      }}
+                      onFocus={() => window.scrollTo(0, 0)}
+                      placeholder="0.00"
+                      className="text-4xl sm:text-5xl font-extrabold text-white bg-transparent border-none outline-none w-56 text-center placeholder-white/30 focus:ring-0"
+                    />
+                  </div>
+                  <p className="text-[11px] text-[#a0cfb2]/85 mt-2 font-medium">
+                    Cash in wallet, checking & savings accounts
+                  </p>
+                </div>
+                <p className="text-xs text-[#6e8074] leading-relaxed pt-2">
+                  This is your starting balance. Every time you log an expense, Spendy will automatically subtract it from this balance.
+                </p>
+              </div>
+
+              <div className="flex gap-2.5 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setStep(1)}
+                  className="px-4 py-3 rounded-2xl border border-[#e4dfd3] text-xs font-bold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer"
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-3 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white rounded-2xl text-sm font-extrabold shadow-md shadow-[#1b4332]/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                >
+                  <span>Next Step</span>
+                  <ArrowRight size={16} />
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* ── STEP 3: Pay Schedule ── */}
+          {step === 3 && (
             <div className="space-y-3.5 sm:space-y-4">
               <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider block">
                 Select your payday schedule:
@@ -302,14 +385,14 @@ export default function OnboardingModal({ onComplete }) {
               <div className="flex gap-2.5 pt-2">
                 <button
                   type="button"
-                  onClick={() => setStep(1)}
+                  onClick={() => setStep(2)}
                   className="px-4 py-3 rounded-2xl border border-[#e4dfd3] text-xs font-bold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer"
                 >
                   Back
                 </button>
                 <button
                   type="button"
-                  onClick={handleNextFromStep2}
+                  onClick={handleNextFromStep3}
                   className="flex-1 py-3 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white rounded-2xl text-sm font-extrabold shadow-md shadow-[#1b4332]/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
                 >
                   <span>Next Step</span>
@@ -319,8 +402,8 @@ export default function OnboardingModal({ onComplete }) {
             </div>
           )}
 
-          {/* ── STEP 3: Typical Amount & Variable Check ── */}
-          {step === 3 && (
+          {/* ── STEP 4: Typical Paycheck Amount & Variable Check ── */}
+          {step === 4 && (
             <form onSubmit={handleFinish} className="space-y-4">
               <div>
                 <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">
@@ -378,7 +461,7 @@ export default function OnboardingModal({ onComplete }) {
               <div className="flex gap-2.5 pt-2">
                 <button
                   type="button"
-                  onClick={() => setStep(2)}
+                  onClick={() => setStep(3)}
                   className="px-4 py-3 rounded-2xl border border-[#e4dfd3] text-xs font-bold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer"
                 >
                   Back

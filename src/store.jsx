@@ -116,15 +116,34 @@ function reducer(state, action) {
       if (isDuplicate) {
         return state;
       }
+      const prevBal = state.currentBalance !== undefined ? Number(state.currentBalance) : 2500;
+      const updatedBalance = Math.round((prevBal - Number(newExp.amount || 0)) * 100) / 100;
       return {
         ...state,
+        currentBalance: updatedBalance,
         expenses: [{ ...newExp, _createdAt: now }, ...state.expenses],
       };
     }
-    case 'UPDATE_EXPENSE':
-      return { ...state, expenses: state.expenses.map(e => e.id === action.payload.id ? action.payload : e) };
-    case 'DELETE_EXPENSE':
-      return { ...state, expenses: state.expenses.filter(e => e.id !== action.payload) };
+    case 'UPDATE_EXPENSE': {
+      const oldExp = state.expenses.find(e => e.id === action.payload.id);
+      const diff = (oldExp ? Number(oldExp.amount || 0) : 0) - Number(action.payload.amount || 0);
+      const prevBal = state.currentBalance !== undefined ? Number(state.currentBalance) : 2500;
+      return {
+        ...state,
+        currentBalance: Math.round((prevBal + diff) * 100) / 100,
+        expenses: state.expenses.map(e => e.id === action.payload.id ? action.payload : e),
+      };
+    }
+    case 'DELETE_EXPENSE': {
+      const exp = state.expenses.find(e => e.id === action.payload);
+      const refund = exp ? Number(exp.amount || 0) : 0;
+      const prevBal = state.currentBalance !== undefined ? Number(state.currentBalance) : 2500;
+      return {
+        ...state,
+        currentBalance: Math.round((prevBal + refund) * 100) / 100,
+        expenses: state.expenses.filter(e => e.id !== action.payload),
+      };
+    }
     case 'ADD_CATEGORY':
       return { ...state, categories: [...state.categories, action.payload] };
     case 'UPDATE_CATEGORY':
@@ -153,6 +172,22 @@ function reducer(state, action) {
       const fallbackGroup = updatedGroups[0] || 'Other';
       const updatedCategories = state.categories.map(c => c.group === groupToDelete ? { ...c, group: fallbackGroup } : c);
       return { ...state, categoryGroups: updatedGroups, categories: updatedCategories };
+    }
+    case 'SET_BALANCE': {
+      const amt = Math.round((Number(action.payload) || 0) * 100) / 100;
+      return {
+        ...state,
+        currentBalance: amt,
+        initialBalance: amt,
+      };
+    }
+    case 'DEPOSIT_PAYCHECK': {
+      const amt = Math.round((Number(action.payload) || 0) * 100) / 100;
+      const prevBal = state.currentBalance !== undefined ? Number(state.currentBalance) : 0;
+      return {
+        ...state,
+        currentBalance: Math.round((prevBal + amt) * 100) / 100,
+      };
     }
     case 'SET_BUDGET': {
       const exists = state.budgets.find(b => b.id === action.payload.id);
@@ -193,6 +228,8 @@ function reducer(state, action) {
         budgets: SAMPLE_BUDGETS,
         incomeSources: DEFAULT_INCOME_SOURCES,
         monthlyIncome: Math.round(calculateMonthlyIncomeFromSources(DEFAULT_INCOME_SOURCES)),
+        currentBalance: 2450,
+        initialBalance: 2450,
       };
     case 'CLEAR_ALL_DATA':
       return {
@@ -202,19 +239,29 @@ function reducer(state, action) {
         budgets: [],
         incomeSources: [],
         monthlyIncome: 0,
+        currentBalance: 0,
+        initialBalance: 0,
         userName: '',
         onboardingComplete: false,
         paydaySettings: null,
       };
-    case 'COMPLETE_ONBOARDING':
+    case 'COMPLETE_ONBOARDING': {
+      const bal = action.payload.currentBalance !== undefined
+        ? Math.round((Number(action.payload.currentBalance) || 0) * 100) / 100
+        : (action.payload.initialBalance !== undefined
+            ? Math.round((Number(action.payload.initialBalance) || 0) * 100) / 100
+            : (state.currentBalance !== undefined ? state.currentBalance : 0));
       return {
         ...state,
         userName: action.payload.userName || '',
         onboardingComplete: true,
+        currentBalance: bal,
+        initialBalance: bal,
         paydaySettings: action.payload.paydaySettings || null,
         monthlyIncome: action.payload.monthlyIncome !== undefined ? action.payload.monthlyIncome : state.monthlyIncome,
         incomeSources: action.payload.incomeSources || state.incomeSources,
       };
+    }
     case 'UPDATE_PAYDAY_SETTINGS':
       return {
         ...state,
@@ -262,6 +309,12 @@ function loadState() {
           parsed.monthlyIncome = Math.round(calculateMonthlyIncomeFromSources(DEFAULT_INCOME_SOURCES));
         }
       }
+      if (parsed.currentBalance === undefined) {
+        parsed.currentBalance = parsed.initialBalance !== undefined ? parsed.initialBalance : 2450;
+      }
+      if (parsed.initialBalance === undefined) {
+        parsed.initialBalance = parsed.currentBalance;
+      }
       return parsed;
     }
   } catch {}
@@ -281,6 +334,8 @@ const initialState = loadState() || {
   budgets: SAMPLE_BUDGETS,
   incomeSources: DEFAULT_INCOME_SOURCES,
   monthlyIncome: Math.round(calculateMonthlyIncomeFromSources(DEFAULT_INCOME_SOURCES)),
+  currentBalance: 2450,
+  initialBalance: 2450,
   userName: '',
   onboardingComplete: false,
   paydaySettings: null,
