@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useApp, formatMoney, getMonthExpenses, getCategoryTotals, getTotalSpent } from '../store';
+import { useApp, formatMoney, getMonthExpenses, getWeekExpenses, getCategoryTotals, getTotalSpent } from '../store';
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -45,10 +45,13 @@ export default function Insights() {
     });
   }, [expenses]);
 
+  const isWeekly = period === 'week';
+  const activeExp  = useMemo(() => isWeekly ? getWeekExpenses(expenses) : getMonthExpenses(expenses), [expenses, isWeekly]);
+  const catTotals = useMemo(() => getCategoryTotals(activeExp, categories), [activeExp, categories]);
+  const totalSpent = useMemo(() => getTotalSpent(activeExp), [activeExp]);
+  const periodIncome = isWeekly ? Math.round((monthlyIncome * 12) / 52) : monthlyIncome;
+  const savings   = Math.max(0, periodIncome - totalSpent);
   const monthExp  = useMemo(() => getMonthExpenses(expenses), [expenses]);
-  const catTotals = useMemo(() => getCategoryTotals(monthExp, categories), [monthExp, categories]);
-  const totalSpent = useMemo(() => getTotalSpent(monthExp), [monthExp]);
-  const savings   = Math.max(0, monthlyIncome - totalSpent);
 
   const dailyData = useMemo(() => {
     const start = startOfMonth(now);
@@ -105,10 +108,10 @@ export default function Insights() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         {[
-          { label: 'Total Spent',    value: formatMoney(totalSpent), color: '#991b1b', bg: 'bg-[#fef2f2]', icon: TrendingDown },
-          { label: 'Net Saved',      value: formatMoney(savings), color: '#1b4332', bg: 'bg-[#eaf4ee]', icon: TrendingUp },
+          { label: isWeekly ? 'Spent (7 Days)' : 'Total Spent (Month)', value: formatMoney(totalSpent), color: '#991b1b', bg: 'bg-[#fef2f2]', icon: TrendingDown },
+          { label: isWeekly ? 'Est. Weekly Savings' : 'Monthly Net Saved', value: formatMoney(savings), color: '#1b4332', bg: 'bg-[#eaf4ee]', icon: TrendingUp },
           { label: 'Active Categories', value: catTotals.length, color: '#2d6a4f', bg: 'bg-[#f0f7f3]', icon: null },
-          { label: 'Transactions',   value: monthExp.length, color: '#15803d', bg: 'bg-[#edf7f0]', icon: null },
+          { label: isWeekly ? 'Weekly Outflows' : 'Monthly Outflows', value: activeExp.length, color: '#15803d', bg: 'bg-[#edf7f0]', icon: null },
         ].map(({ label, value, color }) => (
           <div key={label} className="rounded-2xl bg-[#ffffff] border border-[#e7e4da] p-3 sm:p-4 shadow-xs">
             <p className="text-[10px] sm:text-xs text-[#6e8074] mb-1 font-bold uppercase tracking-wider">{label}</p>

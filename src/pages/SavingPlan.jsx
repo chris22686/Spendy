@@ -40,11 +40,11 @@ function buildPlan(expenses, categories, monthlyIncome, days) {
     if (i % 3 === 0) dayTasks.push({ action: 'Review Daily Pace', desc: 'Verify you are under your daily cap', icon: '📊' });
     if (isWeekend)   dayTasks.push({ action: 'No-Spend Challenge', desc: 'Opt for home activities or walk outside', icon: '🌲' });
     if (i % 7 === 0) dayTasks.push({ action: 'Weekly Meal Prep', desc: 'Prep healthy lunches to cut takeout spending', icon: '🥗' });
-    if (reductions[i % reductions.length]) {
+    if (reductions.length > 0 && reductions[i % reductions.length]) {
       const r = reductions[i % reductions.length];
       dayTasks.push({ action: 'Cap Spending', desc: `Keep ${r.category.name} under ${formatMoney(r.cap / 4)} today`, icon: r.category.icon });
     }
-    dayTasks.push({ action: 'Automatic Stash', desc: `Transfer ${formatMoney(dailySaving.toFixed(2))} to your savings account`, icon: '💰' });
+    dayTasks.push({ action: 'Automatic Stash', desc: `Transfer ${formatMoney(dailySaving)} to your savings account`, icon: '💰' });
 
     tasks.push({ date: format(d, 'EEE, MMM d'), day: i + 1, tasks: dayTasks });
   }

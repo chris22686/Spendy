@@ -2,8 +2,27 @@ import { getCategoryById, formatMoney } from '../store';
 import { Trash2, RefreshCw } from 'lucide-react';
 import { format } from 'date-fns';
 
+function formatCardDate(dateStr) {
+  try {
+    if (!dateStr) return '';
+    const safeStr = dateStr.includes('T') ? dateStr : `${dateStr}T00:00:00`;
+    const d = new Date(safeStr);
+    if (!isNaN(d.getTime())) return format(d, 'MMM d, yyyy');
+  } catch {}
+  return dateStr;
+}
+
 export default function TransactionCard({ expense, categories, onDelete, onClick }) {
   const cat = getCategoryById(categories, expense.category);
+
+  const handleDelete = (e) => {
+    e.stopPropagation();
+    if (!onDelete) return;
+    const desc = expense.description || 'this expense';
+    if (window.confirm(`Delete "${desc}"?`)) {
+      onDelete(expense.id);
+    }
+  };
 
   return (
     <div
@@ -31,7 +50,7 @@ export default function TransactionCard({ expense, categories, onDelete, onClick
           <span className="text-[11px] sm:text-xs font-medium text-[#65776c] truncate max-w-[100px] sm:max-w-none">{cat.name}</span>
           <span className="text-[#c1cbc4]">·</span>
           <span className="text-[11px] sm:text-xs text-[#809186] shrink-0">
-            {format(new Date(expense.date + 'T00:00:00'), 'MMM d, yyyy')}
+            {formatCardDate(expense.date)}
           </span>
           {expense.notes && (
             <>
@@ -48,7 +67,8 @@ export default function TransactionCard({ expense, categories, onDelete, onClick
         </span>
         {onDelete && (
           <button
-            onClick={(e) => { e.stopPropagation(); onDelete(expense.id); }}
+            type="button"
+            onClick={handleDelete}
             className="p-1 sm:p-1.5 rounded-lg text-[#94a399] hover:text-[#b91c1c] hover:bg-[#fee2e2] transition-all cursor-pointer"
             title="Delete expense"
           >

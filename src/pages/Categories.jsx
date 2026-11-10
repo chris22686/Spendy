@@ -13,6 +13,20 @@ export default function Categories() {
   const [showGroupModal, setShowGroupModal] = useState(false);
   const [editCat, setEditCat] = useState(null);
 
+  const handleDeleteCategory = (cat) => {
+    if (categories.length <= 1) {
+      alert('You must keep at least one category.');
+      return;
+    }
+    const count = (state.expenses || []).filter(e => e.category === cat.id).length;
+    const msg = count > 0
+      ? `Delete category "${cat.name}"? It is linked to ${count} transaction(s).`
+      : `Delete category "${cat.name}"?`;
+    if (window.confirm(msg)) {
+      dispatch({ type: 'DELETE_CATEGORY', payload: cat.id });
+    }
+  };
+
   // Group categories under their respective categoryGroups, plus any leftover groups
   const grouped = {};
   categoryGroups.forEach(g => {
@@ -104,7 +118,8 @@ export default function Categories() {
                       <Pencil size={15} />
                     </button>
                     <button
-                      onClick={() => dispatch({ type: 'DELETE_CATEGORY', payload: cat.id })}
+                      type="button"
+                      onClick={() => handleDeleteCategory(cat)}
                       className="p-2 rounded-xl text-[#991b1b] bg-[#fef2f2] border border-[#fecaca] hover:bg-[#fee2e2] transition-all cursor-pointer"
                       title="Delete category"
                     >

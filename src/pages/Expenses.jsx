@@ -5,6 +5,16 @@ import { Search, X, Plus } from 'lucide-react';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 
+function formatGroupDate(dateStr) {
+  try {
+    if (!dateStr) return 'Unknown Date';
+    const safe = dateStr.includes('T') ? dateStr : `${dateStr}T00:00:00`;
+    const d = new Date(safe);
+    if (!isNaN(d.getTime())) return format(d, 'EEEE, MMMM d, yyyy');
+  } catch {}
+  return dateStr;
+}
+
 export default function Expenses() {
   const { state, dispatch } = useApp();
   const { expenses, categories } = state;
@@ -102,7 +112,7 @@ export default function Expenses() {
             <div key={date}>
               <div className="flex items-center justify-between mb-3 px-1">
                 <h3 className="text-xs font-bold text-[#55695e] uppercase tracking-wider">
-                  {format(new Date(date + 'T00:00:00'), 'EEEE, MMMM d, yyyy')}
+                  {formatGroupDate(date)}
                 </h3>
                 <span className="text-xs font-bold text-[#1b4332] bg-[#eaf4ee] px-2.5 py-0.5 rounded-full border border-[#cce3d5]">
                   {formatMoney(exps.reduce((s, e) => s + e.amount, 0))}
@@ -149,8 +159,15 @@ export default function Expenses() {
 }
 
 function ExpenseModal({ expense, categories, onSave, onClose }) {
-  const [form, setForm] = useState({ ...expense });
-  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const [form, setForm] = useState({
+    ...expense,
+    amount: expense.amount !== undefined ? expense.amount.toString() : '',
+  });
+  const [error, setError] = useState('');
+  const set = (k, v) => {
+    setForm(f => ({ ...f, [k]: v }));
+    setError('');
+  };
 
   useEffect(() => {
     document.body.dataset.modalOpen = 'true';
@@ -158,6 +175,28 @@ function ExpenseModal({ expense, categories, onSave, onClose }) {
       delete document.body.dataset.modalOpen;
     };
   }, []);
+
+  const handleSubmit = (e) => {
+    e?.preventDefault();
+    if (!form.description?.trim()) {
+      setError('Please enter a description');
+      return;
+    }
+    const val = parseFloat(form.amount);
+    if (isNaN(val) || val <= 0) {
+      setError('Please enter a valid amount greater than 0');
+      return;
+    }
+    if (!form.date) {
+      setError('Please choose a valid date');
+      return;
+    }
+    onSave({
+      ...form,
+      description: form.description.trim(),
+      amount: val,
+    });
+  };
 
   return (
     <div className="fixed inset-0 bg-[#000000]/50 backdrop-blur-xs z-50 overflow-y-auto px-4 modal-backdrop-safe flex flex-col items-center justify-start sm:justify-center">
@@ -169,10 +208,18 @@ function ExpenseModal({ expense, categories, onSave, onClose }) {
           <h2 className="text-base sm:text-lg font-bold text-[#14261c]">Edit Expense</h2>
           <button onClick={onClose} className="text-[#7d8f84] hover:text-[#14261c] p-1 cursor-pointer"><X size={18}/></button>
         </div>
-        <div className="space-y-4">
+
+        {error && (
+          <div className="p-3 mb-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="text-xs font-bold text-[#55695e] mb-1.5 block uppercase tracking-wider">Description</label>
             <input
+              type="text"
               value={form.description}
               onChange={e => set('description', e.target.value)}
               onFocus={() => window.scrollTo(0, 0)}
@@ -184,9 +231,12 @@ function ExpenseModal({ expense, categories, onSave, onClose }) {
               <label className="text-xs font-bold text-[#55695e] mb-1.5 block uppercase tracking-wider">Amount (€)</label>
               <input
                 type="number"
+                step="any"
+                min="0"
                 value={form.amount}
-                onChange={e => set('amount', parseFloat(e.target.value)||0)}
+                onChange={e => set('amount', e.target.value)}
                 onFocus={() => window.scrollTo(0, 0)}
+                placeholder="0.00"
                 className="w-full bg-[#f8f7f2] border border-[#e4dfd3] rounded-xl px-4 py-2.5 text-base sm:text-sm text-[#14261c] focus:outline-none focus:border-[#1b4332]"
               />
             </div>
@@ -216,6 +266,7 @@ function ExpenseModal({ expense, categories, onSave, onClose }) {
               value={form.notes||''}
               onChange={e => set('notes', e.target.value)}
               onFocus={() => window.scrollTo(0, 0)}
+              placeholder="Receipt details..."
               className="w-full bg-[#f8f7f2] border border-[#e4dfd3] rounded-xl px-4 py-2.5 text-base sm:text-sm text-[#14261c] focus:outline-none focus:border-[#1b4332]"
             />
           </div>
@@ -226,11 +277,11 @@ function ExpenseModal({ expense, categories, onSave, onClose }) {
             </div>
             <span className="text-sm font-semibold text-[#14261c]">Recurring expense</span>
           </label>
-        </div>
-        <div className="flex gap-3 mt-6">
-          <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-[#e4dfd3] text-sm font-semibold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer">Cancel</button>
-          <button onClick={() => onSave(form)} className="flex-1 px-4 py-2.5 rounded-xl bg-[#1b4332] hover:bg-[#245740] text-sm font-bold text-white shadow-md shadow-[#1b4332]/25 cursor-pointer">Save Changes</button>
-        </div>
+          <div className="flex gap-3 pt-2">
+            <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-[#e4dfd3] text-sm font-semibold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer">Cancel</button>
+            <button type="submit" className="flex-1 px-4 py-2.5 rounded-xl bg-[#1b4332] hover:bg-[#245740] text-sm font-bold text-white shadow-md shadow-[#1b4332]/25 cursor-pointer">Save Changes</button>
+          </div>
+        </form>
       </div>
     </div>
   );

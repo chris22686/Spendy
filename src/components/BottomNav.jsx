@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, CreditCard, Plus, Tag, MoreHorizontal, Target, BarChart3, Sparkles, BookOpen, RotateCcw, X } from 'lucide-react';
 import ResetModal from './ResetModal';
@@ -8,6 +8,15 @@ export default function BottomNav() {
   const navigate = useNavigate();
   const [showMore, setShowMore] = useState(false);
   const [showReset, setShowReset] = useState(false);
+
+  useEffect(() => {
+    if (showMore) {
+      document.body.dataset.modalOpen = 'true';
+      return () => {
+        delete document.body.dataset.modalOpen;
+      };
+    }
+  }, [showMore]);
 
   const mainNav = [
     { to: '/',           icon: LayoutDashboard, label: 'Home' },

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useApp } from '../store';
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, CreditCard, PlusCircle,
@@ -18,7 +19,9 @@ const NAV = [
 ];
 
 export default function Sidebar() {
+  const { state } = useApp();
   const [showReset, setShowReset] = useState(false);
+  const userName = state?.userName ? `${state.userName}'s Wallet` : 'My Wallet';
 
   return (
     <>
@@ -88,7 +91,7 @@ export default function Sidebar() {
               <img src="/icon.png" alt="Profile" className="w-full h-full object-cover" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold text-[#143928] truncate">My Wallet</p>
+              <p className="text-xs font-bold text-[#143928] truncate">{userName}</p>
               <p className="text-[11px] text-[#718578] truncate">Standard Plan</p>
             </div>
           </div>

@@ -17,17 +17,19 @@ export default function Budgets() {
   const budgetsWithSpent = useMemo(() =>
     budgets.map(b => {
       const spent = monthExp.filter(e => e.category === b.category).reduce((s, e) => s + e.amount, 0);
-      const pct = Math.min((spent / b.limit) * 100, 100);
-      const remaining = b.limit - spent;
+      const limitVal = Number(b.limit) || 0;
+      const rawPct = limitVal > 0 ? (spent / limitVal) * 100 : 0;
+      const pct = Math.min(rawPct, 100);
+      const remaining = limitVal - spent;
       const cat = getCategoryById(categories, b.category);
-      return { ...b, spent, pct, remaining, cat };
-    }).sort((a, b) => b.pct - a.pct)
+      return { ...b, spent, pct, rawPct, remaining, cat };
+    }).sort((a, b) => b.rawPct - a.rawPct)
   , [budgets, monthExp, categories]);
 
   const totalBudget = budgets.reduce((s, b) => s + b.limit, 0);
   const totalSpent  = budgetsWithSpent.reduce((s, b) => s + b.spent, 0);
-  const overBudget  = budgetsWithSpent.filter(b => b.pct >= 100).length;
-  const warningBudget = budgetsWithSpent.filter(b => b.pct >= 80 && b.pct < 100).length;
+  const overBudget  = budgetsWithSpent.filter(b => b.rawPct >= 100).length;
+  const warningBudget = budgetsWithSpent.filter(b => b.rawPct >= 80 && b.rawPct < 100).length;
 
   return (
     <div className="space-y-6">
@@ -115,8 +117,8 @@ export default function Budgets() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {budgetsWithSpent.map(b => {
-          const isOver    = b.pct >= 100;
-          const isWarning = b.pct >= 80 && !isOver;
+          const isOver    = b.rawPct >= 100;
+          const isWarning = b.rawPct >= 80 && !isOver;
           const barColor  = isOver ? '#dc2626' : isWarning ? '#ea580c' : '#1b4332';
 
           return (
@@ -162,7 +164,7 @@ export default function Budgets() {
                     {formatMoney(b.spent)} <span className="text-[#88998e]">of</span> {formatMoney(b.limit)}
                   </span>
                   <span className={`font-bold ${isOver ? 'text-[#dc2626]' : isWarning ? 'text-[#ea580c]' : 'text-[#1b4332]'}`}>
-                    {b.pct.toFixed(0)}%
+                    {b.rawPct.toFixed(0)}%
                   </span>
                 </div>
                 <div className="h-2.5 bg-[#f3efe5] rounded-full overflow-hidden p-0.5">
@@ -200,8 +202,12 @@ export default function Budgets() {
 }
 
 function BudgetModal({ initial, categories, onSave, onClose }) {
-  const [form, setForm] = useState(initial || { category: categories[0]?.id || '', limit: '', period: 'monthly' });
-  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const [form, setForm] = useState(initial ? { ...initial, limit: initial.limit?.toString() || '' } : { category: categories[0]?.id || '', limit: '', period: 'monthly' });
+  const [error, setError] = useState('');
+  const set = (k, v) => {
+    setForm(f => ({ ...f, [k]: v }));
+    setError('');
+  };
 
   useEffect(() => {
     document.body.dataset.modalOpen = 'true';
@@ -209,6 +215,20 @@ function BudgetModal({ initial, categories, onSave, onClose }) {
       delete document.body.dataset.modalOpen;
     };
   }, []);
+
+  const handleSubmit = (e) => {
+    e?.preventDefault();
+    const val = parseFloat(form.limit);
+    if (isNaN(val) || val <= 0) {
+      setError('Please enter a budget limit greater than 0');
+      return;
+    }
+    if (!form.category) {
+      setError('Please select a category');
+      return;
+    }
+    onSave({ ...form, limit: val });
+  };
 
   return (
     <div className="fixed inset-0 bg-[#000000]/50 backdrop-blur-xs z-50 overflow-y-auto px-4 modal-backdrop-safe flex flex-col items-center justify-start sm:justify-center">
@@ -220,7 +240,14 @@ function BudgetModal({ initial, categories, onSave, onClose }) {
           <h2 className="text-base sm:text-lg font-bold text-[#14261c]">{initial ? 'Edit' : 'New'} Budget</h2>
           <button onClick={onClose} className="text-[#7d8f84] hover:text-[#14261c] p-1 cursor-pointer"><X size={18}/></button>
         </div>
-        <div className="space-y-4">
+
+        {error && (
+          <div className="p-3 mb-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">Category</label>
             <select
@@ -235,10 +262,12 @@ function BudgetModal({ initial, categories, onSave, onClose }) {
             <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">Budget Limit (€)</label>
             <input
               type="number"
+              step="any"
+              min="0"
               value={form.limit}
               onChange={e => set('limit', e.target.value)}
               onFocus={() => window.scrollTo(0, 0)}
-              placeholder="0.00"
+              placeholder="e.g. 250.00"
               className="w-full bg-[#f8f7f2] border border-[#e4dfd3] rounded-xl px-4 py-2.5 text-base sm:text-sm text-[#14261c] focus:outline-none focus:border-[#1b4332]"
             />
           </div>
@@ -259,13 +288,13 @@ function BudgetModal({ initial, categories, onSave, onClose }) {
               ))}
             </div>
           </div>
-        </div>
-        <div className="flex gap-3 mt-6">
-          <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-[#e4dfd3] text-sm font-semibold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer">Cancel</button>
-          <button onClick={() => onSave({ ...form, limit: parseFloat(form.limit) || 0 })} className="flex-1 px-4 py-2.5 rounded-xl bg-[#1b4332] hover:bg-[#245740] text-sm font-bold text-white shadow-md shadow-[#1b4332]/25 cursor-pointer">
-            {initial ? 'Save Changes' : 'Create Budget'}
-          </button>
-        </div>
+          <div className="flex gap-3 pt-2">
+            <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-[#e4dfd3] text-sm font-semibold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer">Cancel</button>
+            <button type="submit" className="flex-1 px-4 py-2.5 rounded-xl bg-[#1b4332] hover:bg-[#245740] text-sm font-bold text-white shadow-md shadow-[#1b4332]/25 cursor-pointer">
+              {initial ? 'Save Changes' : 'Create Budget'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
