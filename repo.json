@@ -19,12 +19,20 @@
       "iconURL": "https://raw.githubusercontent.com/chris22686/Spendy/main/public/icon.png",
       "tintColor": "#1b4332",
       "category": "finance",
-      "version": "1.1.2",
-      "versionDate": "2026-11-11T00:04:35Z",
-      "versionDescription": "Fix paycheck day validation: limit to 1-31, block duplicate/empty days, handle 29-31 in short months",
-      "downloadURL": "https://github.com/chris22686/Spendy/releases/download/v1.1.2/Spendy.ipa",
-      "size": 1882933,
+      "version": "1.1.3",
+      "versionDate": "2026-11-11T00:09:43Z",
+      "versionDescription": "Start new users with zero spending: remove demo expenses/budgets on onboarding, clean up existing users once, keep profile on demo reload",
+      "downloadURL": "https://github.com/chris22686/Spendy/releases/download/v1.1.3/Spendy.ipa",
+      "size": 1883081,
       "versions": [
+        {
+          "version": "1.1.3",
+          "date": "2026-11-11T00:09:43Z",
+          "localizedDescription": "Start new users with zero spending: remove demo expenses/budgets on onboarding, clean up existing users once, keep profile on demo reload",
+          "downloadURL": "https://github.com/chris22686/Spendy/releases/download/v1.1.3/Spendy.ipa",
+          "size": 1883081,
+          "minOSVersion": "14.0"
+        },
         {
           "version": "1.1.2",
           "date": "2026-11-11T00:04:35Z",
