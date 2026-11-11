@@ -119,7 +119,7 @@ export default function PaydayPromptModal({ onClose }) {
               >
                 {incomeSources.map((s) => (
                   <option key={s.id} value={s.id}>
-                    {s.icon || '💼'} {s.name} ({formatMoney(s.amount)})
+                    {s.icon || '💼'} {s.name}{s.amount > 0 ? ` (${formatMoney(s.amount)})` : ''}
                   </option>
                 ))}
               </select>

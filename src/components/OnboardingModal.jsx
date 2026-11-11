@@ -95,10 +95,13 @@ export default function OnboardingModal({ onComplete }) {
 
   const handleFinish = (e) => {
     e?.preventDefault();
-    const parsedAmount = parseFloat(baseAmount);
-    if (isNaN(parsedAmount) || parsedAmount <= 0) {
-      setError('Please enter your typical or estimated salary amount');
-      return;
+    let parsedAmount = 0;
+    if (!isVariable) {
+      parsedAmount = parseFloat(baseAmount);
+      if (isNaN(parsedAmount) || parsedAmount <= 0) {
+        setError('Please enter your paycheck amount or enable variable pay');
+        return;
+      }
     }
 
     // Determine starting/current balance
@@ -199,7 +202,7 @@ export default function OnboardingModal({ onComplete }) {
             {step === 1 && "Let's personalize your budgeting experience in 4 quick steps."}
             {step === 2 && 'Enter your current funds across cash & bank accounts.'}
             {step === 3 && 'Set your pay schedule so Spendy can notify you on payday.'}
-            {step === 4 && 'Forecast your monthly income and enable payday check-ins.'}
+            {step === 4 && (isVariable ? 'Confirm variable paycheck tracking and payday reminders.' : 'Enter your fixed paycheck amount.')}
           </p>
 
           {/* Dots Indicator */}
@@ -434,37 +437,15 @@ export default function OnboardingModal({ onComplete }) {
             </div>
           )}
 
-          {/* ── STEP 4: Typical Paycheck Amount & Variable Check ── */}
+          {/* ── STEP 4: Paycheck Amount / Variable Check ── */}
           {step === 4 && (
             <form onSubmit={handleFinish} className="space-y-4">
-              <div>
-                <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">
-                  {paySchedule === 'twice_month'
-                    ? 'Estimated Amount per 15-day Paycheck (€)'
-                    : paySchedule === 'weekly'
-                    ? 'Estimated Weekly Paycheck (€)'
-                    : 'Estimated Monthly Salary (€)'}
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7d8f84] text-base font-bold">€</span>
-                  <input
-                    type="number"
-                    step="any"
-                    placeholder="0.00"
-                    value={baseAmount}
-                    onChange={(e) => {
-                      setBaseAmount(e.target.value);
-                      setError('');
-                    }}
-                    onFocus={() => window.scrollTo(0, 0)}
-                    className="w-full bg-[#f8f7f2] border border-[#dcd7cb] rounded-2xl pl-9 pr-4 py-3 text-base font-bold text-[#14261c] focus:outline-none focus:border-[#1b4332]"
-                  />
-                </div>
-              </div>
-
               {/* Variable Paycheck Toggle */}
               <div
-                onClick={() => setIsVariable(!isVariable)}
+                onClick={() => {
+                  setIsVariable(!isVariable);
+                  setError('');
+                }}
                 className={`p-3.5 sm:p-4 rounded-2xl border transition-all cursor-pointer flex items-start gap-3 ${
                   isVariable
                     ? 'border-[#1b4332] bg-[#eaf4ee]'
@@ -489,6 +470,45 @@ export default function OnboardingModal({ onComplete }) {
                   </p>
                 </div>
               </div>
+
+              {/* Only ask for paycheck amount if pay does NOT vary */}
+              {isVariable ? (
+                <div className="p-3.5 sm:p-4 bg-[#f8f7f2] border border-[#e4dfd3] rounded-2xl text-xs space-y-1">
+                  <p className="font-bold text-[#14261c] flex items-center gap-1.5">
+                    <span>✨</span>
+                    <span>No estimated amount needed</span>
+                  </p>
+                  <p className="text-[11px] leading-relaxed text-[#6e8074]">
+                    Because your paycheck varies each time, you don't need to enter an estimate now. On your paycheck dates ${paySchedule === 'twice_month' ? `(Day ${payDay1} & Day ${payDay2})` : paySchedule === 'weekly' ? '(every week)' : `(Day ${payDay1})`}, Spendy will prompt you to enter the exact amount you received.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-1.5 animate-in fade-in duration-200">
+                  <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider block">
+                    {paySchedule === 'twice_month'
+                      ? 'Fixed Amount per 15-day Paycheck (€)'
+                      : paySchedule === 'weekly'
+                      ? 'Fixed Weekly Paycheck (€)'
+                      : 'Fixed Monthly Salary (€)'}
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7d8f84] text-base font-bold">€</span>
+                    <input
+                      type="number"
+                      step="any"
+                      placeholder="0.00"
+                      value={baseAmount}
+                      inputMode="decimal"
+                      onChange={(e) => {
+                        setBaseAmount(e.target.value);
+                        setError('');
+                      }}
+                      onFocus={() => window.scrollTo(0, 0)}
+                      className="w-full bg-[#f8f7f2] border border-[#dcd7cb] rounded-2xl pl-9 pr-4 py-3 text-base font-bold text-[#14261c] focus:outline-none focus:border-[#1b4332]"
+                    />
+                  </div>
+                </div>
+              )}
 
               <div className="flex gap-2.5 pt-2">
                 <button
