@@ -76,10 +76,9 @@ export const DEFAULT_NOTIFICATION_SETTINGS = {
 };
 
 export const DEFAULT_QUICK_PRESETS = [
-  { id: 'qp-coffee', title: 'Coffee', icon: '☕', amount: 3.00, category: 'food' },
+  { id: 'qp-coffee', title: 'Coffee', icon: '☕', amount: 2.50, category: 'food' },
   { id: 'qp-lunch', title: 'Lunch', icon: '🥪', amount: 10.00, category: 'food' },
-  { id: 'qp-transit', title: 'Transit', icon: '🚌', amount: 2.50, category: 'transport' },
-  { id: 'qp-groceries', title: 'Groceries', icon: '🛒', amount: 25.00, category: 'food' },
+  { id: 'qp-gas', title: 'Gas', icon: '⛽', amount: 30.00, category: 'transport' },
 ];
 
 // ─── Demo data detection ──────────────────────────────────────────────────────
@@ -380,6 +379,12 @@ function loadState() {
         parsed.notificationSettings = DEFAULT_NOTIFICATION_SETTINGS;
       }
       if (!Array.isArray(parsed.quickPresets) || parsed.quickPresets.length === 0) {
+        parsed.quickPresets = DEFAULT_QUICK_PRESETS;
+      } else if (
+        parsed.quickPresets.length === 4 &&
+        parsed.quickPresets.some(p => p.id === 'qp-transit') &&
+        parsed.quickPresets.some(p => p.id === 'qp-groceries')
+      ) {
         parsed.quickPresets = DEFAULT_QUICK_PRESETS;
       }
       if (parsed.onboardingComplete && !parsed.demoData && !parsed.sampleCleanupDone) {
