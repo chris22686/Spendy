@@ -75,6 +75,13 @@ export const DEFAULT_NOTIFICATION_SETTINGS = {
   dailyReminderTime: '20:00',
 };
 
+export const DEFAULT_QUICK_PRESETS = [
+  { id: 'qp-coffee', title: 'Coffee', icon: '☕', amount: 3.00, category: 'food' },
+  { id: 'qp-lunch', title: 'Lunch', icon: '🥪', amount: 10.00, category: 'food' },
+  { id: 'qp-transit', title: 'Transit', icon: '🚌', amount: 2.50, category: 'transport' },
+  { id: 'qp-groceries', title: 'Groceries', icon: '🛒', amount: 25.00, category: 'food' },
+];
+
 // ─── Demo data detection ──────────────────────────────────────────────────────
 // Sample records use fixed ids ('1'-'30', 'b1'-'b8'); real ones use uuids.
 // Only untouched samples match, so anything the user edited is kept.
@@ -262,6 +269,7 @@ function reducer(state, action) {
         monthlyIncome: Math.round(calculateMonthlyIncomeFromSources(DEFAULT_INCOME_SOURCES)),
         currentBalance: 2450,
         initialBalance: 2450,
+        quickPresets: DEFAULT_QUICK_PRESETS,
       };
     case 'CLEAR_ALL_DATA':
       return {
@@ -279,6 +287,12 @@ function reducer(state, action) {
         onboardingComplete: false,
         paydaySettings: null,
         notificationSettings: DEFAULT_NOTIFICATION_SETTINGS,
+        quickPresets: DEFAULT_QUICK_PRESETS,
+      };
+    case 'SET_QUICK_PRESETS':
+      return {
+        ...state,
+        quickPresets: Array.isArray(action.payload) ? action.payload : DEFAULT_QUICK_PRESETS,
       };
     case 'COMPLETE_ONBOARDING': {
       const bal = action.payload.currentBalance !== undefined
@@ -365,6 +379,9 @@ function loadState() {
       if (!parsed.notificationSettings) {
         parsed.notificationSettings = DEFAULT_NOTIFICATION_SETTINGS;
       }
+      if (!Array.isArray(parsed.quickPresets) || parsed.quickPresets.length === 0) {
+        parsed.quickPresets = DEFAULT_QUICK_PRESETS;
+      }
       if (parsed.onboardingComplete && !parsed.demoData && !parsed.sampleCleanupDone) {
         return { ...stripSampleData(parsed), sampleCleanupDone: true };
       }
@@ -395,6 +412,7 @@ const initialState = loadState() || {
   onboardingComplete: false,
   paydaySettings: null,
   notificationSettings: DEFAULT_NOTIFICATION_SETTINGS,
+  quickPresets: DEFAULT_QUICK_PRESETS,
 };
 
 // ─── Context ──────────────────────────────────────────────────────────────────

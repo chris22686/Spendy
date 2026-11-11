@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp, formatMoney, getMonthExpenses, getWeekExpenses, getTotalSpent, getCategoryTotals } from '../store';
 import StatCard from '../components/StatCard';
@@ -7,7 +7,9 @@ import ResetModal from '../components/ResetModal';
 import IncomeSourcesModal from '../components/IncomeSourcesModal';
 import AdjustBalanceModal from '../components/AdjustBalanceModal';
 import NotificationModal from '../components/NotificationModal';
-import { DollarSign, TrendingDown, Target, CreditCard, ArrowRight, Flame, Zap, Plus, RotateCcw, Wallet, Bell } from 'lucide-react';
+import QuickAddModal from '../components/QuickAddModal';
+import { v4 as uuidv4 } from 'uuid';
+import { DollarSign, TrendingDown, Target, CreditCard, ArrowRight, Flame, Zap, Plus, RotateCcw, Wallet, Bell, Pencil, CheckCircle, X } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
@@ -17,12 +19,59 @@ const CHART_COLORS = ['#1b4332','#2d6a4f','#40916c','#52b788','#d97706','#0ea5e9
 
 export default function Dashboard({ onOpenPaydayPrompt }) {
   const { state, dispatch } = useApp();
-  const { expenses, categories, budgets, monthlyIncome, userName, paydaySettings, currentBalance = 0 } = state;
+  const { expenses, categories, budgets, monthlyIncome, userName, paydaySettings, currentBalance = 0, quickPresets = [] } = state;
   const navigate = useNavigate();
   const [showReset, setShowReset] = useState(false);
   const [showIncomeModal, setShowIncomeModal] = useState(false);
   const [showBalanceModal, setShowBalanceModal] = useState(false);
   const [showNotifModal, setShowNotifModal] = useState(false);
+  const [showQuickAddModal, setShowQuickAddModal] = useState(false);
+  const [quickToast, setQuickToast] = useState(null);
+  const [lastAddedId, setLastAddedId] = useState(null);
+
+  useEffect(() => {
+    if (!quickToast) return;
+    const timer = setTimeout(() => {
+      setQuickToast(null);
+    }, 3800);
+    return () => clearTimeout(timer);
+  }, [quickToast]);
+
+  const handleQuickAdd = (preset) => {
+    const newId = uuidv4();
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
+    const cat = categories.find(c => c.id === preset.category) || { name: 'Expense', icon: preset.icon || '💸' };
+
+    dispatch({
+      type: 'ADD_EXPENSE',
+      payload: {
+        id: newId,
+        amount: Number(preset.amount) || 0,
+        category: preset.category,
+        description: preset.title,
+        date: todayStr,
+        notes: 'Logged via 1-Tap Quick Add',
+        recurring: false,
+      },
+    });
+
+    setLastAddedId(newId);
+    setQuickToast({
+      id: newId,
+      title: preset.title,
+      icon: preset.icon || cat.icon || '💸',
+      amount: Number(preset.amount) || 0,
+      categoryName: cat.name,
+    });
+  };
+
+  const handleUndoQuickAdd = () => {
+    if (lastAddedId) {
+      dispatch({ type: 'DELETE_EXPENSE', payload: lastAddedId });
+      setQuickToast(null);
+      setLastAddedId(null);
+    }
+  };
 
   const monthExp  = useMemo(() => getMonthExpenses(expenses), [expenses]);
   const weekExp   = useMemo(() => getWeekExpenses(expenses), [expenses]);
@@ -168,6 +217,102 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
           color="#52b788"
           trend={-5}
         />
+      </div>
+
+      {/* Floating 1-Tap Confirmation Toast */}
+      {quickToast && (
+        <aside
+          role="status"
+          aria-live="polite"
+          aria-label="Quick expense logged"
+          className="fixed top-4 left-3 right-3 sm:left-auto sm:right-6 sm:w-[380px] z-[999] bg-[#ffffff] border-2 border-[#1b4332] rounded-2xl p-4 shadow-2xl shadow-[#1b4332]/25 transition-all duration-300 animate-fade-in"
+          style={{ top: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}
+        >
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#eaf4ee] border border-[#a3d4b6] flex items-center justify-center text-xl shrink-0 shadow-xs">
+              {quickToast.icon}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5 text-xs font-black text-[#1b4332] uppercase tracking-wider">
+                <CheckCircle size={14} className="text-[#2d6a4f]" />
+                <span>1-Tap Expense Added!</span>
+              </div>
+              <p className="text-sm font-extrabold text-[#14261c] truncate mt-0.5">
+                {quickToast.title}
+              </p>
+              <p className="text-xs text-[#52685b] mt-0.5">
+                <span className="font-bold text-[#991b1b]">-{formatMoney(quickToast.amount)}</span> · {quickToast.categoryName}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setQuickToast(null)}
+              className="p-1 text-[#8fa296] hover:text-[#1b4332] rounded-lg transition-colors cursor-pointer -mr-1 -mt-1"
+              title="Dismiss notification"
+            >
+              <X size={16} />
+            </button>
+          </div>
+
+          <div className="mt-2.5 pt-2.5 border-t border-[#f0ece1] flex items-center justify-between gap-2">
+            <span className="text-[11px] text-[#718578] font-medium">Balance updated</span>
+            <button
+              type="button"
+              onClick={handleUndoQuickAdd}
+              className="px-3 py-1 rounded-lg bg-[#fee2e2] hover:bg-[#fed7d7] text-[#991b1b] text-xs font-extrabold transition-colors cursor-pointer active:scale-95"
+            >
+              Undo
+            </button>
+          </div>
+        </aside>
+      )}
+
+      {/* 1-Tap Quick Add Shortcuts */}
+      <div className="rounded-3xl bg-[#ffffff] border border-[#e7e4da] p-4 sm:p-5 shadow-xs space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-xl bg-[#eaf4ee] text-[#1b4332] flex items-center justify-center shadow-2xs">
+              <Zap size={15} className="stroke-[2.5]" />
+            </div>
+            <div>
+              <h2 className="text-sm sm:text-base font-black text-[#14261c] tracking-tight">1-Tap Quick Add</h2>
+              <p className="text-[11px] text-[#6e8074]">Tap any shortcut to log an expense instantly</p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setShowQuickAddModal(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#f8f7f2] hover:bg-[#eae6db] border border-[#e4dfd3] text-xs font-bold text-[#55695e] hover:text-[#1b4332] transition-all cursor-pointer"
+            title="Customize quick shortcuts"
+          >
+            <Pencil size={12} />
+            <span>Customize</span>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          {(quickPresets || []).map((preset) => (
+            <button
+              key={preset.id}
+              type="button"
+              onClick={() => handleQuickAdd(preset)}
+              className="flex items-center gap-2.5 p-3 rounded-2xl border border-[#e4dfd3] bg-[#f8f7f2] hover:bg-[#eaf4ee] hover:border-[#b8ddc6] active:scale-95 transition-all text-left group cursor-pointer shadow-2xs"
+            >
+              <span className="text-2xl shrink-0 group-hover:scale-110 transition-transform">
+                {preset.icon || '☕'}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-extrabold text-[#14261c] truncate">
+                  {preset.title}
+                </p>
+                <p className="text-xs font-black text-[#1b4332] truncate">
+                  {formatMoney(preset.amount)}
+                </p>
+              </div>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Budget Alerts */}
@@ -347,6 +492,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
 
       <AdjustBalanceModal isOpen={showBalanceModal} onClose={() => setShowBalanceModal(false)} />
       <NotificationModal isOpen={showNotifModal} onClose={() => setShowNotifModal(false)} />
+      <QuickAddModal isOpen={showQuickAddModal} onClose={() => setShowQuickAddModal(false)} />
     </div>
   );
 }
