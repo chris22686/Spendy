@@ -337,10 +337,11 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
           <button
             type="button"
             onClick={() => setShowQuickAddModal(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#f8f7f2] hover:bg-[#eae6db] border border-[#e4dfd3] text-xs font-bold text-[#55695e] hover:text-[#1b4332] transition-all cursor-pointer"
+            data-testid="customize-quickadd-btn"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#f8f7f2] hover:bg-[#eae6db] active:scale-90 active:rotate-2 border border-[#e4dfd3] text-xs font-bold text-[#55695e] hover:text-[#1b4332] transition-all cursor-pointer shadow-2xs group"
             title="Customize quick shortcuts"
           >
-            <Pencil size={12} />
+            <Pencil size={12} className="group-hover:rotate-12 group-hover:scale-110 transition-transform duration-200" />
             <span>Customize</span>
           </button>
         </div>
@@ -352,9 +353,9 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
               type="button"
               data-testid={`quick-add-${preset.id}`}
               onClick={() => handleQuickAdd(preset)}
-              className="flex items-center gap-2.5 p-3 rounded-2xl border border-[#e4dfd3] bg-[#f8f7f2] hover:bg-[#eaf4ee] hover:border-[#b8ddc6] active:scale-95 transition-all text-left group cursor-pointer shadow-2xs"
+              className="flex items-center gap-2.5 p-3 rounded-2xl border border-[#e4dfd3] bg-[#f8f7f2] hover:bg-[#eaf4ee] hover:border-[#b8ddc6] active:scale-92 active:rotate-[0.5deg] transition-all duration-150 text-left group cursor-pointer shadow-2xs hover:shadow-xs"
             >
-              <span className="text-2xl shrink-0 group-hover:scale-110 transition-transform">
+              <span className="text-2xl shrink-0 group-hover:scale-115 group-active:scale-90 transition-transform duration-150">
                 {preset.icon || '☕'}
               </span>
               <div className="min-w-0 flex-1">

@@ -92,7 +92,7 @@ export default function Categories() {
                 <div
                   key={cat.id}
                   onClick={() => { setEditCat(cat); setShowForm(true); }}
-                  className="flex items-center gap-3 sm:gap-3.5 p-3 sm:p-4 rounded-2xl bg-[#ffffff] border border-[#e8e4da] hover:border-[#cbd7cf] hover:shadow-[0_4px_16px_rgba(27,67,50,0.05)] transition-all cursor-pointer group"
+                  className="flex items-center gap-3 sm:gap-3.5 p-3 sm:p-4 rounded-2xl bg-[#ffffff] border border-[#e8e4da] hover:border-[#1b4332]/40 hover:shadow-[0_4px_16px_rgba(27,67,50,0.06)] active:scale-97 transition-all duration-150 cursor-pointer group"
                 >
                   <div
                     className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center text-xl sm:text-2xl flex-shrink-0 shadow-xs"
@@ -112,7 +112,7 @@ export default function Categories() {
                   <div className="flex items-center gap-1.5 shrink-0" onClick={e => e.stopPropagation()}>
                     <button
                       onClick={() => { setEditCat(cat); setShowForm(true); }}
-                      className="p-2 rounded-xl text-[#5b6c62] hover:text-[#1b4332] bg-[#f8f7f2] border border-[#e8e4da] hover:bg-[#eaf4ee] transition-all cursor-pointer"
+                      className="p-2 rounded-xl text-[#5b6c62] hover:text-[#1b4332] bg-[#f8f7f2] border border-[#e8e4da] hover:bg-[#eaf4ee] active:scale-90 active:rotate-12 transition-all cursor-pointer group-hover:scale-105"
                       title="Edit category"
                     >
                       <Pencil size={15} />
