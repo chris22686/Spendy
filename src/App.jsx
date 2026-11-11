@@ -15,18 +15,27 @@ import Insights      from './pages/Insights';
 import SavingPlan    from './pages/SavingPlan';
 import MonthlyStory  from './pages/MonthlyStory';
 import { format } from 'date-fns';
+import { scheduleAppNotifications } from './utils/notifications';
 
 function AppContent() {
   const { state } = useApp();
   const [showSplash, setShowSplash] = useState(true);
   const [showPaydayPrompt, setShowPaydayPrompt] = useState(false);
 
-  // Check if today matches the user's payday settings & if it is variable pay
+  // Schedule native notifications on startup / settings change
+  useEffect(() => {
+    if (state.onboardingComplete && state.notificationSettings) {
+      scheduleAppNotifications(state.notificationSettings, state.paydaySettings);
+    }
+  }, [state.onboardingComplete, state.notificationSettings, state.paydaySettings]);
+
+  // Check if today matches the user's payday settings & notify or prompt
   useEffect(() => {
     if (!state.onboardingComplete || !state.paydaySettings) return;
 
     const { schedule, payDays = [], isVariable, lastPromptDate } = state.paydaySettings;
-    if (!isVariable) return;
+    const notifyOnPayday = state.notificationSettings?.notifyOnPayday ?? true;
+    if (!isVariable && !notifyOnPayday) return;
 
     const today = new Date();
     const todayStr = format(today, 'yyyy-MM-dd');

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '../store';
-import { ArrowRight, User, Check, Sparkles, Wallet } from 'lucide-react';
+import { ArrowRight, User, Check, Sparkles, Wallet, Bell, Clock } from 'lucide-react';
+import { requestNotificationPermission, scheduleAppNotifications } from '../utils/notifications';
 
 // Paycheck day helpers: a month has at most 31 days
 const MIN_PAY_DAY = 1;
@@ -46,6 +47,11 @@ export default function OnboardingModal({ onComplete }) {
   const [baseAmount, setBaseAmount] = useState('');
   const [isVariable, setIsVariable] = useState(true);
   const [error, setError] = useState('');
+
+  // Step 5: Notifications & Reminders
+  const [notifyOnPayday, setNotifyOnPayday] = useState(true);
+  const [notifyDaily, setNotifyDaily] = useState(true);
+  const [dailyReminderTime, setDailyReminderTime] = useState('20:00');
 
   // Prevent background scroll while modal is active
   useEffect(() => {
@@ -93,13 +99,27 @@ export default function OnboardingModal({ onComplete }) {
     setStep(4);
   };
 
-  const handleFinish = (e) => {
+  const handleNextFromStep4 = (e) => {
+    e?.preventDefault();
+    if (!isVariable) {
+      const parsedAmount = parseFloat(baseAmount);
+      if (isNaN(parsedAmount) || parsedAmount <= 0) {
+        setError('Please enter your paycheck amount or enable variable pay');
+        return;
+      }
+    }
+    setError('');
+    setStep(5);
+  };
+
+  const handleFinish = async (e) => {
     e?.preventDefault();
     let parsedAmount = 0;
     if (!isVariable) {
       parsedAmount = parseFloat(baseAmount);
       if (isNaN(parsedAmount) || parsedAmount <= 0) {
         setError('Please enter your paycheck amount or enable variable pay');
+        setStep(4);
         return;
       }
     }
@@ -166,6 +186,16 @@ export default function OnboardingModal({ onComplete }) {
       lastPromptDate: '',
     };
 
+    const notificationSettings = {
+      notifyOnPayday: Boolean(notifyOnPayday),
+      notifyDaily: Boolean(notifyDaily),
+      dailyReminderTime: dailyReminderTime || '20:00',
+    };
+
+    if (notifyOnPayday || notifyDaily) {
+      await requestNotificationPermission();
+    }
+
     dispatch({
       type: 'COMPLETE_ONBOARDING',
       payload: {
@@ -175,8 +205,11 @@ export default function OnboardingModal({ onComplete }) {
         monthlyIncome: calculatedMonthly,
         incomeSources: generatedSources,
         paydaySettings,
+        notificationSettings,
       },
     });
+
+    await scheduleAppNotifications(notificationSettings, paydaySettings);
 
     if (onComplete) onComplete();
   };
@@ -190,24 +223,26 @@ export default function OnboardingModal({ onComplete }) {
         {/* Top Progress & Banner */}
         <div className="shrink-0 bg-gradient-to-r from-[#133928] via-[#1b4332] to-[#2d6a4f] p-4 sm:p-6 text-white text-center relative">
           <div className="w-10 h-10 sm:w-12 sm:h-12 mx-auto rounded-2xl bg-white/15 flex items-center justify-center mb-2 sm:mb-3 text-xl sm:text-2xl shadow-inner">
-            {step === 1 ? '👋' : step === 2 ? '💳' : step === 3 ? '🗓️' : '💰'}
+            {step === 1 ? '👋' : step === 2 ? '💳' : step === 3 ? '🗓️' : step === 4 ? '💰' : '🔔'}
           </div>
           <h2 className="text-lg sm:text-xl font-black tracking-tight">
             {step === 1 && 'Welcome to Spendy!'}
             {step === 2 && 'How much money do you have now?'}
             {step === 3 && 'How often do you get paid?'}
             {step === 4 && 'Salary & Variable Pay'}
+            {step === 5 && 'Reminders & Notifications'}
           </h2>
           <p className="text-xs text-white/80 mt-1 font-medium max-w-sm mx-auto">
-            {step === 1 && "Let's personalize your budgeting experience in 4 quick steps."}
+            {step === 1 && "Let's personalize your budgeting experience in 5 quick steps."}
             {step === 2 && 'Enter your current funds across cash & bank accounts.'}
             {step === 3 && 'Set your pay schedule so Spendy can notify you on payday.'}
-            {step === 4 && (isVariable ? 'Confirm variable paycheck tracking and payday reminders.' : 'Enter your fixed paycheck amount.')}
+            {step === 4 && (isVariable ? 'Confirm variable paycheck tracking.' : 'Enter your fixed paycheck amount.')}
+            {step === 5 && 'Choose if and when Spendy notifies you about paydays and daily spending.'}
           </p>
 
           {/* Dots Indicator */}
           <div className="flex justify-center items-center gap-2 mt-3 sm:mt-4">
-            {[1, 2, 3, 4].map((s) => (
+            {[1, 2, 3, 4, 5].map((s) => (
               <span
                 key={s}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
@@ -439,7 +474,7 @@ export default function OnboardingModal({ onComplete }) {
 
           {/* ── STEP 4: Paycheck Amount / Variable Check ── */}
           {step === 4 && (
-            <form onSubmit={handleFinish} className="space-y-4">
+            <form onSubmit={handleNextFromStep4} className="space-y-4">
               {/* Variable Paycheck Toggle */}
               <div
                 onClick={() => {
@@ -514,6 +549,133 @@ export default function OnboardingModal({ onComplete }) {
                 <button
                   type="button"
                   onClick={() => setStep(3)}
+                  className="px-4 py-3 rounded-2xl border border-[#e4dfd3] text-xs font-bold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer"
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-3 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white rounded-2xl text-sm font-extrabold shadow-md shadow-[#1b4332]/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                >
+                  <span>Continue</span>
+                  <ArrowRight size={16} />
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* ── STEP 5: Smart Reminders & Notifications ── */}
+          {step === 5 && (
+            <form onSubmit={handleFinish} className="space-y-4">
+              {/* Payday Notifications Option */}
+              <div
+                onClick={() => setNotifyOnPayday(!notifyOnPayday)}
+                className={`p-3.5 sm:p-4 rounded-2xl border transition-all cursor-pointer flex items-start gap-3 ${
+                  notifyOnPayday
+                    ? 'border-[#1b4332] bg-[#eaf4ee]'
+                    : 'border-[#e4dfd3] bg-[#f8f7f2] hover:bg-[#ece8df]'
+                }`}
+              >
+                <span className="text-2xl mt-0.5">💰</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs sm:text-sm font-bold text-[#14261c]">
+                      Notify me every time I get paid
+                    </p>
+                    <div
+                      className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors ${
+                        notifyOnPayday ? 'bg-[#1b4332] text-white' : 'border border-[#dcd7cb] bg-white'
+                      }`}
+                    >
+                      {notifyOnPayday && <Check size={14} strokeWidth={3} />}
+                    </div>
+                  </div>
+                  <p className="text-[11px] sm:text-xs text-[#6e8074] mt-1 leading-relaxed">
+                    Get an alert on your payday ${
+                      paySchedule === 'twice_month'
+                        ? `(Day ${payDay1} & Day ${payDay2})`
+                        : paySchedule === 'weekly'
+                        ? '(every Friday)'
+                        : `(Day ${payDay1})`
+                    } to log your paycheck and keep your balance 100% accurate.
+                  </p>
+                </div>
+              </div>
+
+              {/* Daily Reminder Option */}
+              <div
+                onClick={() => setNotifyDaily(!notifyDaily)}
+                className={`p-3.5 sm:p-4 rounded-2xl border transition-all cursor-pointer flex items-start gap-3 ${
+                  notifyDaily
+                    ? 'border-[#1b4332] bg-[#eaf4ee]'
+                    : 'border-[#e4dfd3] bg-[#f8f7f2] hover:bg-[#ece8df]'
+                }`}
+              >
+                <span className="text-2xl mt-0.5">⏰</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs sm:text-sm font-bold text-[#14261c]">
+                      Notify me once per day
+                    </p>
+                    <div
+                      className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors ${
+                        notifyDaily ? 'bg-[#1b4332] text-white' : 'border border-[#dcd7cb] bg-white'
+                      }`}
+                    >
+                      {notifyDaily && <Check size={14} strokeWidth={3} />}
+                    </div>
+                  </div>
+                  <p className="text-[11px] sm:text-xs text-[#6e8074] mt-1 leading-relaxed">
+                    Get a daily reminder to take 30 seconds to log today's expenses and track your budget.
+                  </p>
+                </div>
+              </div>
+
+              {/* Daily Time Picker */}
+              {notifyDaily && (
+                <div className="p-3.5 sm:p-4 bg-[#f8f7f2] border border-[#e4dfd3] rounded-2xl space-y-2.5 animate-in fade-in duration-200">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-[#55695e] uppercase tracking-wider">
+                      <Clock size={14} />
+                      <span>Reminder Time:</span>
+                    </div>
+                    <input
+                      type="time"
+                      value={dailyReminderTime}
+                      onChange={(e) => setDailyReminderTime(e.target.value || '20:00')}
+                      className="bg-white border border-[#dcd7cb] text-[#14261c] font-black text-sm px-3 py-1.5 rounded-xl shadow-2xs focus:outline-none focus:border-[#1b4332]"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-1.5 flex-wrap pt-1">
+                    <span className="text-[11px] text-[#718578] font-semibold">Popular times:</span>
+                    {[
+                      { label: '09:00', value: '09:00' },
+                      { label: '14:00', value: '14:00' },
+                      { label: '20:00', value: '20:00' },
+                      { label: '21:30', value: '21:30' },
+                    ].map((preset) => (
+                      <button
+                        key={preset.value}
+                        type="button"
+                        onClick={() => setDailyReminderTime(preset.value)}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                          dailyReminderTime === preset.value
+                            ? 'bg-[#1b4332] text-white shadow-xs'
+                            : 'bg-white border border-[#dcd7cb] text-[#65776c] hover:bg-[#eae6db]'
+                        }`}
+                      >
+                        {preset.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-2.5 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setStep(4)}
                   className="px-4 py-3 rounded-2xl border border-[#e4dfd3] text-xs font-bold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer"
                 >
                   Back

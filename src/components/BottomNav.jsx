@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, CreditCard, Plus, Tag, MoreHorizontal, Target, BarChart3, Sparkles, BookOpen, RotateCcw, X } from 'lucide-react';
 import ResetModal from './ResetModal';
+import NotificationModal from './NotificationModal';
+import { Bell } from 'lucide-react';
 
 export default function BottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
   const [showMore, setShowMore] = useState(false);
   const [showReset, setShowReset] = useState(false);
+  const [showNotif, setShowNotif] = useState(false);
 
   useEffect(() => {
     if (showMore) {
@@ -158,14 +161,25 @@ export default function BottomNav() {
               })}
             </div>
 
-            {/* Reset Data Shortcut */}
-            <div className="pt-2 border-t border-[#f1ede3]">
+            {/* Quick Actions */}
+            <div className="pt-2 border-t border-[#f1ede3] flex flex-col gap-2">
+              <button
+                onClick={() => {
+                  setShowMore(false);
+                  setShowNotif(true);
+                }}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-[#cde2d6] bg-[#eaf4ee] text-[#1b4332] text-xs font-bold hover:bg-[#d9ede0] transition-colors cursor-pointer"
+              >
+                <Bell size={15} />
+                <span>Reminders & Notifications</span>
+              </button>
+
               <button
                 onClick={() => {
                   setShowMore(false);
                   setShowReset(true);
                 }}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-[#fee2e2] bg-[#fffbfb] text-[#991b1b] text-xs font-bold hover:bg-[#fee2e2]/50 transition-colors cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl border border-[#fee2e2] bg-[#fffbfb] text-[#991b1b] text-xs font-bold hover:bg-[#fee2e2]/50 transition-colors cursor-pointer"
               >
                 <RotateCcw size={15} />
                 <span>Reset or Clear Data</span>
@@ -176,6 +190,7 @@ export default function BottomNav() {
       )}
 
       <ResetModal isOpen={showReset} onClose={() => setShowReset(false)} />
+      <NotificationModal isOpen={showNotif} onClose={() => setShowNotif(false)} />
     </>
   );
 }

@@ -69,6 +69,12 @@ export const SAMPLE_BUDGETS = [
 
 export const DEFAULT_GROUPS = ['Essentials', 'Lifestyle', 'Subscriptions', 'Finance', 'Other'];
 
+export const DEFAULT_NOTIFICATION_SETTINGS = {
+  notifyOnPayday: true,
+  notifyDaily: true,
+  dailyReminderTime: '20:00',
+};
+
 // ─── Demo data detection ──────────────────────────────────────────────────────
 // Sample records use fixed ids ('1'-'30', 'b1'-'b8'); real ones use uuids.
 // Only untouched samples match, so anything the user edited is kept.
@@ -272,6 +278,7 @@ function reducer(state, action) {
         userName: '',
         onboardingComplete: false,
         paydaySettings: null,
+        notificationSettings: DEFAULT_NOTIFICATION_SETTINGS,
       };
     case 'COMPLETE_ONBOARDING': {
       const bal = action.payload.currentBalance !== undefined
@@ -290,8 +297,17 @@ function reducer(state, action) {
         paydaySettings: action.payload.paydaySettings || null,
         monthlyIncome: action.payload.monthlyIncome !== undefined ? action.payload.monthlyIncome : state.monthlyIncome,
         incomeSources: action.payload.incomeSources || state.incomeSources,
+        notificationSettings: action.payload.notificationSettings || state.notificationSettings || DEFAULT_NOTIFICATION_SETTINGS,
       };
     }
+    case 'UPDATE_NOTIFICATION_SETTINGS':
+      return {
+        ...state,
+        notificationSettings: {
+          ...(state.notificationSettings || DEFAULT_NOTIFICATION_SETTINGS),
+          ...action.payload,
+        },
+      };
     case 'UPDATE_PAYDAY_SETTINGS':
       return {
         ...state,
@@ -346,6 +362,9 @@ function loadState() {
       if (parsed.initialBalance === undefined) {
         parsed.initialBalance = parsed.currentBalance;
       }
+      if (!parsed.notificationSettings) {
+        parsed.notificationSettings = DEFAULT_NOTIFICATION_SETTINGS;
+      }
       if (parsed.onboardingComplete && !parsed.demoData && !parsed.sampleCleanupDone) {
         return { ...stripSampleData(parsed), sampleCleanupDone: true };
       }
@@ -375,6 +394,7 @@ const initialState = loadState() || {
   userName: '',
   onboardingComplete: false,
   paydaySettings: null,
+  notificationSettings: DEFAULT_NOTIFICATION_SETTINGS,
 };
 
 // ─── Context ──────────────────────────────────────────────────────────────────

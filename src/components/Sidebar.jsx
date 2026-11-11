@@ -6,6 +6,8 @@ import {
   Tag, Target, BarChart3, Sparkles, BookOpen, RotateCcw
 } from 'lucide-react';
 import ResetModal from './ResetModal';
+import NotificationModal from './NotificationModal';
+import { Bell } from 'lucide-react';
 
 const NAV = [
   { to: '/',          icon: LayoutDashboard, label: 'Dashboard'  },
@@ -21,6 +23,7 @@ const NAV = [
 export default function Sidebar() {
   const { state } = useApp();
   const [showReset, setShowReset] = useState(false);
+  const [showNotif, setShowNotif] = useState(false);
   const userName = state?.userName ? `${state.userName}'s Wallet` : 'My Wallet';
 
   return (
@@ -78,6 +81,15 @@ export default function Sidebar() {
         {/* Reset Data & User Footer */}
         <div className="p-3 lg:p-3.5 border-t border-[#ece8de] space-y-2">
           <button
+            onClick={() => setShowNotif(true)}
+            className="w-full flex items-center justify-center lg:justify-start gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-[#718578] hover:text-[#1b4332] hover:bg-[#eaf4ee] transition-colors cursor-pointer"
+            title="Notification Reminders"
+          >
+            <Bell size={16} />
+            <span className="hidden lg:block">Reminders</span>
+          </button>
+
+          <button
             onClick={() => setShowReset(true)}
             className="w-full flex items-center justify-center lg:justify-start gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-[#718578] hover:text-[#991b1b] hover:bg-[#fee2e2]/60 transition-colors cursor-pointer"
             title="Reset or clear data"
@@ -99,6 +111,7 @@ export default function Sidebar() {
       </aside>
 
       <ResetModal isOpen={showReset} onClose={() => setShowReset(false)} />
+      <NotificationModal isOpen={showNotif} onClose={() => setShowNotif(false)} />
     </>
   );
 }

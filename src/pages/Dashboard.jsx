@@ -6,7 +6,8 @@ import TransactionCard from '../components/TransactionCard';
 import ResetModal from '../components/ResetModal';
 import IncomeSourcesModal from '../components/IncomeSourcesModal';
 import AdjustBalanceModal from '../components/AdjustBalanceModal';
-import { DollarSign, TrendingDown, Target, CreditCard, ArrowRight, Flame, Zap, Plus, RotateCcw, Wallet } from 'lucide-react';
+import NotificationModal from '../components/NotificationModal';
+import { DollarSign, TrendingDown, Target, CreditCard, ArrowRight, Flame, Zap, Plus, RotateCcw, Wallet, Bell } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
@@ -21,6 +22,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
   const [showReset, setShowReset] = useState(false);
   const [showIncomeModal, setShowIncomeModal] = useState(false);
   const [showBalanceModal, setShowBalanceModal] = useState(false);
+  const [showNotifModal, setShowNotifModal] = useState(false);
 
   const monthExp  = useMemo(() => getMonthExpenses(expenses), [expenses]);
   const weekExp   = useMemo(() => getWeekExpenses(expenses), [expenses]);
@@ -100,6 +102,15 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
               <span className="truncate">Payday Check-In</span>
             </button>
           )}
+
+          <button
+            onClick={() => setShowNotifModal(true)}
+            className="flex items-center justify-center gap-1.5 px-3 py-2 sm:py-2.5 bg-[#ffffff] hover:bg-[#f8f7f2] border border-[#e7e4da] text-[#65776c] hover:text-[#1b4332] rounded-xl text-xs font-bold shadow-2xs transition-all cursor-pointer"
+            title="Notification Reminders"
+          >
+            <Bell size={14} />
+            <span>Alerts</span>
+          </button>
 
           <button
             onClick={() => setShowReset(true)}
@@ -335,6 +346,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
       )}
 
       <AdjustBalanceModal isOpen={showBalanceModal} onClose={() => setShowBalanceModal(false)} />
+      <NotificationModal isOpen={showNotifModal} onClose={() => setShowNotifModal(false)} />
     </div>
   );
 }
