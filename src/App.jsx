@@ -40,7 +40,12 @@ function AppContent() {
       isPayday = today.getDay() === 5;
     } else {
       // Check if today is one of the designated pay days (or close to it)
-      isPayday = payDays.includes(dayOfMonth);
+      // Clamp to the month's length so day 29/30/31 still triggers in shorter months
+      const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+      isPayday = payDays.some(d => {
+        const day = Math.min(Math.max(parseInt(d, 10) || 1, 1), 31);
+        return Math.min(day, daysInMonth) === dayOfMonth;
+      });
     }
 
     if (isPayday) {

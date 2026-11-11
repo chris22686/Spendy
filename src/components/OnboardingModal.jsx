@@ -2,6 +2,24 @@ import { useState, useEffect } from 'react';
 import { useApp } from '../store';
 import { ArrowRight, User, Check, Sparkles, Wallet } from 'lucide-react';
 
+// Paycheck day helpers: a month has at most 31 days
+const MIN_PAY_DAY = 1;
+const MAX_PAY_DAY = 31;
+
+// Keep only digits while typing and never allow a value above 31
+function sanitizePayDayInput(raw) {
+  const digits = String(raw).replace(/\D/g, '').slice(0, 2);
+  if (digits === '') return '';
+  const n = parseInt(digits, 10);
+  if (n > MAX_PAY_DAY) return String(MAX_PAY_DAY);
+  return digits;
+}
+
+function isValidPayDay(value) {
+  const n = Number(value);
+  return Number.isInteger(n) && n >= MIN_PAY_DAY && n <= MAX_PAY_DAY;
+}
+
 export default function OnboardingModal({ onComplete }) {
   const { dispatch } = useApp();
 
@@ -61,6 +79,16 @@ export default function OnboardingModal({ onComplete }) {
   };
 
   const handleNextFromStep3 = () => {
+    if (paySchedule === 'twice_month' || paySchedule === 'monthly_1') {
+      if (!isValidPayDay(payDay1) || (paySchedule === 'twice_month' && !isValidPayDay(payDay2))) {
+        setError(`Paycheck days must be between ${MIN_PAY_DAY} and ${MAX_PAY_DAY}`);
+        return;
+      }
+      if (paySchedule === 'twice_month' && Number(payDay1) === Number(payDay2)) {
+        setError('Please choose two different paycheck days');
+        return;
+      }
+    }
     setError('');
     setStep(4);
   };
@@ -129,7 +157,8 @@ export default function OnboardingModal({ onComplete }) {
 
     const paydaySettings = {
       schedule: paySchedule,
-      payDays: paySchedule === 'twice_month' ? [parseInt(payDay1, 10), parseInt(payDay2, 10)] : [parseInt(payDay1, 10)],
+      payDays: (paySchedule === 'twice_month' ? [payDay1, payDay2] : [payDay1])
+        .map(d => Math.min(MAX_PAY_DAY, Math.max(MIN_PAY_DAY, parseInt(d, 10) || MIN_PAY_DAY))),
       isVariable: Boolean(isVariable),
       lastPromptDate: '',
     };
@@ -346,7 +375,8 @@ export default function OnboardingModal({ onComplete }) {
                       min="1"
                       max="31"
                       value={payDay1}
-                      onChange={(e) => setPayDay1(e.target.value)}
+                      inputMode="numeric"
+                      onChange={(e) => { setPayDay1(sanitizePayDayInput(e.target.value)); setError(''); }}
                       onFocus={() => window.scrollTo(0, 0)}
                       className="w-12 bg-white border border-[#dcd7cb] rounded-lg px-2 py-1.5 text-center font-bold text-[#14261c] text-base sm:text-xs"
                     />
@@ -356,7 +386,8 @@ export default function OnboardingModal({ onComplete }) {
                       min="1"
                       max="31"
                       value={payDay2}
-                      onChange={(e) => setPayDay2(e.target.value)}
+                      inputMode="numeric"
+                      onChange={(e) => { setPayDay2(sanitizePayDayInput(e.target.value)); setError(''); }}
                       onFocus={() => window.scrollTo(0, 0)}
                       className="w-12 bg-white border border-[#dcd7cb] rounded-lg px-2 py-1.5 text-center font-bold text-[#14261c] text-base sm:text-xs"
                     />
@@ -374,7 +405,8 @@ export default function OnboardingModal({ onComplete }) {
                       min="1"
                       max="31"
                       value={payDay1}
-                      onChange={(e) => setPayDay1(e.target.value)}
+                      inputMode="numeric"
+                      onChange={(e) => { setPayDay1(sanitizePayDayInput(e.target.value)); setError(''); }}
                       onFocus={() => window.scrollTo(0, 0)}
                       className="w-14 bg-white border border-[#dcd7cb] rounded-lg px-2 py-1.5 text-center font-bold text-[#14261c] text-base sm:text-xs"
                     />
