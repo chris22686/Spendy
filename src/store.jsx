@@ -69,6 +69,30 @@ export const SAMPLE_BUDGETS = [
 
 export const DEFAULT_GROUPS = ['Essentials', 'Lifestyle', 'Subscriptions', 'Finance', 'Other'];
 
+// ─── Demo data detection ──────────────────────────────────────────────────────
+// Sample records use fixed ids ('1'-'30', 'b1'-'b8'); real ones use uuids.
+// Only untouched samples match, so anything the user edited is kept.
+const SAMPLE_EXPENSE_MAP = new Map(SAMPLE_EXPENSES.map(e => [e.id, e]));
+const SAMPLE_BUDGET_MAP = new Map(SAMPLE_BUDGETS.map(b => [b.id, b]));
+
+function isSampleExpense(e) {
+  const s = e && SAMPLE_EXPENSE_MAP.get(e.id);
+  return !!s && s.description === e.description && Number(s.amount) === Number(e.amount) && s.category === e.category;
+}
+
+function isSampleBudget(b) {
+  const s = b && SAMPLE_BUDGET_MAP.get(b.id);
+  return !!s && s.category === b.category && Number(s.limit) === Number(b.limit);
+}
+
+function stripSampleData(state) {
+  return {
+    ...state,
+    expenses: (state.expenses || []).filter(e => !isSampleExpense(e)),
+    budgets: (state.budgets || []).filter(b => !isSampleBudget(b)),
+  };
+}
+
 // ─── Default Income Sources ────────────────────────────────────────────────────
 export const DEFAULT_INCOME_SOURCES = [
   { id: 'inc-1', name: 'Primary Salary (1st Paycheck)', amount: 1500, frequency: 'bi-weekly', icon: '💼', color: '#1b4332' },
@@ -222,6 +246,8 @@ function reducer(state, action) {
     }
     case 'RESET_DEMO_DATA':
       return {
+        ...state,
+        demoData: true,
         expenses: SAMPLE_EXPENSES,
         categories: DEFAULT_CATEGORIES,
         categoryGroups: DEFAULT_GROUPS,
@@ -233,6 +259,8 @@ function reducer(state, action) {
       };
     case 'CLEAR_ALL_DATA':
       return {
+        demoData: false,
+        sampleCleanupDone: true,
         expenses: [],
         categories: DEFAULT_CATEGORIES,
         categoryGroups: DEFAULT_GROUPS,
@@ -252,7 +280,9 @@ function reducer(state, action) {
             ? Math.round((Number(action.payload.initialBalance) || 0) * 100) / 100
             : (state.currentBalance !== undefined ? state.currentBalance : 0));
       return {
-        ...state,
+        ...stripSampleData(state),
+        demoData: false,
+        sampleCleanupDone: true,
         userName: action.payload.userName || '',
         onboardingComplete: true,
         currentBalance: bal,
@@ -288,7 +318,7 @@ function loadState() {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (!Array.isArray(parsed.expenses)) {
-        parsed.expenses = SAMPLE_EXPENSES;
+        parsed.expenses = [];
       }
       if (!Array.isArray(parsed.categories) || parsed.categories.length === 0) {
         parsed.categories = DEFAULT_CATEGORIES;
@@ -297,7 +327,7 @@ function loadState() {
         parsed.categoryGroups = DEFAULT_GROUPS;
       }
       if (!Array.isArray(parsed.budgets)) {
-        parsed.budgets = SAMPLE_BUDGETS;
+        parsed.budgets = [];
       }
       if (!parsed.incomeSources || !Array.isArray(parsed.incomeSources) || parsed.incomeSources.length === 0) {
         if (parsed.monthlyIncome && parsed.monthlyIncome > 0) {
@@ -305,15 +335,19 @@ function loadState() {
             { id: 'inc-legacy', name: 'Primary Salary / Income', amount: parsed.monthlyIncome, frequency: 'monthly', icon: '💼', color: '#1b4332' }
           ];
         } else {
-          parsed.incomeSources = DEFAULT_INCOME_SOURCES;
-          parsed.monthlyIncome = Math.round(calculateMonthlyIncomeFromSources(DEFAULT_INCOME_SOURCES));
+          // No income configured (e.g. after "Clear All Data") – keep it empty, never inject fake income
+          parsed.incomeSources = [];
+          parsed.monthlyIncome = 0;
         }
       }
       if (parsed.currentBalance === undefined) {
-        parsed.currentBalance = parsed.initialBalance !== undefined ? parsed.initialBalance : 2450;
+        parsed.currentBalance = parsed.initialBalance !== undefined ? parsed.initialBalance : 0;
       }
       if (parsed.initialBalance === undefined) {
         parsed.initialBalance = parsed.currentBalance;
+      }
+      if (parsed.onboardingComplete && !parsed.demoData && !parsed.sampleCleanupDone) {
+        return { ...stripSampleData(parsed), sampleCleanupDone: true };
       }
       return parsed;
     }
@@ -328,14 +362,16 @@ function saveState(state) {
 }
 
 const initialState = loadState() || {
-  expenses: SAMPLE_EXPENSES,
+  expenses: [],
   categories: DEFAULT_CATEGORIES,
   categoryGroups: DEFAULT_GROUPS,
-  budgets: SAMPLE_BUDGETS,
-  incomeSources: DEFAULT_INCOME_SOURCES,
-  monthlyIncome: Math.round(calculateMonthlyIncomeFromSources(DEFAULT_INCOME_SOURCES)),
-  currentBalance: 2450,
-  initialBalance: 2450,
+  budgets: [],
+  incomeSources: [],
+  monthlyIncome: 0,
+  currentBalance: 0,
+  initialBalance: 0,
+  demoData: false,
+  sampleCleanupDone: true,
   userName: '',
   onboardingComplete: false,
   paydaySettings: null,
