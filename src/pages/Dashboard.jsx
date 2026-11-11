@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useApp, formatMoney, getMonthExpenses, getWeekExpenses, getTotalSpent, getCategoryTotals } from '../store';
+import { useApp, formatMoney, getMonthExpenses, getWeekExpenses, getTotalSpent, getCategoryTotals, calculateStreak } from '../store';
 import StatCard from '../components/StatCard';
 import TransactionCard from '../components/TransactionCard';
 import ResetModal from '../components/ResetModal';
@@ -8,6 +8,8 @@ import IncomeSourcesModal from '../components/IncomeSourcesModal';
 import AdjustBalanceModal from '../components/AdjustBalanceModal';
 import NotificationModal from '../components/NotificationModal';
 import QuickAddModal from '../components/QuickAddModal';
+import StreakModal from '../components/StreakModal';
+import StreakCelebrationModal from '../components/StreakCelebrationModal';
 import { v4 as uuidv4 } from 'uuid';
 import { DollarSign, TrendingDown, Target, CreditCard, ArrowRight, Flame, Zap, Plus, RotateCcw, Wallet, Bell, Pencil, CheckCircle, X } from 'lucide-react';
 import {
@@ -26,6 +28,8 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
   const [showBalanceModal, setShowBalanceModal] = useState(false);
   const [showNotifModal, setShowNotifModal] = useState(false);
   const [showQuickAddModal, setShowQuickAddModal] = useState(false);
+  const [showStreakModal, setShowStreakModal] = useState(false);
+  const [celebrationStreak, setCelebrationStreak] = useState(null);
   const [quickToast, setQuickToast] = useState(null);
   const [lastAddedId, setLastAddedId] = useState(null);
 
@@ -38,6 +42,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
   }, [quickToast]);
 
   const handleQuickAdd = (preset) => {
+    const wasLoggedToday = streakInfo.loggedToday;
     const newId = uuidv4();
     const todayStr = format(new Date(), 'yyyy-MM-dd');
     const cat = categories.find(c => c.id === preset.category) || { name: 'Expense', icon: preset.icon || '💸' };
@@ -55,6 +60,9 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
       },
     });
 
+    if (!wasLoggedToday) {
+      setCelebrationStreak(streakInfo.currentStreak + 1);
+    }
     setLastAddedId(newId);
     setQuickToast({
       id: newId,
@@ -73,6 +81,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
     }
   };
 
+  const streakInfo = useMemo(() => calculateStreak(expenses), [expenses]);
   const monthExp  = useMemo(() => getMonthExpenses(expenses), [expenses]);
   const weekExp   = useMemo(() => getWeekExpenses(expenses), [expenses]);
   const monthTotal = useMemo(() => getTotalSpent(monthExp), [monthExp]);
@@ -136,6 +145,26 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
             <span className="text-[11px] font-semibold text-[#1b4332] bg-[#eaf4ee] border border-[#cce3d5] px-2.5 py-0.5 rounded-full">
               Live
             </span>
+            <button
+              type="button"
+              onClick={() => setShowStreakModal(true)}
+              data-testid="streak-badge-btn"
+              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-black border transition-all cursor-pointer shadow-2xs hover:scale-102 active:scale-95 ${
+                streakInfo.loggedToday
+                  ? 'bg-[#eaf4ee] text-[#1b4332] border-[#a3d4b6] hover:bg-[#d8edd0]'
+                  : streakInfo.isPendingToday
+                  ? 'bg-[#fef3c7] text-[#92400e] border-[#fde68a] hover:bg-[#fde68a]'
+                  : 'bg-[#f8f7f2] text-[#6e8074] border-[#e4dfd3] hover:text-[#1b4332] hover:bg-[#eae6db]'
+              }`}
+              title="Daily Tracking Streak"
+            >
+              <span>{streakInfo.currentStreak > 0 ? '🔥' : '✨'}</span>
+              <span>
+                {streakInfo.currentStreak > 0
+                  ? `${streakInfo.currentStreak}-Day Streak`
+                  : 'Start Streak'}
+              </span>
+            </button>
           </div>
           <p className="text-[#65776c] text-xs sm:text-sm mt-0.5 font-medium">{format(new Date(), 'MMMM yyyy')} overview</p>
         </div>
@@ -267,6 +296,31 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
         </aside>
       )}
 
+      {!streakInfo.loggedToday && (
+        <div
+          onClick={() => setShowStreakModal(true)}
+          data-testid="streak-reminder-banner"
+          className="p-3.5 rounded-2xl bg-gradient-to-r from-[#fef3c7]/75 via-[#fef9c3]/55 to-[#eaf4ee]/75 border border-[#fde68a] flex items-center justify-between gap-3 cursor-pointer hover:border-[#f59e0b] hover:shadow-xs transition-all"
+        >
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span className="text-xl shrink-0 animate-bounce">{streakInfo.currentStreak > 0 ? '🔥' : '✨'}</span>
+            <div className="min-w-0">
+              <p className="text-xs font-black text-[#92400e] truncate">
+                {streakInfo.isPendingToday
+                  ? `Keep your ${streakInfo.currentStreak}-day streak alive!`
+                  : 'Start your gentle daily streak today'}
+              </p>
+              <p className="text-[11px] text-[#78350f] truncate">
+                {streakInfo.isPendingToday
+                  ? "Tap a quick shortcut below to log today's spending ✨"
+                  : 'Takes 5 seconds. No stress, no guilt, just gentle awareness.'}
+              </p>
+            </div>
+          </div>
+          <span className="text-xs font-black text-[#b45309] shrink-0 hover:underline">View Streak →</span>
+        </div>
+      )}
+
       {/* 1-Tap Quick Add Shortcuts */}
       <div className="rounded-3xl bg-[#ffffff] border border-[#e7e4da] p-4 sm:p-5 shadow-xs space-y-3">
         <div className="flex items-center justify-between">
@@ -296,6 +350,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
             <button
               key={preset.id}
               type="button"
+              data-testid={`quick-add-${preset.id}`}
               onClick={() => handleQuickAdd(preset)}
               className="flex items-center gap-2.5 p-3 rounded-2xl border border-[#e4dfd3] bg-[#f8f7f2] hover:bg-[#eaf4ee] hover:border-[#b8ddc6] active:scale-95 transition-all text-left group cursor-pointer shadow-2xs"
             >
@@ -493,6 +548,21 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
       <AdjustBalanceModal isOpen={showBalanceModal} onClose={() => setShowBalanceModal(false)} />
       <NotificationModal isOpen={showNotifModal} onClose={() => setShowNotifModal(false)} />
       <QuickAddModal isOpen={showQuickAddModal} onClose={() => setShowQuickAddModal(false)} />
+      <StreakModal
+        isOpen={showStreakModal}
+        onClose={() => setShowStreakModal(false)}
+        streakInfo={streakInfo}
+        longestStreak={state.longestStreak || 0}
+        onAddExpenseClick={() => {
+          setShowStreakModal(false);
+          navigate('/add');
+        }}
+      />
+      <StreakCelebrationModal
+        isOpen={celebrationStreak !== null}
+        streak={celebrationStreak || 1}
+        onClose={() => setCelebrationStreak(null)}
+      />
     </div>
   );
 }

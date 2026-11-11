@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useApp, formatMoney } from '../store';
+import { useApp, formatMoney, calculateStreak } from '../store';
 import { v4 as uuidv4 } from 'uuid';
 import { CheckCircle, RefreshCw, Calendar, Tag, FileText, ChevronLeft, Plus, ArrowRight, X, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
+import StreakCelebrationModal from '../components/StreakCelebrationModal';
 
 export default function AddExpense() {
   const { state, dispatch } = useApp();
@@ -20,6 +21,7 @@ export default function AddExpense() {
     recurring: false,
   });
   const [saved, setSaved] = useState(false);
+  const [celebrationStreak, setCelebrationStreak] = useState(null);
   const [showDuplicateNotice, setShowDuplicateNotice] = useState(false);
   const [toastInfo, setToastInfo] = useState(null);
   const [errors, setErrors] = useState({});
@@ -77,6 +79,9 @@ export default function AddExpense() {
     lastSubmitTimeRef.current = now;
     setShowDuplicateNotice(false);
 
+    const currentStreakInfo = calculateStreak(state.expenses);
+    const wasLoggedToday = currentStreakInfo.loggedToday;
+    const nextStreak = currentStreakInfo.currentStreak + 1;
     const amountNum = parseFloat(form.amount);
     const newExpense = {
       ...form,
@@ -104,6 +109,9 @@ export default function AddExpense() {
       categoryColor: catObj.color,
     };
 
+    if (!wasLoggedToday) {
+      setCelebrationStreak(nextStreak);
+    }
     setToastInfo(savedData);
     setSaved(true);
 
@@ -402,6 +410,12 @@ export default function AddExpense() {
           </div>
         )}
       </form>
+
+      <StreakCelebrationModal
+        isOpen={celebrationStreak !== null}
+        streak={celebrationStreak || 1}
+        onClose={() => setCelebrationStreak(null)}
+      />
     </div>
   );
 }

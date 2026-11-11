@@ -1,4 +1,5 @@
 import { createContext, useContext, useReducer, useEffect } from 'react';
+import { format, subDays } from 'date-fns';
 
 // ─── Default Categories ───────────────────────────────────────────────────────
 export const DEFAULT_CATEGORIES = [
@@ -118,6 +119,54 @@ export const FREQUENCY_LABELS = {
   one_time: 'One-Time / Transfer',
 };
 
+// ─── Daily Tracking Streak ───────────────────────────────────────────────────
+export function calculateStreak(expenses) {
+  if (!expenses || expenses.length === 0) {
+    return { currentStreak: 0, loggedToday: false, isPendingToday: false };
+  }
+
+  const uniqueDates = Array.from(
+    new Set(
+      expenses
+        .map(e => (e.date ? e.date.split('T')[0] : null))
+        .filter(Boolean)
+    )
+  ).sort().reverse();
+
+  if (uniqueDates.length === 0) {
+    return { currentStreak: 0, loggedToday: false, isPendingToday: false };
+  }
+
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
+  const yesterdayStr = format(subDays(new Date(), 1), 'yyyy-MM-dd');
+
+  const loggedToday = uniqueDates.includes(todayStr);
+  const loggedYesterday = uniqueDates.includes(yesterdayStr);
+
+  if (!loggedToday && !loggedYesterday) {
+    return { currentStreak: 0, loggedToday: false, isPendingToday: false };
+  }
+
+  let streak = 0;
+  let checkDate = loggedToday ? new Date() : subDays(new Date(), 1);
+
+  for (let i = 0; i < 365; i++) {
+    const targetStr = format(checkDate, 'yyyy-MM-dd');
+    if (uniqueDates.includes(targetStr)) {
+      streak++;
+      checkDate = subDays(checkDate, 1);
+    } else {
+      break;
+    }
+  }
+
+  return {
+    currentStreak: streak,
+    loggedToday,
+    isPendingToday: !loggedToday && loggedYesterday,
+  };
+}
+
 export function calculateMonthlyIncomeFromSources(sources) {
   if (!Array.isArray(sources) || sources.length === 0) return 0;
   return sources.reduce((sum, s) => {
@@ -154,10 +203,14 @@ function reducer(state, action) {
       }
       const prevBal = state.currentBalance !== undefined ? Number(state.currentBalance) : 2500;
       const updatedBalance = Math.round((prevBal - Number(newExp.amount || 0)) * 100) / 100;
+      const nextExpenses = [{ ...newExp, _createdAt: now }, ...state.expenses];
+      const s = calculateStreak(nextExpenses);
+      const longest = Math.max(state.longestStreak || 0, s.currentStreak);
       return {
         ...state,
         currentBalance: updatedBalance,
-        expenses: [{ ...newExp, _createdAt: now }, ...state.expenses],
+        expenses: nextExpenses,
+        longestStreak: longest,
       };
     }
     case 'UPDATE_EXPENSE': {
@@ -387,6 +440,9 @@ function loadState() {
       ) {
         parsed.quickPresets = DEFAULT_QUICK_PRESETS;
       }
+      if (parsed.longestStreak === undefined) {
+        parsed.longestStreak = calculateStreak(parsed.expenses || []).currentStreak;
+      }
       if (parsed.onboardingComplete && !parsed.demoData && !parsed.sampleCleanupDone) {
         return { ...stripSampleData(parsed), sampleCleanupDone: true };
       }
@@ -418,6 +474,7 @@ const initialState = loadState() || {
   paydaySettings: null,
   notificationSettings: DEFAULT_NOTIFICATION_SETTINGS,
   quickPresets: DEFAULT_QUICK_PRESETS,
+  longestStreak: 0,
 };
 
 // ─── Context ──────────────────────────────────────────────────────────────────
