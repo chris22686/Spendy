@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useApp, formatMoney, getMonthExpenses, getCategoryById } from '../store';
+import { useApp, formatMoney, getMonthExpenses, getCategoryById, getCategoryName } from '../store';
 import { Sparkles, ChevronRight, TrendingDown, Target, Calendar, Zap, CheckCircle } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 
@@ -92,22 +92,22 @@ export default function SavingPlan() {
             <Sparkles size={22} />
           </div>
           <div>
-            <h2 className="text-base font-extrabold text-white">Your {planDays}-Day Adaptive Plan</h2>
-            <p className="text-xs text-[#a0cfb2] font-medium">Personalized targets reducing non-essential spending</p>
+            <h2 className="text-base font-extrabold text-white">{state.language === 'el' ? `Προσαρμοστικό Πλάνο ${planDays} Ημερών` : `Your ${planDays}-Day Adaptive Plan`}</h2>
+            <p className="text-xs text-[#a0cfb2] font-medium">{state.language === 'el' ? 'Εξατομικευμένοι στόχοι για μείωση περιττών εξόδων' : 'Personalized targets reducing non-essential spending'}</p>
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 border-t border-white/10 pt-5">
           <div className="p-3 bg-white/5 rounded-2xl border border-white/10 text-center">
             <p className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#99f6e4] truncate">{formatMoney(projectedMonthly)}</p>
-            <p className="text-xs text-[#a0cfb2] font-semibold mt-1">Projected Monthly Savings</p>
+            <p className="text-xs text-[#a0cfb2] font-semibold mt-1">{state.language === 'el' ? 'Εκτιμώμενη Μηνιαία Αποταμίευση' : 'Projected Monthly Savings'}</p>
           </div>
           <div className="p-3 bg-white/5 rounded-2xl border border-white/10 text-center">
             <p className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#fef08a] truncate">{formatMoney(projectedYearly)}</p>
-            <p className="text-xs text-[#a0cfb2] font-semibold mt-1">Projected Annual Savings</p>
+            <p className="text-xs text-[#a0cfb2] font-semibold mt-1">{state.language === 'el' ? 'Εκτιμώμενη Ετήσια Αποταμίευση' : 'Projected Annual Savings'}</p>
           </div>
           <div className="p-3 bg-white/5 rounded-2xl border border-white/10 text-center">
             <p className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#bbf7d0] truncate">{formatMoney(plan.dailySaving.toFixed(2))}</p>
-            <p className="text-xs text-[#a0cfb2] font-semibold mt-1">Daily Stash Target</p>
+            <p className="text-xs text-[#a0cfb2] font-semibold mt-1">{state.language === 'el' ? 'Ημερήσιος Στόχος Αποταμίευσης' : 'Daily Stash Target'}</p>
           </div>
         </div>
       </div>
@@ -116,25 +116,25 @@ export default function SavingPlan() {
         <div className="rounded-2xl bg-[#ffffff] border border-[#e7e4da] p-5 shadow-xs">
           <div className="flex items-center gap-2 mb-2">
             <TrendingDown size={18} className="text-[#991b1b]" />
-            <span className="text-xs font-bold text-[#6e8074] uppercase tracking-wider">Current Daily Outflow Average</span>
+            <span className="text-xs font-bold text-[#6e8074] uppercase tracking-wider">{state.language === 'el' ? 'Μέσος Ημερήσιος Όρος Εξόδων' : 'Current Daily Outflow Average'}</span>
           </div>
           <p className="text-3xl font-extrabold text-[#991b1b]">{formatMoney(plan.dailyAvg.toFixed(2))}</p>
-          <p className="text-xs text-[#809186] mt-1 font-medium">Derived from past 30-day run rate</p>
+          <p className="text-xs text-[#809186] mt-1 font-medium">{state.language === 'el' ? 'Βάσει των τελευταίων 30 ημερών' : 'Derived from past 30-day run rate'}</p>
         </div>
         <div className="rounded-2xl bg-[#ffffff] border border-[#e7e4da] p-5 shadow-xs">
           <div className="flex items-center gap-2 mb-2">
             <Target size={18} className="text-[#1b4332]" />
-            <span className="text-xs font-bold text-[#6e8074] uppercase tracking-wider">Recommended Target Cap</span>
+            <span className="text-xs font-bold text-[#6e8074] uppercase tracking-wider">{state.language === 'el' ? 'Προτεινόμενο Ημερήσιο Όριο' : 'Recommended Target Cap'}</span>
           </div>
           <p className="text-3xl font-extrabold text-[#1b4332]">{formatMoney(plan.dailyTarget.toFixed(2))}</p>
-          <p className="text-xs text-[#809186] mt-1 font-medium">Achieves 25% lifestyle trimming</p>
+          <p className="text-xs text-[#809186] mt-1 font-medium">{state.language === 'el' ? 'Επιτυγχάνει 25% μείωση στα έξοδα lifestyle' : 'Achieves 25% lifestyle trimming'}</p>
         </div>
       </div>
 
       <div className="rounded-2xl bg-[#ffffff] border border-[#e7e4da] p-5 shadow-[0_2px_12px_rgba(27,67,50,0.03)]">
         <div className="flex items-center gap-2 mb-4">
           <Zap size={18} className="text-[#d97706]" />
-          <h2 className="text-sm font-bold text-[#14261c]">Recommended Category Caps</h2>
+          <h2 className="text-sm font-bold text-[#14261c]">{state.language === 'el' ? 'Προτεινόμενα Όρια ανά Κατηγορία' : 'Recommended Category Caps'}</h2>
         </div>
         <div className="grid sm:grid-cols-2 gap-3">
           {plan.reductions.map((r, i) => (
@@ -146,7 +146,7 @@ export default function SavingPlan() {
                 {r.category.icon}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-[#14261c] truncate">{r.category.name}</p>
+                <p className="text-xs font-bold text-[#14261c] truncate">{getCategoryName(r.category, state.language)}</p>
                 <div className="flex items-center gap-1.5 mt-1 text-xs font-semibold">
                   <span className="text-[#991b1b] line-through">{formatMoney(r.current)}</span>
                   <ChevronRight size={12} className="text-[#809186]" />
@@ -166,7 +166,7 @@ export default function SavingPlan() {
       <div className="space-y-2.5">
         <div className="flex items-center gap-2 mb-3">
           <Calendar size={18} className="text-[#1b4332]" />
-          <h2 className="text-sm font-bold text-[#14261c]">Step-by-Step Action Roadmap</h2>
+          <h2 className="text-sm font-bold text-[#14261c]">{state.language === 'el' ? 'Βήμα-Βήμα Πλάνο Δράσης' : 'Step-by-Step Action Roadmap'}</h2>
         </div>
 
         {plan.tasks.map((day, i) => {

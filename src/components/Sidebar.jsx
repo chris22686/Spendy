@@ -84,7 +84,7 @@ export default function Sidebar() {
           <button
             onClick={() => setShowNotif(true)}
             className="w-full flex items-center justify-center lg:justify-start gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-[#718578] hover:text-[#1b4332] hover:bg-[#eaf4ee] transition-colors cursor-pointer"
-            title="Notification Reminders"
+            title={state.language === 'el' ? 'Υπενθυμίσεις Ειδοποιήσεων' : 'Notification Reminders'}
           >
             <Bell size={16} />
             <span className="hidden lg:block">Reminders</span>
@@ -93,7 +93,7 @@ export default function Sidebar() {
           <button
             onClick={() => setShowReset(true)}
             className="w-full flex items-center justify-center lg:justify-start gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-[#718578] hover:text-[#991b1b] hover:bg-[#fee2e2]/60 transition-colors cursor-pointer"
-            title="Reset or clear data"
+            title={state.language === 'el' ? 'Επαναφορά ή καθαρισμός δεδομένων' : 'Reset or clear data'}
           >
             <RotateCcw size={16} />
             <span className="hidden lg:block">Reset Data</span>

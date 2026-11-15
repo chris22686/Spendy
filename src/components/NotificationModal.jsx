@@ -68,8 +68,8 @@ export default function NotificationModal({ isOpen, onClose }) {
               <Bell size={20} className="stroke-[2.5]" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-black text-[#14261c] tracking-tight">Notification Settings</h2>
-              <p className="text-xs text-[#718578]">Payday alerts & daily reminders</p>
+              <h2 className="text-base sm:text-lg font-black text-[#14261c] tracking-tight">{state.language === 'el' ? 'Ρυθμίσεις Ειδοποιήσεων' : 'Notification Settings'}</h2>
+              <p className="text-xs text-[#718578]">{state.language === 'el' ? 'Ειδοποιήσεις πληρωμών & καθημερινές υπενθυμίσεις' : 'Payday alerts & daily reminders'}</p>
             </div>
           </div>
           <button
@@ -100,7 +100,7 @@ export default function NotificationModal({ isOpen, onClose }) {
             <span className="text-2xl mt-0.5">💰</span>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-bold text-[#14261c]">Notify me on payday</p>
+                <p className="text-sm font-bold text-[#14261c]">{state.language === 'el' ? 'Ειδοποίησέ με την ημέρα πληρωμής' : 'Notify me on payday'}</p>
                 <div
                   className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors ${
                     notifyOnPayday ? 'bg-[#1b4332] text-white' : 'border border-[#dcd7cb] bg-white'
@@ -133,7 +133,7 @@ export default function NotificationModal({ isOpen, onClose }) {
             <span className="text-2xl mt-0.5">⏰</span>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-bold text-[#14261c]">Notify me once per day</p>
+                <p className="text-sm font-bold text-[#14261c]">{state.language === 'el' ? 'Καθημερινή υπενθύμιση' : 'Notify me once per day'}</p>
                 <div
                   className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors ${
                     notifyDaily ? 'bg-[#1b4332] text-white' : 'border border-[#dcd7cb] bg-white'
@@ -143,7 +143,7 @@ export default function NotificationModal({ isOpen, onClose }) {
                 </div>
               </div>
               <p className="text-xs text-[#6e8074] mt-1 leading-relaxed">
-                Daily reminder to log your daily spending and keep your budget up to date.
+                {state.language === 'el' ? 'Καθημερινή υπενθύμιση για να καταγράφεις τα έξοδα της ημέρας και να παραμένεις εντός πλάνου.' : 'Daily reminder to log your daily spending and keep your budget up to date.'}
               </p>
             </div>
           </div>

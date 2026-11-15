@@ -75,7 +75,7 @@ export default function PaydayPromptModal({ onClose }) {
               🎉
             </div>
             <div>
-              <h2 className="text-base font-extrabold leading-tight">Payday Check-In!</h2>
+              <h2 className="text-base font-extrabold leading-tight">{state.language === 'el' ? 'Έλεγχος Ημέρας Πληρωμής! 🎉' : 'Payday Check-In!'}</h2>
               <p className="text-xs text-white/80">
                 {userName ? `Hey ${userName}, it's pay time!` : "It's payday time!"}
               </p>
@@ -94,10 +94,10 @@ export default function PaydayPromptModal({ onClose }) {
           <div className="p-3 bg-[#eaf4ee] rounded-2xl border border-[#cde2d6] text-xs text-[#1b4332]">
             <p className="font-bold flex items-center gap-1.5 mb-0.5">
               <Sparkles size={14} />
-              <span>Variable Income Tracker</span>
+              <span>{state.language === 'el' ? 'Καταγραφή Κυμαινόμενου Εισοδήματος' : 'Variable Income Tracker'}</span>
             </p>
             <p className="text-[11px] leading-relaxed">
-              Because your paycheck amount changes, enter the exact amount you were paid today so your budget reflects reality.
+              {state.language === 'el' ? 'Επειδή το ποσό της πληρωμής σου ποικίλλει, πληκτρολόγησε το ακριβές ποσό που πιστώθηκε σήμερα ώστε το υπόλοιπό σου να αντικατοπτρίζει την πραγματικότητα.' : 'Because your paycheck amount changes, enter the exact amount you were paid today so your budget reflects reality.'}
             </p>
           </div>
 
@@ -110,7 +110,7 @@ export default function PaydayPromptModal({ onClose }) {
           {incomeSources.length > 1 && (
             <div>
               <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">
-                Which paycheck was deposited?
+                {state.language === 'el' ? 'Ποια πληρωμή πιστώθηκε;' : 'Which paycheck was deposited?'}
               </label>
               <select
                 value={selectedSourceId}
@@ -153,14 +153,14 @@ export default function PaydayPromptModal({ onClose }) {
               onClick={handleSkip}
               className="flex-1 py-2.5 rounded-xl border border-[#e4dfd3] text-xs font-bold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer"
             >
-              Skip for Now
+              {state.language === 'el' ? 'Παράλειψη προς το παρόν' : 'Skip for Now'}
             </button>
             <button
               type="submit"
               className="flex-1 py-2.5 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white rounded-xl text-xs font-bold shadow-md shadow-[#1b4332]/25 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
             >
               <Check size={15} strokeWidth={2.8} />
-              <span>Confirm Paycheck</span>
+              <span>{state.language === 'el' ? 'Επιβεβαίωση Πληρωμής' : 'Confirm Paycheck'}</span>
             </button>
           </div>
         </form>

@@ -267,7 +267,7 @@ export default function OnboardingModal({ onComplete }) {
             <form onSubmit={handleNextFromStep1} className="space-y-4">
               <div>
                 <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-2 block">
-                  What should we call you?
+                  {state.language === 'el' ? 'Πώς θέλεις να σε λέμε;' : 'What should we call you?'}
                 </label>
                 <div className="relative">
                   <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7d8f84]" size={18} />
@@ -279,7 +279,7 @@ export default function OnboardingModal({ onComplete }) {
                       setError('');
                     }}
                     onFocus={() => window.scrollTo(0, 0)}
-                    placeholder="e.g. Alex, Chris, Stefan..."
+                    placeholder={state.language === 'el' ? 'π.χ. Στέφανος, Μαρία, Γιώργος...' : 'e.g. Alex, Chris, Stefan...'}
                     className="w-full bg-[#f8f7f2] border border-[#dcd7cb] rounded-2xl pl-11 pr-4 py-3 text-base font-bold text-[#14261c] focus:outline-none focus:border-[#1b4332] transition-colors"
                   />
                 </div>
@@ -290,7 +290,7 @@ export default function OnboardingModal({ onComplete }) {
                   type="submit"
                   className="w-full py-3.5 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white rounded-2xl text-sm font-extrabold shadow-md shadow-[#1b4332]/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
                 >
-                  <span>Continue</span>
+                  <span>{state.language === 'el' ? 'Συνέχεια' : 'Continue'}</span>
                   <ArrowRight size={16} />
                 </button>
               </div>
@@ -302,11 +302,11 @@ export default function OnboardingModal({ onComplete }) {
             <form onSubmit={handleNextFromStep2} className="space-y-4">
               <div>
                 <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-2 block">
-                  Current Available Balance
+                  {state.language === 'el' ? 'Τρέχον Διαθέσιμο Υπόλοιπο' : 'Current Available Balance'}
                 </label>
                 <div className="rounded-3xl bg-gradient-to-br from-[#133928] via-[#1b4332] to-[#2d6a4f] border border-[#2d6a4f]/50 p-5 sm:p-6 text-center text-white shadow-xl shadow-[#1b4332]/20 relative overflow-hidden">
                   <p className="text-[11px] font-bold text-[#a0cfb2] uppercase tracking-wider mb-2">
-                    Total Money You Have Right Now
+                    {state.language === 'el' ? 'Συνολικά Χρήματα που Έχεις Τώρα' : 'Total Money You Have Right Now'}
                   </p>
                   <div className="flex items-center justify-center gap-1 sm:gap-2">
                     <span className="text-3xl sm:text-4xl font-light text-[#86bfa0]">€</span>
@@ -325,11 +325,11 @@ export default function OnboardingModal({ onComplete }) {
                     />
                   </div>
                   <p className="text-[11px] text-[#a0cfb2]/85 mt-2 font-medium">
-                    Cash in wallet, checking & savings accounts
+                    {state.language === 'el' ? 'Μετρητά στο πορτοφόλι, κάρτες και λογαριασμοί' : 'Cash in wallet, checking & savings accounts'}
                   </p>
                 </div>
                 <p className="text-xs text-[#6e8074] leading-relaxed pt-2">
-                  This is your starting balance. Every time you log an expense, Spendy will automatically subtract it from this balance.
+                  {state.language === 'el' ? 'Αυτό είναι το αρχικό σου υπόλοιπο. Κάθε φορά που καταγράφεις ένα έξοδο, το Spendy θα το αφαιρεί αυτόματα από αυτό το ποσό.' : 'This is your starting balance. Every time you log an expense, Spendy will automatically subtract it from this balance.'}
                 </p>
               </div>
 
@@ -338,14 +338,12 @@ export default function OnboardingModal({ onComplete }) {
                   type="button"
                   onClick={() => setStep(1)}
                   className="px-4 py-3 rounded-2xl border border-[#e4dfd3] text-xs font-bold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer"
-                >
-                  Back
-                </button>
+                >{state.language === 'el' ? 'Πίσω' : 'Back'}</button>
                 <button
                   type="submit"
                   className="flex-1 py-3 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white rounded-2xl text-sm font-extrabold shadow-md shadow-[#1b4332]/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
                 >
-                  <span>Next Step</span>
+                  <span>{state.language === 'el' ? 'Επόμενο Βήμα' : 'Next Step'}</span>
                   <ArrowRight size={16} />
                 </button>
               </div>
@@ -356,27 +354,27 @@ export default function OnboardingModal({ onComplete }) {
           {step === 3 && (
             <div className="space-y-3.5 sm:space-y-4">
               <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider block">
-                Select your payday schedule:
+                {state.language === 'el' ? 'Επίλεξε πότε πληρώνεσαι:' : 'Select your payday schedule:'}
               </label>
 
               <div className="space-y-2.5">
                 {[
                   {
                     id: 'twice_month',
-                    title: 'Every 15 Days (Twice a Month)',
-                    desc: 'e.g. 1st and 15th of every month',
+                    title: state.language === 'el' ? 'Κάθε 15 Ημέρες (2 φορές το μήνα)' : 'Every 15 Days (Twice a Month)',
+                    desc: state.language === 'el' ? 'π.χ. 1η και 15η κάθε μήνα' : 'e.g. 1st and 15th of every month',
                     icon: '🌓',
                   },
                   {
                     id: 'monthly_1',
-                    title: 'Monthly (Once a Month)',
-                    desc: 'e.g. End of month or 1st of each month',
+                    title: state.language === 'el' ? 'Μηνιαία (1 φορά το μήνα)' : 'Monthly (Once a Month)',
+                    desc: state.language === 'el' ? 'π.χ. τέλος του μήνα ή 1η κάθε μήνα' : 'e.g. End of month or 1st of each month',
                     icon: '🌕',
                   },
                   {
                     id: 'weekly',
-                    title: 'Weekly (Every 7 Days)',
-                    desc: 'Receive payments every week',
+                    title: state.language === 'el' ? 'Εβδομαδιαία (Κάθε 7 ημέρες)' : 'Weekly (Every 7 Days)',
+                    desc: state.language === 'el' ? 'Πληρωμή κάθε εβδομάδα' : 'Receive payments every week',
                     icon: '⚡',
                   },
                 ].map((opt) => (
@@ -406,9 +404,9 @@ export default function OnboardingModal({ onComplete }) {
               {/* Day selection */}
               {paySchedule === 'twice_month' && (
                 <div className="p-3 bg-[#f8f7f2] rounded-2xl border border-[#e4dfd3] flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 text-xs">
-                  <span className="font-bold text-[#14261c]">Paycheck days:</span>
+                  <span className="font-bold text-[#14261c]">{state.language === 'el' ? 'Ημέρες πληρωμής:' : 'Paycheck days:'}</span>
                   <div className="flex items-center gap-2">
-                    <span>Day</span>
+                    <span>{state.language === 'el' ? 'Ημέρα' : 'Day'}</span>
                     <input
                       type="number"
                       min="1"
@@ -419,7 +417,7 @@ export default function OnboardingModal({ onComplete }) {
                       onFocus={() => window.scrollTo(0, 0)}
                       className="w-12 bg-white border border-[#dcd7cb] rounded-lg px-2 py-1.5 text-center font-bold text-[#14261c] text-base sm:text-xs"
                     />
-                    <span>& Day</span>
+                    <span>{state.language === 'el' ? '& Ημέρα' : '& Day'}</span>
                     <input
                       type="number"
                       min="1"
@@ -436,9 +434,9 @@ export default function OnboardingModal({ onComplete }) {
 
               {paySchedule === 'monthly_1' && (
                 <div className="p-3 bg-[#f8f7f2] rounded-2xl border border-[#e4dfd3] flex items-center justify-between gap-2 text-xs">
-                  <span className="font-bold text-[#14261c]">Day of month you get paid:</span>
+                  <span className="font-bold text-[#14261c]">{state.language === 'el' ? 'Ημέρα μήνα που πληρώνεσαι:' : 'Day of month you get paid:'}</span>
                   <div className="flex items-center gap-2">
-                    <span>Day</span>
+                    <span>{state.language === 'el' ? 'Ημέρα' : 'Day'}</span>
                     <input
                       type="number"
                       min="1"
@@ -458,15 +456,13 @@ export default function OnboardingModal({ onComplete }) {
                   type="button"
                   onClick={() => setStep(2)}
                   className="px-4 py-3 rounded-2xl border border-[#e4dfd3] text-xs font-bold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer"
-                >
-                  Back
-                </button>
+                >{state.language === 'el' ? 'Πίσω' : 'Back'}</button>
                 <button
                   type="button"
                   onClick={handleNextFromStep3}
                   className="flex-1 py-3 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white rounded-2xl text-sm font-extrabold shadow-md shadow-[#1b4332]/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
                 >
-                  <span>Next Step</span>
+                  <span>{state.language === 'el' ? 'Επόμενο Βήμα' : 'Next Step'}</span>
                   <ArrowRight size={16} />
                 </button>
               </div>
@@ -499,10 +495,10 @@ export default function OnboardingModal({ onComplete }) {
                 </div>
                 <div>
                   <p className="text-xs font-bold text-[#14261c]">
-                    My paycheck amount changes / varies each time
+                    {state.language === 'el' ? 'Το ποσό της πληρωμής μου αλλάζει / ποικίλλει κάθε φορά' : 'My paycheck amount changes / varies each time'}
                   </p>
                   <p className="text-[11px] text-[#6e8074] mt-0.5">
-                    Spendy will prompt you on your payday date to enter the exact amount you were paid!
+                    {state.language === 'el' ? 'Το Spendy θα σου υπενθυμίζει την ημέρα πληρωμής να γράψεις το ακριβές ποσό!' : 'Spendy will prompt you on your payday date to enter the exact amount you were paid!'}
                   </p>
                 </div>
               </div>
@@ -512,20 +508,18 @@ export default function OnboardingModal({ onComplete }) {
                 <div className="p-3.5 sm:p-4 bg-[#f8f7f2] border border-[#e4dfd3] rounded-2xl text-xs space-y-1">
                   <p className="font-bold text-[#14261c] flex items-center gap-1.5">
                     <span>✨</span>
-                    <span>No estimated amount needed</span>
+                    <span>{state.language === 'el' ? 'Δεν απαιτείται εκτίμηση ποσού' : 'No estimated amount needed'}</span>
                   </p>
                   <p className="text-[11px] leading-relaxed text-[#6e8074]">
-                    Because your paycheck varies each time, you don't need to enter an estimate now. On your paycheck dates ${paySchedule === 'twice_month' ? `(Day ${payDay1} & Day ${payDay2})` : paySchedule === 'weekly' ? '(every week)' : `(Day ${payDay1})`}, Spendy will prompt you to enter the exact amount you received.
+                    {state.language === 'el' ? 'Επειδή ο μισθός σου διαφέρει κάθε φορά, δεν χρειάζεται να γράψεις εκτίμηση τώρα. Την ημέρα πληρωμής, το Spendy θα σε ρωτήσει το ακριβές ποσό που πιστώθηκε.' : "Because your paycheck varies each time, you don't need to enter an estimate now. On your paycheck dates, Spendy will prompt you to enter the exact amount you received."}
                   </p>
                 </div>
               ) : (
                 <div className="space-y-1.5 animate-in fade-in duration-200">
                   <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider block">
-                    {paySchedule === 'twice_month'
-                      ? 'Fixed Amount per 15-day Paycheck (€)'
-                      : paySchedule === 'weekly'
-                      ? 'Fixed Weekly Paycheck (€)'
-                      : 'Fixed Monthly Salary (€)'}
+                    {state.language === 'el'
+                        ? (paySchedule === 'twice_month' ? 'Σταθερό Ποσό ανά 15νθήμερο (€)' : paySchedule === 'weekly' ? 'Σταθερό Εβδομαδιαίο Ποσό (€)' : 'Σταθερός Μηνιαίος Μισθός (€)')
+                        : (paySchedule === 'twice_month' ? 'Fixed Amount per 15-day Paycheck (€)' : paySchedule === 'weekly' ? 'Fixed Weekly Paycheck (€)' : 'Fixed Monthly Salary (€)')}
                   </label>
                   <div className="relative">
                     <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7d8f84] text-base font-bold">€</span>
@@ -551,14 +545,12 @@ export default function OnboardingModal({ onComplete }) {
                   type="button"
                   onClick={() => setStep(3)}
                   className="px-4 py-3 rounded-2xl border border-[#e4dfd3] text-xs font-bold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer"
-                >
-                  Back
-                </button>
+                >{state.language === 'el' ? 'Πίσω' : 'Back'}</button>
                 <button
                   type="submit"
                   className="flex-1 py-3 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white rounded-2xl text-sm font-extrabold shadow-md shadow-[#1b4332]/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
                 >
-                  <span>Continue</span>
+                  <span>{state.language === 'el' ? 'Συνέχεια' : 'Continue'}</span>
                   <ArrowRight size={16} />
                 </button>
               </div>
@@ -581,7 +573,7 @@ export default function OnboardingModal({ onComplete }) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
                     <p className="text-xs sm:text-sm font-bold text-[#14261c]">
-                      Notify me every time I get paid
+                      {state.language === 'el' ? 'Ειδοποίησέ με κάθε φορά που πληρώνομαι' : 'Notify me every time I get paid'}
                     </p>
                     <div
                       className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors ${
@@ -592,13 +584,7 @@ export default function OnboardingModal({ onComplete }) {
                     </div>
                   </div>
                   <p className="text-[11px] sm:text-xs text-[#6e8074] mt-1 leading-relaxed">
-                    Get an alert on your payday ${
-                      paySchedule === 'twice_month'
-                        ? `(Day ${payDay1} & Day ${payDay2})`
-                        : paySchedule === 'weekly'
-                        ? '(every Friday)'
-                        : `(Day ${payDay1})`
-                    } to log your paycheck and keep your balance 100% accurate.
+                    {state.language === 'el' ? 'Λάβε ειδοποίηση την ημέρα πληρωμής για να καταγράψεις τον μισθό σου και να διατηρείς το υπόλοιπό σου 100% ακριβές.' : 'Get an alert on your payday to log your paycheck and keep your balance 100% accurate.'}
                   </p>
                 </div>
               </div>
@@ -616,7 +602,7 @@ export default function OnboardingModal({ onComplete }) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
                     <p className="text-xs sm:text-sm font-bold text-[#14261c]">
-                      Notify me once per day
+                      {state.language === 'el' ? 'Καθημερινή υπενθύμιση' : 'Notify me once per day'}
                     </p>
                     <div
                       className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors ${
@@ -627,7 +613,7 @@ export default function OnboardingModal({ onComplete }) {
                     </div>
                   </div>
                   <p className="text-[11px] sm:text-xs text-[#6e8074] mt-1 leading-relaxed">
-                    Get a daily reminder to take 30 seconds to log today's expenses and track your budget.
+                    {state.language === 'el' ? 'Λάβε μια καθημερινή υπενθύμιση για να αφιερώσεις 30 δευτερόλεπτα στην καταγραφή των σημερινών εξόδων.' : "Get a daily reminder to take 30 seconds to log today's expenses and track your budget."}
                   </p>
                 </div>
               </div>
@@ -638,7 +624,7 @@ export default function OnboardingModal({ onComplete }) {
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1.5 text-xs font-bold text-[#55695e] uppercase tracking-wider">
                       <Clock size={14} />
-                      <span>Reminder Time:</span>
+                      <span>{state.language === 'el' ? 'Ώρα Υπενθύμισης:' : 'Reminder Time:'}</span>
                     </div>
                     <input
                       type="time"
@@ -678,9 +664,7 @@ export default function OnboardingModal({ onComplete }) {
                   type="button"
                   onClick={() => setStep(4)}
                   className="px-4 py-3 rounded-2xl border border-[#e4dfd3] text-xs font-bold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer"
-                >
-                  Back
-                </button>
+                >{state.language === 'el' ? 'Πίσω' : 'Back'}</button>
                 <button
                   type="submit"
                   className="flex-1 py-3 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white rounded-2xl text-sm font-extrabold shadow-md shadow-[#1b4332]/25 flex items-center justify-center gap-2 transition-all cursor-pointer"

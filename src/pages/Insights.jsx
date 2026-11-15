@@ -5,6 +5,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
   LineChart, Line, AreaChart, Area
 } from 'recharts';
+import { el } from 'date-fns/locale';
 import { format, subMonths, eachDayOfInterval, startOfMonth, endOfMonth, startOfWeek, endOfWeek } from 'date-fns';
 import { TrendingDown, TrendingUp, Lightbulb } from 'lucide-react';
 
@@ -128,13 +129,13 @@ export default function Insights() {
           <div>
             <h2 className="text-base font-extrabold text-[#143928]">{state.language === 'el' ? 'Εκτιμώμενη Δυνατότητα Αποταμίευσης' : 'Estimated Savings Potential'}</h2>
             <p className="text-xs text-[#406e57] font-medium">
-              You could save an estimated <strong className="text-[#143928] font-bold text-sm">{formatMoney(totalPotentialSaving)}/month</strong> by optimizing variable categories
+              {state.language === 'el' ? <>Μπορείς να εξοικονομήσεις περίπου <strong className="text-[#143928] font-bold text-sm">{formatMoney(totalPotentialSaving)}/μήνα</strong> βελτιστοποιώντας τις μεταβλητές κατηγορίες</> : <>You could save an estimated <strong className="text-[#143928] font-bold text-sm">{formatMoney(totalPotentialSaving)}/month</strong> by optimizing variable categories</>}
             </p>
           </div>
         </div>
 
         {savingsPotential.length === 0 ? (
-          <p className="text-xs text-[#406e57] font-medium py-2">Your spending is currently optimal! Keep up the great work.</p>
+          <p className="text-xs text-[#406e57] font-medium py-2">{state.language === 'el' ? 'Τα έξοδά σου είναι ιδανικά αυτή τη στιγμή! Συνέχισε έτσι.' : 'Your spending is currently optimal! Keep up the great work.'}</p>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
             {savingsPotential.map((s, i) => (
@@ -164,8 +165,8 @@ export default function Insights() {
       <div className="grid lg:grid-cols-5 gap-5">
         <div className="lg:col-span-2 rounded-2xl bg-[#ffffff] border border-[#e7e4da] p-5 shadow-[0_2px_12px_rgba(27,67,50,0.03)] flex flex-col justify-between">
           <div>
-            <h2 className="text-sm font-bold text-[#14261c] mb-0.5">Category Breakdown</h2>
-            <p className="text-xs text-[#6e8074] mb-4 font-medium">Distribution for current cycle</p>
+            <h2 className="text-sm font-bold text-[#14261c] mb-0.5">{state.language === 'el' ? 'Κατανομή Κατηγοριών' : 'Category Breakdown'}</h2>
+            <p className="text-xs text-[#6e8074] mb-4 font-medium">{state.language === 'el' ? 'Κατανομή για τον τρέχοντα κύκλο' : 'Distribution for current cycle'}</p>
           </div>
           <ResponsiveContainer width="100%" height={210}>
             <PieChart>
@@ -191,8 +192,8 @@ export default function Insights() {
 
         <div className="lg:col-span-3 rounded-2xl bg-[#ffffff] border border-[#e7e4da] p-5 shadow-[0_2px_12px_rgba(27,67,50,0.03)] flex flex-col justify-between">
           <div>
-            <h2 className="text-sm font-bold text-[#14261c] mb-0.5">Top Spending Categories</h2>
-            <p className="text-xs text-[#6e8074] mb-4 font-medium">Largest outflows ranked</p>
+            <h2 className="text-sm font-bold text-[#14261c] mb-0.5">{state.language === 'el' ? 'Μεγαλύτερες Κατηγορίες Εξόδων' : 'Top Spending Categories'}</h2>
+            <p className="text-xs text-[#6e8074] mb-4 font-medium">{state.language === 'el' ? 'Κατάταξη μεγαλύτερων εξόδων' : 'Largest outflows ranked'}</p>
           </div>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={topCats} layout="vertical" margin={{ left: 10, right: 20, top: 0, bottom: 0 }}>
@@ -210,8 +211,8 @@ export default function Insights() {
       </div>
 
       <div className="rounded-2xl bg-[#ffffff] border border-[#e7e4da] p-5 shadow-[0_2px_12px_rgba(27,67,50,0.03)]">
-        <h2 className="text-sm font-bold text-[#14261c] mb-0.5">Daily Spending Rhythm — {format(now, 'MMMM yyyy')}</h2>
-        <p className="text-xs text-[#6e8074] mb-4 font-medium">Day-by-day fluctuation</p>
+        <h2 className="text-sm font-bold text-[#14261c] mb-0.5">{state.language === 'el' ? `Ημερήσιος Ρυθμός Εξόδων — ${format(now, 'MMMM yyyy', { locale: el })}` : `Daily Spending Rhythm — ${format(now, 'MMMM yyyy')}`}</h2>
+        <p className="text-xs text-[#6e8074] mb-4 font-medium">{state.language === 'el' ? 'Ημερήσια διακύμανση εξόδων' : 'Day-by-day fluctuation'}</p>
         <ResponsiveContainer width="100%" height={200}>
           <AreaChart data={dailyData} margin={{ top: 5, right: 5, bottom: 0, left: 0 }}>
             <defs>
@@ -230,8 +231,8 @@ export default function Insights() {
       </div>
 
       <div className="rounded-2xl bg-[#ffffff] border border-[#e7e4da] p-5 shadow-[0_2px_12px_rgba(27,67,50,0.03)]">
-        <h2 className="text-sm font-bold text-[#14261c] mb-0.5">6-Month Trend</h2>
-        <p className="text-xs text-[#6e8074] mb-4 font-medium">Historical monthly expenses comparison</p>
+        <h2 className="text-sm font-bold text-[#14261c] mb-0.5">{state.language === 'el' ? 'Τάση 6 Μηνών' : '6-Month Trend'}</h2>
+        <p className="text-xs text-[#6e8074] mb-4 font-medium">{state.language === 'el' ? 'Σύγκριση εξόδων προηγούμενων μηνών' : 'Historical monthly expenses comparison'}</p>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={monthlyBreakdown} margin={{ top: 5, right: 5, bottom: 0, left: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e7e4da" />

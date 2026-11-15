@@ -148,7 +148,7 @@ export default function AddExpense() {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5 text-xs font-black text-[#1b4332] uppercase tracking-wider">
                 <CheckCircle size={14} className="text-[#2d6a4f]" />
-                <span>Expense Added!</span>
+                <span>{state.language === 'el' ? 'Το Έξοδο Προστέθηκε!' : 'Expense Added!'}</span>
               </div>
               <p className="text-sm font-bold text-[#14261c] truncate mt-0.5">
                 {toastInfo.description}
@@ -161,20 +161,20 @@ export default function AddExpense() {
               type="button"
               onClick={() => setToastInfo(null)}
               className="p-1 text-[#8fa296] hover:text-[#1b4332] rounded-lg transition-colors cursor-pointer -mr-1 -mt-1"
-              title="Dismiss notification"
+              title={state.language === 'el' ? 'Κλείσιμο ειδοποίησης' : 'Dismiss notification'}
             >
               <X size={16} />
             </button>
           </div>
 
           <div className="mt-3 pt-3 border-t border-[#f0ece1] flex items-center justify-between gap-2">
-            <span className="text-[11px] text-[#718578] font-medium">Logged in balances</span>
+            <span className="text-[11px] text-[#718578] font-medium">{state.language === 'el' ? 'Ενημερώθηκε το υπόλοιπο' : 'Logged in balances'}</span>
             <button
               type="button"
               onClick={() => navigate('/expenses')}
               className="text-xs font-bold text-white bg-[#1b4332] hover:bg-[#2d6a4f] px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all shadow-xs active:scale-95 cursor-pointer"
             >
-              <span>View in Expenses</span>
+              <span>{state.language === 'el' ? 'Προβολή στα Έξοδα' : 'View in Expenses'}</span>
               <ArrowRight size={13} strokeWidth={2.5} />
             </button>
           </div>
@@ -199,9 +199,9 @@ export default function AddExpense() {
           <div className="flex items-center gap-3 min-w-0">
             <CheckCircle size={22} className="text-[#2d6a4f] shrink-0" />
             <div className="min-w-0">
-              <p className="font-bold text-sm text-[#143928]">Expense successfully logged!</p>
+              <p className="font-bold text-sm text-[#143928]">{state.language === 'el' ? 'Το έξοδο καταχωρήθηκε επιτυχώς!' : 'Expense successfully logged!'}</p>
               <p className="text-xs text-[#406e57] mt-0.5 truncate">
-                Added <span className="font-bold">{toastInfo.description}</span> ({formatMoney(toastInfo.amount)}) to your balance.
+                {state.language === 'el' ? `Αφαιρέθηκαν ${formatMoney(toastInfo.amount)} για ${toastInfo.description} από το υπόλοιπό σου.` : `Added ${toastInfo.description} (${formatMoney(toastInfo.amount)}) to your balance.`}
               </p>
             </div>
           </div>
@@ -209,9 +209,7 @@ export default function AddExpense() {
             type="button"
             onClick={() => navigate('/expenses')}
             className="text-xs font-bold text-[#1b4332] bg-[#ffffff] border border-[#a3d4b6] px-3 py-1.5 rounded-xl hover:bg-[#d8edd0] transition-colors shrink-0 cursor-pointer"
-          >
-            View
-          </button>
+          >{state.language === 'el' ? 'Προβολή' : 'View'}</button>
         </div>
       )}
 
@@ -398,8 +396,8 @@ export default function AddExpense() {
           >
             <AlertCircle size={18} className="text-[#d97706] shrink-0" />
             <div>
-              <p className="font-bold text-[#78350f]">Expense already saved!</p>
-              <p className="text-[11px] text-[#92400e] mt-0.5">Rapid clicks were blocked so duplicate entries aren't added.</p>
+              <p className="font-bold text-[#78350f]">{state.language === 'el' ? 'Το έξοδο έχει ήδη αποθηκευτεί!' : 'Expense already saved!'}</p>
+              <p className="text-[11px] text-[#92400e] mt-0.5">{state.language === 'el' ? 'Τα γρήγορα πολλαπλά πατήματα μπλοκαρίστηκαν για να μην προστεθεί διπλότυπο έξοδο.' : "Rapid clicks were blocked so duplicate entries aren't added."}</p>
             </div>
           </div>
         )}

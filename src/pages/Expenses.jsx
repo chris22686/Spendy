@@ -269,7 +269,7 @@ function ExpenseModal({ expense, categories, onSave, onClose, state, t }) {
               value={form.notes||''}
               onChange={e => set('notes', e.target.value)}
               onFocus={() => window.scrollTo(0, 0)}
-              placeholder="Receipt details..."
+              placeholder={state?.language === 'el' ? 'Λεπτομέρειες, απόδειξη...' : 'Receipt details...'}
               className="w-full bg-[#f8f7f2] border border-[#e4dfd3] rounded-xl px-4 py-2.5 text-base sm:text-sm text-[#14261c] focus:outline-none focus:border-[#1b4332]"
             />
           </div>

@@ -120,6 +120,19 @@ export const FREQUENCY_LABELS = {
   one_time: 'One-Time / Transfer',
 };
 
+export function getFrequencyLabel(frequency, lang = 'el') {
+  if (lang === 'el') {
+    switch (frequency) {
+      case 'monthly': return 'Μηνιαία';
+      case 'bi-weekly': return 'Κάθε 15 Ημέρες (Δεκαπενθήμερο)';
+      case 'weekly': return 'Εβδομαδιαία';
+      case 'one_time': return 'Μία Φορά / Μεταφορά';
+      default: return frequency || 'Μηνιαία';
+    }
+  }
+  return FREQUENCY_LABELS[frequency] || frequency || 'Monthly';
+}
+
 // ─── Daily Tracking Streak ───────────────────────────────────────────────────
 export function calculateStreak(expenses) {
   if (!expenses || expenses.length === 0) {

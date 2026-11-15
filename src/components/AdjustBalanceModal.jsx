@@ -51,7 +51,7 @@ export default function AdjustBalanceModal({ isOpen, onClose }) {
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-bold text-[#14261c]">{t('balance_modal_title')}</h2>
-              <p className="text-xs text-[#718578]">Update available funds across cash & bank</p>
+              <p className="text-xs text-[#718578]">{state.language === 'el' ? 'Ενημέρωσε το διαθέσιμο ποσό σε μετρητά & τράπεζα' : 'Update available funds across cash & bank'}</p>
             </div>
           </div>
           <button
@@ -72,7 +72,7 @@ export default function AdjustBalanceModal({ isOpen, onClose }) {
 
           <div className="rounded-2xl bg-gradient-to-br from-[#133928] via-[#1b4332] to-[#2d6a4f] p-5 text-center text-white shadow-lg">
             <p className="text-[11px] font-bold text-[#a0cfb2] uppercase tracking-wider mb-1.5">
-              Current Available Money
+              {state.language === 'el' ? 'Διαθέσιμα Χρήματα Τώρα' : 'Current Available Money'}
             </p>
             <div className="flex items-center justify-center gap-1">
               <span className="text-2xl sm:text-3xl font-light text-[#86bfa0]">€</span>

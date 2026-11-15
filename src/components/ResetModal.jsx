@@ -73,7 +73,7 @@ export default function ResetModal({ isOpen, onClose }) {
             <div className="flex-1">
               <p className="text-sm font-bold text-[#991b1b]">{t('reset_clear_btn')} (Start Fresh)</p>
               <p className="text-xs text-[#7f8e83] mt-0.5">
-                Wipes all 30 sample expenses to zero. Perfect when you're ready to start tracking your own real finances.
+                {state.language === 'el' ? 'Μηδενίζει όλα τα δοκιμαστικά έξοδα. Ιδανικό όταν είσαι έτοιμος να καταγράψεις τα δικά σου πραγματικά οικονομικά.' : "Wipes all sample expenses to zero. Perfect when you're ready to start tracking your own real finances."}
               </p>
             </div>
           </button>
@@ -86,9 +86,9 @@ export default function ResetModal({ isOpen, onClose }) {
               <RotateCcw size={18} />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-bold text-[#14261c]">Reload Sample Demo Data</p>
+              <p className="text-sm font-bold text-[#14261c]">{state.language === 'el' ? 'Φόρτωση Δοκιμαστικών Δεδομένων' : 'Reload Sample Demo Data'}</p>
               <p className="text-xs text-[#7f8e83] mt-0.5">
-                Restores the 30 realistic sample transactions, initial category caps, and standard metrics.
+                {state.language === 'el' ? 'Επαναφέρει δοκιμαστικές συναλλαγές και αρχικά όρια κατηγοριών.' : 'Restores realistic sample transactions and initial category caps.'}
               </p>
             </div>
           </button>

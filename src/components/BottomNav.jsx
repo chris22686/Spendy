@@ -95,9 +95,7 @@ export default function BottomNav() {
             className={`text-[10px] mt-1 font-semibold ${
               ['/budgets', '/insights', '/plan', '/story'].includes(location.pathname) ? 'text-[#1b4332]' : 'text-[#7e8e83]'
             }`}
-          >
-            More
-          </span>
+          >{t('nav_more')}</span>
         </button>
       </nav>
 
@@ -112,8 +110,8 @@ export default function BottomNav() {
           >
             <div className="flex items-center justify-between pb-2 border-b border-[#f1ede3]">
               <div>
-                <h3 className="text-base font-extrabold text-[#14261c]">More Tools & Pages</h3>
-                <p className="text-xs text-[#718578]">Quick navigation</p>
+                <h3 className="text-base font-extrabold text-[#14261c]">{state.language === 'el' ? 'Περισσότερα Εργαλεία & Σελίδες' : 'More Tools & Pages'}</h3>
+                <p className="text-xs text-[#718578]">{state.language === 'el' ? 'Γρήγορη πλοήγηση' : 'Quick navigation'}</p>
               </div>
               <button
                 onClick={() => setShowMore(false)}
@@ -174,7 +172,7 @@ export default function BottomNav() {
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-[#cde2d6] bg-[#eaf4ee] text-[#1b4332] text-xs font-bold hover:bg-[#d9ede0] transition-colors cursor-pointer"
               >
                 <Bell size={15} />
-                <span>Reminders & Notifications</span>
+                <span>{state.language === 'el' ? 'Υπενθυμίσεις & Ειδοποιήσεις' : 'Reminders & Notifications'}</span>
               </button>
 
               <button
@@ -185,7 +183,7 @@ export default function BottomNav() {
                 className="w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl border border-[#fee2e2] bg-[#fffbfb] text-[#991b1b] text-xs font-bold hover:bg-[#fee2e2]/50 transition-colors cursor-pointer"
               >
                 <RotateCcw size={15} />
-                <span>Reset or Clear Data</span>
+                <span>{state.language === 'el' ? 'Επαναφορά ή Καθαρισμός Δεδομένων' : 'Reset or Clear Data'}</span>
               </button>
             </div>
           </div>

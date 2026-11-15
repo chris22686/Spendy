@@ -114,7 +114,7 @@ export default function Categories() {
                     <button
                       onClick={() => { setEditCat(cat); setShowForm(true); }}
                       className="p-2 rounded-xl text-[#5b6c62] hover:text-[#1b4332] bg-[#f8f7f2] border border-[#e8e4da] hover:bg-[#eaf4ee] active:scale-90 active:rotate-12 transition-all cursor-pointer group-hover:scale-105"
-                      title="Edit category"
+                      title={state.language === 'el' ? 'Επεξεργασία κατηγορίας' : 'Edit category'}
                     >
                       <Pencil size={15} />
                     </button>
@@ -122,7 +122,7 @@ export default function Categories() {
                       type="button"
                       onClick={() => handleDeleteCategory(cat)}
                       className="p-2 rounded-xl text-[#991b1b] bg-[#fef2f2] border border-[#fecaca] hover:bg-[#fee2e2] transition-all cursor-pointer"
-                      title="Delete category"
+                      title={state.language === 'el' ? 'Διαγραφή κατηγορίας' : 'Delete category'}
                     >
                       <Trash2 size={15} />
                     </button>
@@ -159,6 +159,7 @@ export default function Categories() {
 }
 
 function CategoryModal({ initial, groups, onSave, onClose }) {
+  const { state, t } = useApp();
   const [form, setForm] = useState(
     initial || { name: '', icon: '📦', color: '#1b4332', group: groups[0] || 'Other' }
   );
@@ -173,7 +174,7 @@ function CategoryModal({ initial, groups, onSave, onClose }) {
   }, []);
 
   const handleSave = () => {
-    if (!form.name.trim()) { setErrors({ name: 'Name is required' }); return; }
+    if (!form.name.trim()) { setErrors({ name: state.language === 'el' ? 'Συμπλήρωσε όνομα κατηγορίας' : 'Name is required' }); return; }
     onSave(form);
   };
 
@@ -185,7 +186,7 @@ function CategoryModal({ initial, groups, onSave, onClose }) {
       >
         {/* Fixed Header */}
         <div className="shrink-0 p-4 sm:p-5 border-b border-[#eeebe2] flex items-center justify-between bg-[#fbfaf6]">
-          <h2 className="text-base sm:text-lg font-bold text-[#14261c]">{initial ? 'Edit Category' : 'Create New Category'}</h2>
+          <h2 className="text-base sm:text-lg font-bold text-[#14261c]">{initial ? (state.language === 'el' ? 'Επεξεργασία Κατηγορίας' : 'Edit Category') : (state.language === 'el' ? 'Νέα Κατηγορία' : 'Create New Category')}</h2>
           <button onClick={onClose} className="text-[#7d8f84] hover:text-[#14261c] p-1.5 rounded-xl hover:bg-[#eae6db] transition-colors cursor-pointer"><X size={18}/></button>
         </div>
 
@@ -208,11 +209,11 @@ function CategoryModal({ initial, groups, onSave, onClose }) {
           </div>
 
           <div>
-            <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">Category Name</label>
+            <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">{t('cat_name_label')}</label>
             <input
               value={form.name}
               onChange={e => { set('name', e.target.value); setErrors({}); }}
-              placeholder="e.g. Coffee, Groceries, Fitness..."
+              placeholder={state.language === 'el' ? 'π.χ. Καφές, Σούπερ Μάρκετ, Γυμναστήριο...' : 'e.g. Coffee, Groceries, Fitness...'}
               className={`w-full bg-[#f8f7f2] border ${errors.name ? 'border-[#dc2626]' : 'border-[#e4dfd3]'} rounded-xl px-4 py-2.5 text-base sm:text-sm text-[#14261c] focus:outline-none focus:border-[#1b4332]`}
             />
             {errors.name && <p className="text-[#dc2626] text-xs mt-1 font-medium">{errors.name}</p>}
@@ -289,7 +290,7 @@ function CategoryModal({ initial, groups, onSave, onClose }) {
 }
 
 function GroupsModal({ groups, categories, onClose }) {
-  const { dispatch } = useApp();
+  const { state, dispatch, t } = useApp();
   const [newGroupName, setNewGroupName] = useState('');
   const [editingGroup, setEditingGroup] = useState(null);
   const [editedName, setEditedName] = useState('');
@@ -369,8 +370,8 @@ function GroupsModal({ groups, categories, onClose }) {
               <Layers size={20} />
             </div>
             <div>
-              <h2 className="text-base font-extrabold text-[#14261c] leading-tight">Category Groups</h2>
-              <p className="text-xs text-[#6e8074] font-medium">Add, rename, or delete groups</p>
+              <h2 className="text-base font-extrabold text-[#14261c] leading-tight">{state.language === 'el' ? 'Ομάδες Κατηγοριών' : 'Category Groups'}</h2>
+              <p className="text-xs text-[#6e8074] font-medium">{state.language === 'el' ? 'Προσθήκη, μετονομασία ή διαγραφή ομάδων' : 'Add, rename, or delete groups'}</p>
             </div>
           </div>
           <button
@@ -392,12 +393,12 @@ function GroupsModal({ groups, categories, onClose }) {
         {/* Add Group Form */}
         <form onSubmit={handleAdd} className="p-5 pb-3">
           <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">
-            Add New Group
+            {state.language === 'el' ? 'Προσθήκη Νέας Ομάδας' : 'Add New Group'}
           </label>
           <div className="flex gap-2">
             <input
               type="text"
-              placeholder="e.g. Work, Kids, Personal..."
+              placeholder={state.language === 'el' ? 'π.χ. Προσωπικά, Σπίτι, Παιδιά...' : 'e.g. Work, Kids, Personal...'}
               value={newGroupName}
               onChange={(e) => { setNewGroupName(e.target.value); setError(''); }}
               className="flex-1 bg-[#f8f7f2] border border-[#dcd7cb] rounded-xl px-3.5 py-2.5 text-sm font-semibold text-[#14261c] focus:outline-none focus:border-[#1b4332]"
@@ -407,7 +408,7 @@ function GroupsModal({ groups, categories, onClose }) {
               className="px-4 py-2.5 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white rounded-xl text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
             >
               <Plus size={15} strokeWidth={2.8} />
-              <span>Add</span>
+              <span>{state.language === 'el' ? 'Προσθήκη' : 'Add'}</span>
             </button>
           </div>
         </form>
@@ -465,14 +466,14 @@ function GroupsModal({ groups, categories, onClose }) {
                       <button
                         onClick={() => handleStartEdit(group)}
                         className="w-7 h-7 rounded-lg bg-[#ffffff] hover:bg-[#eaf4ee] border border-[#e4dfd3] flex items-center justify-center text-[#55695e] hover:text-[#1b4332] transition-colors cursor-pointer"
-                        title="Rename group"
+                        title={state.language === 'el' ? 'Μετονομασία ομάδας' : 'Rename group'}
                       >
                         <Pencil size={12} />
                       </button>
                       <button
                         onClick={() => handleDelete(group)}
                         className="w-7 h-7 rounded-lg bg-[#fef2f2] hover:bg-[#fee2e2] border border-[#fecaca] flex items-center justify-center text-[#dc2626] transition-colors cursor-pointer"
-                        title="Delete group"
+                        title={state.language === 'el' ? 'Διαγραφή ομάδας' : 'Delete group'}
                       >
                         <Trash2 size={12} />
                       </button>
@@ -489,9 +490,7 @@ function GroupsModal({ groups, categories, onClose }) {
           <button
             onClick={onClose}
             className="px-5 py-2 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white rounded-xl text-xs sm:text-sm font-bold shadow-md shadow-[#1b4332]/25 transition-all cursor-pointer"
-          >
-            Done
-          </button>
+          >{state.language === 'el' ? 'Ολοκλήρωση' : 'Done'}</button>
         </div>
       </div>
     </div>

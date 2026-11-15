@@ -158,7 +158,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
                   ? 'bg-[#fef3c7] text-[#92400e] border-[#fde68a] hover:bg-[#fde68a]'
                   : 'bg-[#f8f7f2] text-[#6e8074] border-[#e4dfd3] hover:text-[#1b4332] hover:bg-[#eae6db]'
               }`}
-              title="Daily Tracking Streak"
+              title={state.language === 'el' ? 'Ημερήσιο Σερί Καταγραφής' : 'Daily Tracking Streak'}
             >
               <span>{streakInfo.currentStreak > 0 ? '🔥' : '✨'}</span>
               <span>
@@ -176,7 +176,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
             <button
               onClick={onOpenPaydayPrompt}
               className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-2 sm:py-2.5 bg-[#eaf4ee] hover:bg-[#d8edd0] border border-[#cce3d5] text-[#1b4332] rounded-xl text-xs font-bold shadow-2xs transition-all cursor-pointer"
-              title="Record paycheck"
+              title={state.language === 'el' ? 'Καταγραφή πληρωμής' : 'Record paycheck'}
             >
               <span>🎉</span>
               <span className="truncate">{t('payday_checkin_btn')}</span>
@@ -186,7 +186,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
           <button
             onClick={() => setShowNotifModal(true)}
             className="flex items-center justify-center gap-1.5 px-3 py-2 sm:py-2.5 bg-[#ffffff] hover:bg-[#f8f7f2] border border-[#e7e4da] text-[#65776c] hover:text-[#1b4332] rounded-xl text-xs font-bold shadow-2xs transition-all cursor-pointer"
-            title="Notification Reminders"
+            title={state.language === 'el' ? 'Υπενθυμίσεις Ειδοποιήσεων' : 'Notification Reminders'}
           >
             <Bell size={14} />
             <span>{t('alerts_btn')}</span>
@@ -195,7 +195,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
           <button
             onClick={() => setShowReset(true)}
             className="flex items-center justify-center gap-1.5 px-3 py-2 sm:py-2.5 bg-[#ffffff] hover:bg-[#f8f7f2] border border-[#e7e4da] text-[#65776c] hover:text-[#991b1b] rounded-xl text-xs font-bold shadow-2xs transition-all cursor-pointer"
-            title="Reset or clear data"
+            title={state.language === 'el' ? 'Επαναφορά ή καθαρισμός δεδομένων' : 'Reset or clear data'}
           >
             <RotateCcw size={14} />
             <span>{t('reset_btn')}</span>
@@ -278,7 +278,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
               type="button"
               onClick={() => setQuickToast(null)}
               className="p-1 text-[#8fa296] hover:text-[#1b4332] rounded-lg transition-colors cursor-pointer -mr-1 -mt-1"
-              title="Dismiss notification"
+              title={state.language === 'el' ? 'Κλείσιμο ειδοποίησης' : 'Dismiss notification'}
             >
               <X size={16} />
             </button>
@@ -341,7 +341,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
             onClick={() => setShowQuickAddModal(true)}
             data-testid="customize-quickadd-btn"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#f8f7f2] hover:bg-[#eae6db] active:scale-90 active:rotate-2 border border-[#e4dfd3] text-xs font-bold text-[#55695e] hover:text-[#1b4332] transition-all cursor-pointer shadow-2xs group"
-            title="Customize quick shortcuts"
+            title={state.language === 'el' ? 'Προσαρμογή συντομεύσεων' : 'Customize quick shortcuts'}
           >
             <Pencil size={12} className="group-hover:rotate-12 group-hover:scale-110 transition-transform duration-200" />
             <span>{t('quick_add_customize')}</span>
@@ -424,7 +424,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
             </div>
             <div className="flex items-center gap-1.5 text-xs text-[#1b4332] bg-[#eaf4ee] border border-[#cce3d5] font-semibold px-2.5 py-1 rounded-full">
               <Zap size={12} className="stroke-[2.5]" />
-              Live Feed
+              {state.language === 'el' ? 'Ενεργό' : 'Live Feed'}
             </div>
           </div>
           <ResponsiveContainer width="100%" height={210}>

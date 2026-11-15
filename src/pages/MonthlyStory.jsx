@@ -117,21 +117,21 @@ export default function MonthlyStory() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4">
           <div className="text-center p-3 sm:p-3.5 rounded-2xl bg-white/5 border border-white/10">
             <p className="text-lg sm:text-2xl font-extrabold text-[#fecaca] truncate">{formatMoney(totalSpent)}</p>
-            <p className="text-xs text-[#a0cfb2] font-semibold mt-1">Total Spent</p>
+            <p className="text-xs text-[#a0cfb2] font-semibold mt-1">{state.language === 'el' ? 'Συνολικά Έξοδα' : 'Total Spent'}</p>
           </div>
           <div className="text-center p-3 sm:p-3.5 rounded-2xl bg-white/5 border border-white/10">
             <p className="text-lg sm:text-2xl font-extrabold text-[#bbf7d0] truncate">{formatMoney(savings)}</p>
-            <p className="text-xs text-[#a0cfb2] font-semibold mt-1">Net Saved</p>
+            <p className="text-xs text-[#a0cfb2] font-semibold mt-1">{state.language === 'el' ? 'Καθαρή Αποταμίευση' : 'Net Saved'}</p>
           </div>
           <div className="text-center p-3 sm:p-3.5 rounded-2xl bg-white/5 border border-white/10">
             <p className="text-lg sm:text-2xl font-extrabold text-[#ffffff] truncate">{monthExp.length}</p>
-            <p className="text-xs text-[#a0cfb2] font-semibold mt-1">Transactions</p>
+            <p className="text-xs text-[#a0cfb2] font-semibold mt-1">{state.language === 'el' ? 'Συναλλαγές' : 'Transactions'}</p>
           </div>
           <div className="text-center p-3 sm:p-3.5 rounded-2xl bg-white/5 border border-white/10">
             <p className="text-lg sm:text-2xl font-extrabold text-[#99f6e4] truncate">
               {monthlyIncome > 0 ? ((savings / monthlyIncome) * 100).toFixed(1) : 0}%
             </p>
-            <p className="text-xs text-[#a0cfb2] font-semibold mt-1">Savings Rate</p>
+            <p className="text-xs text-[#a0cfb2] font-semibold mt-1">{state.language === 'el' ? 'Ποσοστό Αποταμίευσης' : 'Savings Rate'}</p>
           </div>
         </div>
       </div>
@@ -139,25 +139,25 @@ export default function MonthlyStory() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <HighlightCard
           icon={<Flame size={20} className="text-[#dc2626]" />}
-          label="Peak Outflow Day"
+          label={state.language === 'el' ? 'Ημέρα Μεγαλύτερων Εξόδων' : 'Peak Outflow Day'}
           value={topSpendDay.label || '—'}
           sub={formatMoney(topSpendDay.total)}
         />
         <HighlightCard
           icon={<Star size={20} className="text-[#1b4332]" />}
-          label="Best Savings Day"
+          label={state.language === 'el' ? 'Ημέρα Μέγιστης Οικονομίας' : 'Best Savings Day'}
           value={bestSaveDay.label || '—'}
           sub={`Only ${formatMoney(bestSaveDay.total)}`}
         />
         <HighlightCard
           icon={<Award size={20} className="text-[#2d6a4f]" />}
-          label="Top Category"
+          label={state.language === 'el' ? 'Κορυφαία Κατηγορία' : 'Top Category'}
           value={`${topCategory.icon} ${topCategory.name}`}
           sub={formatMoney(topCategory.amount)}
         />
         <HighlightCard
           icon={<AlertTriangle size={20} className="text-[#d97706]" />}
-          label="Unusual Spikes"
+          label={state.language === 'el' ? 'Έκτακτα Έξοδα' : 'Unusual Spikes'}
           value={unusualDays.length}
           sub={`${unusualDays.length} abnormal day${unusualDays.length !== 1 ? 's' : ''}`}
         />
@@ -165,8 +165,8 @@ export default function MonthlyStory() {
 
       <div className="grid lg:grid-cols-2 gap-5">
         <div className="rounded-2xl bg-[#ffffff] border border-[#e7e4da] p-5 shadow-[0_2px_12px_rgba(27,67,50,0.03)]">
-          <h2 className="text-sm font-bold text-[#14261c] mb-0.5">Daily Outflow Cadence</h2>
-          <p className="text-xs text-[#6e8074] mb-4 font-medium">High spikes highlighted in crimson</p>
+          <h2 className="text-sm font-bold text-[#14261c] mb-0.5">{state.language === 'el' ? 'Ημερήσια Ροή Εξόδων' : 'Daily Outflow Cadence'}</h2>
+            <p className="text-xs text-[#6e8074] mb-4 font-medium">{state.language === 'el' ? 'Οι ημέρες με μεγάλα έξοδα επισημαίνονται με κόκκινο' : 'High spikes highlighted in crimson'}</p>
           <ResponsiveContainer width="100%" height={210}>
             <BarChart data={dailySpend} margin={{ top: 5, right: 5, bottom: 0, left: 0 }}>
               <XAxis dataKey="label" tick={{ fill: '#7d8e84', fontSize: 9 }} tickLine={false} axisLine={false} interval={4} />
@@ -186,8 +186,8 @@ export default function MonthlyStory() {
 
         <div className="rounded-2xl bg-[#ffffff] border border-[#e7e4da] p-5 shadow-[0_2px_12px_rgba(27,67,50,0.03)] flex flex-col justify-between">
           <div>
-            <h2 className="text-sm font-bold text-[#14261c] mb-0.5">Category Proportions</h2>
-            <p className="text-xs text-[#6e8074] mb-2 font-medium">Visual distribution across buckets</p>
+            <h2 className="text-sm font-bold text-[#14261c] mb-0.5">{state.language === 'el' ? 'Αναλογία Κατηγοριών' : 'Category Proportions'}</h2>
+            <p className="text-xs text-[#6e8074] mb-2 font-medium">{state.language === 'el' ? 'Κατανομή σε όλες τις κατηγορίες' : 'Visual distribution across buckets'}</p>
           </div>
           <ResponsiveContainer width="100%" height={200}>
             <PieChart>
@@ -205,7 +205,7 @@ export default function MonthlyStory() {
       <div className="rounded-2xl bg-[#ffffff] border border-[#e7e4da] p-5 shadow-[0_2px_12px_rgba(27,67,50,0.03)]">
         <div className="flex items-center gap-2 mb-4">
           <TrendingUp size={18} className="text-[#1b4332]" />
-          <h2 className="text-sm font-bold text-[#14261c]">Monthly Habit Scores</h2>
+          <h2 className="text-sm font-bold text-[#14261c]">{state.language === 'el' ? 'Αξιολόγηση Οικονομικών Συνηθειών' : 'Monthly Habit Scores'}</h2>
         </div>
         <div className="space-y-4">
           {[

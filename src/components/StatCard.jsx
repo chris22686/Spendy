@@ -1,4 +1,9 @@
+import { useApp } from '../store';
+
 export default function StatCard({ label, value, sub, icon: Icon, color = '#1b4332', trend, isHero }) {
+  const { state } = useApp();
+  const isEl = state?.language === 'el';
+
   if (isHero) {
     return (
       <div className="rounded-2xl sm:rounded-3xl p-5 sm:p-6 bg-gradient-to-br from-[#133928] via-[#1b4332] to-[#2d6a4f] text-white shadow-xl shadow-[#1b4332]/20 border border-[#2d6a4f]/50 flex flex-col justify-between relative overflow-hidden group">
@@ -6,7 +11,9 @@ export default function StatCard({ label, value, sub, icon: Icon, color = '#1b43
         
         <div className="flex items-start justify-between relative z-10">
           <div>
-            <span className="text-[10px] sm:text-[11px] font-semibold text-[#8cc5a5] uppercase tracking-wider">Primary Metric</span>
+            <span className="text-[10px] sm:text-[11px] font-semibold text-[#8cc5a5] uppercase tracking-wider">
+              {isEl ? 'ΒΑΣΙΚΟ ΥΠΟΛΟΙΠΟ' : 'PRIMARY METRIC'}
+            </span>
             <p className="text-xs sm:text-sm text-[#cce3d5] font-medium mt-0.5">{label}</p>
           </div>
           <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white shadow-sm">
@@ -47,7 +54,7 @@ export default function StatCard({ label, value, sub, icon: Icon, color = '#1b43
       <div className="mt-3">
         <p className="text-[11px] sm:text-xs text-[#6e8074] font-semibold uppercase tracking-wider mb-1">{label}</p>
         <p className="text-xl sm:text-2xl font-bold text-[#14261c] tracking-tight">{value}</p>
-        {sub && <p className="text-xs text-[#7d8f84] mt-0.5">{sub}</p>}
+        {sub && <p className="text-xs text-[#7e8e83] mt-1 font-medium">{sub}</p>}
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useApp, formatMoney, FREQUENCY_LABELS, calculateMonthlyIncomeFromSources } from '../store';
+import { useApp, formatMoney, FREQUENCY_LABELS, getFrequencyLabel, calculateMonthlyIncomeFromSources } from '../store';
 import { v4 as uuidv4 } from 'uuid';
 import { Plus, Pencil, Trash2, X, Wallet, Sparkles } from 'lucide-react';
 
@@ -102,8 +102,8 @@ export default function IncomeSourcesModal({ onClose }) {
               <Wallet size={20} />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-extrabold text-[#14261c] leading-tight">Expected Income Categories</h2>
-              <p className="text-xs text-[#6e8074] font-medium">Split your salary, 15-day paychecks, transfers & freelance</p>
+              <h2 className="text-base sm:text-lg font-extrabold text-[#14261c] leading-tight">{state.language === 'el' ? 'Κατηγορίες Αναμενόμενων Εσόδων' : 'Expected Income Categories'}</h2>
+              <p className="text-xs text-[#6e8074] font-medium">{state.language === 'el' ? 'Οργάνωσε μισθούς, δεκαπενθήμερα, μεταφορές και έκτακτα έσοδα' : 'Split your salary, 15-day paychecks, transfers & freelance'}</p>
             </div>
           </div>
           <button
@@ -118,7 +118,7 @@ export default function IncomeSourcesModal({ onClose }) {
         <div className="shrink-0 px-4 sm:px-5 py-3 bg-[#eaf4ee] border-b border-[#cde2d6] flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Sparkles size={16} className="text-[#1b4332]" />
-            <span className="text-xs font-bold text-[#1b4332] uppercase tracking-wider">Calculated Monthly Total:</span>
+            <span className="text-xs font-bold text-[#1b4332] uppercase tracking-wider">{state.language === 'el' ? 'Υπολογισμένο Μηνιαίο Σύνολο:' : 'Calculated Monthly Total:'}</span>
           </div>
           <span className="text-lg sm:text-xl font-extrabold text-[#1b4332]">{formatMoney(totalCalculated)}</span>
         </div>
@@ -129,7 +129,7 @@ export default function IncomeSourcesModal({ onClose }) {
             <form onSubmit={handleSave} className="bg-[#f8f7f2] border border-[#e4dfd3] rounded-2xl p-4 sm:p-4.5 space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-extrabold text-[#14261c]">
-                  {editingSource ? 'Edit Income Category' : 'Add New Income Source'}
+                  {editingSource ? (state.language === 'el' ? 'Επεξεργασία Πηγής Εσόδου' : 'Edit Income Category') : (state.language === 'el' ? 'Νέα Πηγή Εσόδου' : 'Add New Income Source')}
                 </h3>
                 <button
                   type="button"
@@ -147,12 +147,10 @@ export default function IncomeSourcesModal({ onClose }) {
               )}
 
               <div>
-                <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1 block">
-                  Category / Source Name
-                </label>
+                <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1 block">{state.language === 'el' ? 'Όνομα Πηγής / Κατηγορίας' : 'Category / Source Name'}</label>
                 <input
                   type="text"
-                  placeholder="e.g. 15th Paycheck, Side Gig, Mom sent money"
+                  placeholder={state.language === 'el' ? 'π.χ. Μισθός, 15νθήμερο, Έξτρα δουλειά...' : 'e.g. 15th Paycheck, Side Gig, Freelance'}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   onFocus={() => window.scrollTo(0, 0)}
@@ -180,27 +178,23 @@ export default function IncomeSourcesModal({ onClose }) {
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1 block">
-                    Frequency
-                  </label>
+                  <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1 block">{state.language === 'el' ? 'Συχνότητα' : 'Frequency'}</label>
                   <select
                     value={frequency}
                     onChange={(e) => setFrequency(e.target.value)}
                     className="w-full bg-[#ffffff] border border-[#dcd7cb] rounded-xl px-3 py-2 text-base sm:text-sm font-semibold text-[#14261c] focus:outline-none focus:border-[#1b4332]"
                   >
-                    <option value="bi-weekly">Every 15 Days (Bi-Weekly × 2)</option>
-                    <option value="monthly">Monthly (Once a month)</option>
-                    <option value="weekly">Weekly (Weekly × 52 ÷ 12)</option>
-                    <option value="one_time">One-Time / Transfer</option>
+                    <option value="bi-weekly">{state.language === 'el' ? 'Κάθε 15 Ημέρες (Δεκαπενθήμερο × 2)' : 'Every 15 Days (Bi-Weekly × 2)'}</option>
+                    <option value="monthly">{state.language === 'el' ? 'Μηνιαία (1 φορά το μήνα)' : 'Monthly (Once a month)'}</option>
+                    <option value="weekly">{state.language === 'el' ? 'Εβδομαδιαία (Εβδομαδιαία × 52 ÷ 12)' : 'Weekly (Weekly × 52 ÷ 12)'}</option>
+                    <option value="one_time">{state.language === 'el' ? 'Μία Φορά / Μεταφορά' : 'One-Time / Transfer'}</option>
                   </select>
                 </div>
               </div>
 
               {/* Icon Selector */}
               <div>
-                <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1 block">
-                  Icon
-                </label>
+                <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1 block">{state.language === 'el' ? 'Εικονίδιο' : 'Icon'}</label>
                 <div className="flex gap-2 flex-wrap bg-[#ffffff] p-2 rounded-xl border border-[#dcd7cb]">
                   {INCOME_ICONS.map((ic) => (
                     <button
@@ -219,9 +213,7 @@ export default function IncomeSourcesModal({ onClose }) {
 
               {/* Color Selector */}
               <div>
-                <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1 block">
-                  Color Accent
-                </label>
+                <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1 block">{state.language === 'el' ? 'Χρώμα' : 'Color Accent'}</label>
                 <div className="flex gap-2 flex-wrap">
                   {INCOME_COLORS.map((c) => (
                     <button
@@ -259,7 +251,7 @@ export default function IncomeSourcesModal({ onClose }) {
               className="w-full py-3 border-2 border-dashed border-[#1b4332]/30 hover:border-[#1b4332] rounded-2xl flex items-center justify-center gap-2 text-sm font-bold text-[#1b4332] bg-[#f8f7f2] hover:bg-[#eef5f0] transition-colors cursor-pointer"
             >
               <Plus size={16} strokeWidth={2.8} />
-              <span>Add Income Source / Category</span>
+              <span>{state.language === 'el' ? '+ Προσθήκη Πηγής Εσόδου' : 'Add Income Source'}</span>
             </button>
           )}
 
@@ -267,7 +259,7 @@ export default function IncomeSourcesModal({ onClose }) {
           <div className="space-y-2.5">
             {sources.length === 0 ? (
               <div className="text-center py-8 text-[#7d8f84] text-xs">
-                No income categories configured. Add your salary or money transfers above.
+                {state.language === 'el' ? 'Δεν έχουν οριστεί πηγές εσόδων. Πρόσθεσε τον μισθό σου παραπάνω.' : 'No income categories configured. Add your salary or money transfers above.'}
               </div>
             ) : (
               sources.map((s) => {
@@ -290,7 +282,7 @@ export default function IncomeSourcesModal({ onClose }) {
                       <div className="min-w-0">
                         <p className="text-sm font-bold text-[#14261c] truncate">{s.name}</p>
                         <p className="text-xs text-[#6e8074] font-medium">
-                          {FREQUENCY_LABELS[s.frequency] || s.frequency} • <span className="font-semibold text-[#1b4332]">{formatMoney(s.amount)}</span>
+                          {getFrequencyLabel(s.frequency, state.language)} • <span className="font-semibold text-[#1b4332]">{formatMoney(s.amount)}</span>
                           {s.frequency !== 'monthly' && s.frequency !== 'one_time' && (
                             <span className="text-[#899c90]"> (≈ {formatMoney(Math.round(monthlyEquivalent))}/mo)</span>
                           )}
@@ -302,14 +294,14 @@ export default function IncomeSourcesModal({ onClose }) {
                       <button
                         onClick={() => openEditForm(s)}
                         className="w-8 h-8 rounded-xl bg-[#f8f7f2] hover:bg-[#e4dfd3] flex items-center justify-center text-[#55695e] transition-colors cursor-pointer"
-                        title="Edit"
+                        title={state.language === 'el' ? 'Επεξεργασία' : 'Edit'}
                       >
                         <Pencil size={14} />
                       </button>
                       <button
                         onClick={() => handleDelete(s.id)}
                         className="w-8 h-8 rounded-xl bg-[#fee2e2]/60 hover:bg-[#fee2e2] flex items-center justify-center text-[#dc2626] transition-colors cursor-pointer"
-                        title="Delete"
+                        title={state.language === 'el' ? 'Διαγραφή' : 'Delete'}
                       >
                         <Trash2 size={14} />
                       </button>
@@ -326,9 +318,7 @@ export default function IncomeSourcesModal({ onClose }) {
           <button
             onClick={onClose}
             className="px-6 py-2.5 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white rounded-xl text-sm font-bold shadow-md shadow-[#1b4332]/25 transition-all cursor-pointer"
-          >
-            Done
-          </button>
+          >{state.language === 'el' ? 'Ολοκλήρωση' : 'Done'}</button>
         </div>
       </div>
     </div>

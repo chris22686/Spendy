@@ -332,7 +332,7 @@ export default function QuickAddModal({ isOpen, onClose }) {
                       type="button"
                       onClick={() => startEdit(item)}
                       className="p-1.5 text-[#718578] group-hover:text-[#1b4332] hover:bg-white rounded-lg transition-all duration-200 group-hover:scale-110 active:rotate-12 cursor-pointer"
-                      title="Edit preset"
+                      title={state.language === 'el' ? 'Επεξεργασία συντόμευσης' : 'Edit preset'}
                     >
                       <Pencil size={14} className="group-hover:rotate-12 transition-transform duration-200" />
                     </button>
@@ -340,7 +340,7 @@ export default function QuickAddModal({ isOpen, onClose }) {
                       type="button"
                       onClick={() => deleteItem(item.id)}
                       className="p-1.5 text-[#718578] hover:text-[#991b1b] hover:bg-white rounded-lg transition-all duration-200 hover:scale-110 active:scale-90 cursor-pointer"
-                      title="Delete preset"
+                      title={state.language === 'el' ? 'Διαγραφή συντόμευσης' : 'Delete preset'}
                     >
                       <Trash2 size={14} />
                     </button>
