@@ -19,12 +19,20 @@
       "iconURL": "https://raw.githubusercontent.com/chris22686/Spendy/main/public/icon.png",
       "tintColor": "#1b4332",
       "category": "finance",
-      "version": "1.1.9",
-      "versionDate": "2026-11-11T23:19:49Z",
-      "versionDescription": "Add responsive tap animations and interactive category chips to 1-Tap Quick Add and Categories",
-      "downloadURL": "https://github.com/chris22686/Spendy/releases/download/v1.1.9/Spendy.ipa",
-      "size": 1937488,
+      "version": "1.1.10",
+      "versionDate": "2026-11-15T08:33:08Z",
+      "versionDescription": "Add simple and clear Greek language support (i18n) and instant language toggle",
+      "downloadURL": "https://github.com/chris22686/Spendy/releases/download/v1.1.10/Spendy.ipa",
+      "size": 1947981,
       "versions": [
+        {
+          "version": "1.1.10",
+          "date": "2026-11-15T08:33:08Z",
+          "localizedDescription": "Add simple and clear Greek language support (i18n) and instant language toggle",
+          "downloadURL": "https://github.com/chris22686/Spendy/releases/download/v1.1.10/Spendy.ipa",
+          "size": 1947981,
+          "minOSVersion": "14.0"
+        },
         {
           "version": "1.1.9",
           "date": "2026-11-11T23:19:49Z",
@@ -55,14 +63,6 @@
           "localizedDescription": "Start new users with zero spending: remove demo expenses/budgets on onboarding, clean up existing users once, keep profile on demo reload",
           "downloadURL": "https://github.com/chris22686/Spendy/releases/download/v1.1.3/Spendy.ipa",
           "size": 1883081,
-          "minOSVersion": "14.0"
-        },
-        {
-          "version": "1.1.2",
-          "date": "2026-11-11T00:04:35Z",
-          "localizedDescription": "Fix paycheck day validation: limit to 1-31, block duplicate/empty days, handle 29-31 in short months",
-          "downloadURL": "https://github.com/chris22686/Spendy/releases/download/v1.1.2/Spendy.ipa",
-          "size": 1882933,
           "minOSVersion": "14.0"
         }
       ],
