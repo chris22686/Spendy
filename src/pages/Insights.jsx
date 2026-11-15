@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useApp, formatMoney, getMonthExpenses, getWeekExpenses, getCategoryTotals, getTotalSpent } from '../store';
+import { useApp, formatMoney, getMonthExpenses, getWeekExpenses, getCategoryTotals, getTotalSpent, getCategoryName } from '../store';
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -90,8 +90,8 @@ export default function Insights() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#14261c] tracking-tight">Insights & Analytics</h1>
-          <p className="text-[#65776c] text-sm mt-0.5 font-medium">Deep dive into your financial habits and trends</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#14261c] tracking-tight">{state.language === 'el' ? 'Στατιστικά & Ανάλυση' : 'Insights & Analytics'}</h1>
+          <p className="text-[#65776c] text-sm mt-0.5 font-medium">{state.language === 'el' ? 'Εις βάθος ανάλυση των εξόδων και των συνηθειών σου' : 'Deep dive into your financial habits and trends'}</p>
         </div>
         <div className="flex gap-1.5 bg-[#ffffff] border border-[#e7e4da] rounded-xl p-1 shadow-2xs self-start sm:self-auto">
           {['month', 'week'].map(p => (
@@ -100,7 +100,7 @@ export default function Insights() {
                 period === p ? 'bg-[#1b4332] text-white shadow-xs' : 'text-[#6e8074] hover:text-[#1b4332]'
               }`}
             >
-              {p === 'month' ? 'Monthly View' : 'Weekly View'}
+              {state.language === 'el' ? (p === 'month' ? 'Μηνιαία Προβολή' : 'Εβδομαδιαία Προβολή') : (p === 'month' ? 'Monthly View' : 'Weekly View')}
             </button>
           ))}
         </div>
@@ -126,7 +126,7 @@ export default function Insights() {
             <Lightbulb size={20} />
           </div>
           <div>
-            <h2 className="text-base font-extrabold text-[#143928]">Estimated Savings Potential</h2>
+            <h2 className="text-base font-extrabold text-[#143928]">{state.language === 'el' ? 'Εκτιμώμενη Δυνατότητα Αποταμίευσης' : 'Estimated Savings Potential'}</h2>
             <p className="text-xs text-[#406e57] font-medium">
               You could save an estimated <strong className="text-[#143928] font-bold text-sm">{formatMoney(totalPotentialSaving)}/month</strong> by optimizing variable categories
             </p>

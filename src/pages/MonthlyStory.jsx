@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react';
-import { useApp, formatMoney, getMonthExpenses, getCategoryTotals, getTotalSpent } from '../store';
+import { useApp, formatMoney, getMonthExpenses, getCategoryTotals, getTotalSpent, getCategoryName, formatLocalizedMonth } from '../store';
 import { BookOpen, Download, TrendingUp, Star, AlertTriangle, Award, Flame } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
@@ -91,15 +91,15 @@ export default function MonthlyStory() {
     <div className="space-y-6" ref={storyRef}>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#14261c] tracking-tight">Monthly Financial Story</h1>
-          <p className="text-[#65776c] text-sm mt-0.5 font-medium">Narrative summary of your performance in {monthName}</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#14261c] tracking-tight">{state.language === 'el' ? 'Μηνιαία Ανασκόπηση' : 'Monthly Financial Story'}</h1>
+          <p className="text-[#65776c] text-sm mt-0.5 font-medium">{state.language === 'el' ? `Οικονομική σύνοψη για τον ${formatLocalizedMonth(now, state.language)}` : `Narrative summary of your performance in ${monthName}`}</p>
         </div>
         <button
           onClick={handleExport}
           className="flex items-center gap-2 px-5 py-2.5 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white rounded-xl text-sm font-bold shadow-md shadow-[#1b4332]/25 transition-all cursor-pointer self-start sm:self-auto"
         >
           <Download size={16} strokeWidth={2.4} />
-          <span>Export Story</span>
+          <span>{state.language === 'el' ? 'Εξαγωγή Αναφοράς' : 'Export Story'}</span>
         </button>
       </div>
 

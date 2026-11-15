@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useApp, formatMoney, DEFAULT_QUICK_PRESETS } from '../store';
+import { useApp, formatMoney, DEFAULT_QUICK_PRESETS, getCategoryName, getPresetTitle } from '../store';
 import { Zap, Plus, Trash2, X, Check, RotateCcw, Pencil, AlertCircle } from 'lucide-react';
 
 const COMMON_EMOJIS = ['☕', '🥪', '🚌', '🛒', '🥐', '🍕', '⛽', '💊', '🎟️', '🏋️', '🍺', '🍦', '🍔', '🚕', '📚', '🎬', '🛍️', '🧼', '🍰', '🥤'];
 
 export default function QuickAddModal({ isOpen, onClose }) {
-  const { state, dispatch } = useApp();
+  const { state, dispatch, t } = useApp();
   const { categories = [], quickPresets = DEFAULT_QUICK_PRESETS } = state;
 
   const [presets, setPresets] = useState(quickPresets);
@@ -127,9 +127,9 @@ export default function QuickAddModal({ isOpen, onClose }) {
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-black text-[#14261c] tracking-tight">
-                Customize 1-Tap Quick Add
+                {t('qa_modal_title')}
               </h2>
-              <p className="text-xs text-[#718578]">Set your go-to shortcuts for instant logging</p>
+              <p className="text-xs text-[#718578]">{t('qa_modal_sub')}</p>
             </div>
           </div>
           <button
@@ -157,7 +157,7 @@ export default function QuickAddModal({ isOpen, onClose }) {
               <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-[#1b4332] animate-ping" />
                 <p className="text-xs font-black text-[#14261c] uppercase tracking-wider">
-                  {presets.some((p) => p.id === editingId) ? 'Edit Shortcut' : 'New Shortcut'}
+                  {presets.some((p) => p.id === editingId) ? t('qa_edit_shortcut') : t('qa_new_shortcut')}
                 </p>
               </div>
               <button
@@ -173,11 +173,11 @@ export default function QuickAddModal({ isOpen, onClose }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div>
                 <label className="text-[11px] font-bold text-[#55695e] uppercase tracking-wider block mb-1">
-                  Shortcut Label
+                  {t('qa_label')}
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Coffee, Lunch..."
+                  placeholder={t('qa_label_placeholder')}
                   value={formTitle}
                   onChange={(e) => setFormTitle(e.target.value)}
                   className="w-full bg-white border border-[#dcd7cb] rounded-xl px-3 py-2 text-sm font-bold text-[#14261c] focus:outline-none focus:border-[#1b4332] focus:ring-2 focus:ring-[#1b4332]/20 transition-all"
@@ -186,7 +186,7 @@ export default function QuickAddModal({ isOpen, onClose }) {
 
               <div>
                 <label className="text-[11px] font-bold text-[#55695e] uppercase tracking-wider block mb-1">
-                  Preset Amount (€)
+                  {t('qa_amount')}
                 </label>
                 <input
                   type="number"
@@ -203,9 +203,9 @@ export default function QuickAddModal({ isOpen, onClose }) {
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-[11px] font-bold text-[#55695e] uppercase tracking-wider block">
-                  Assigned Category
+                  {t('qa_category')}
                 </label>
-                <span className="text-[10px] text-[#718578] font-medium">Tap category to switch</span>
+                <span className="text-[10px] text-[#718578] font-medium">{t('qa_tap_category')}</span>
               </div>
               <div className="flex items-center gap-1.5 flex-wrap max-h-36 overflow-y-auto p-1.5 rounded-xl bg-white border border-[#dcd7cb]">
                 {categories.map((c) => {
@@ -226,7 +226,7 @@ export default function QuickAddModal({ isOpen, onClose }) {
                       }`}
                     >
                       <span className={`text-sm transition-transform duration-200 ${isSelected ? 'scale-110' : ''}`}>{c.icon}</span>
-                      <span>{c.name}</span>
+                      <span>{getCategoryName(c, state.language)}</span>
                       {isSelected && <Check size={12} strokeWidth={3} className="ml-0.5 text-white animate-in zoom-in-75 duration-150" />}
                     </button>
                   );
@@ -237,7 +237,7 @@ export default function QuickAddModal({ isOpen, onClose }) {
             {/* Emoji Selection */}
             <div>
               <label className="text-[11px] font-bold text-[#55695e] uppercase tracking-wider block mb-1.5">
-                Choose Emoji Icon
+                {t('qa_choose_emoji')}
               </label>
               <div className="flex items-center gap-1.5 flex-wrap">
                 {COMMON_EMOJIS.map((emoji) => (
@@ -263,7 +263,7 @@ export default function QuickAddModal({ isOpen, onClose }) {
                 className="px-4 py-2 bg-[#1b4332] hover:bg-[#245740] active:scale-95 text-white rounded-xl text-xs font-extrabold shadow-xs cursor-pointer flex items-center gap-1.5 transition-all"
               >
                 <Check size={14} strokeWidth={3} />
-                <span>Save Shortcut</span>
+                <span>{t('qa_save_shortcut')}</span>
               </button>
             </div>
           </form>
@@ -272,7 +272,7 @@ export default function QuickAddModal({ isOpen, onClose }) {
         {/* Existing Presets List */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-xs text-[#55695e]">
-            <span className="font-bold uppercase tracking-wider">Active Shortcuts ({presets.length}/8)</span>
+            <span className="font-bold uppercase tracking-wider">{t('qa_active_shortcuts', { current: presets.length, max: 8 })}</span>
             {!editingId && presets.length < 8 && (
               <button
                 type="button"
@@ -280,7 +280,7 @@ export default function QuickAddModal({ isOpen, onClose }) {
                 className="flex items-center gap-1 text-[#1b4332] hover:text-[#2d6a4f] font-bold cursor-pointer"
               >
                 <Plus size={14} strokeWidth={3} />
-                <span>Add Preset</span>
+                <span>{t('qa_add_preset')}</span>
               </button>
             )}
           </div>
@@ -313,16 +313,16 @@ export default function QuickAddModal({ isOpen, onClose }) {
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
                         <p className="text-xs sm:text-sm font-extrabold text-[#14261c] truncate">
-                          {item.title}
+                          {getPresetTitle(item, state.language)}
                         </p>
                         {isItemEditing && (
                           <span className="text-[10px] font-black uppercase text-[#1b4332] bg-white px-1.5 py-0.2 rounded-md border border-[#b8ddc6] animate-pulse">
-                            Editing
+                            {t('qa_editing_badge')}
                           </span>
                         )}
                       </div>
                       <p className="text-[11px] text-[#6e8074]">
-                        <span className="font-bold text-[#1b4332]">{formatMoney(item.amount)}</span> · {cat.name}
+                        <span className="font-bold text-[#1b4332]">{formatMoney(item.amount)}</span> · {getCategoryName(cat, state.language)}
                       </p>
                     </div>
                   </div>
@@ -359,7 +359,7 @@ export default function QuickAddModal({ isOpen, onClose }) {
             className="flex items-center gap-1.5 text-xs font-semibold text-[#718578] hover:text-[#14261c] cursor-pointer"
           >
             <RotateCcw size={13} />
-            <span>Reset Defaults</span>
+            <span>{t('qa_reset_defaults')}</span>
           </button>
 
           <div className="flex items-center gap-2">
@@ -375,7 +375,7 @@ export default function QuickAddModal({ isOpen, onClose }) {
               onClick={handleSaveAll}
               className="px-5 py-2.5 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white rounded-xl text-xs font-extrabold shadow-md shadow-[#1b4332]/25 transition-all cursor-pointer"
             >
-              Save Shortcuts
+              {t('qa_save_shortcuts')}
             </button>
           </div>
         </div>

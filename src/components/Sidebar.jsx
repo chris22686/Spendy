@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import ResetModal from './ResetModal';
 import NotificationModal from './NotificationModal';
+import LanguageToggle from './LanguageToggle';
 import { Bell } from 'lucide-react';
 
 const NAV = [

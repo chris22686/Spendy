@@ -1,11 +1,11 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useApp, formatMoney, getMonthExpenses, getCategoryById } from '../store';
+import { useApp, formatMoney, getMonthExpenses, getCategoryById, getCategoryName } from '../store';
 import { v4 as uuidv4 } from 'uuid';
 import { Plus, Pencil, Trash2, X, AlertTriangle, CheckCircle, TrendingUp, Settings2, Wallet } from 'lucide-react';
 import IncomeSourcesModal from '../components/IncomeSourcesModal';
 
 export default function Budgets() {
-  const { state, dispatch } = useApp();
+  const { state, dispatch, t } = useApp();
   const { expenses, categories, budgets, monthlyIncome, incomeSources } = state;
   const [showForm, setShowForm] = useState(false);
   const [showIncomeModal, setShowIncomeModal] = useState(false);
@@ -35,15 +35,15 @@ export default function Budgets() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#14261c] tracking-tight">Budgets</h1>
-          <p className="text-[#65776c] text-sm mt-0.5 font-medium">{budgets.length} budget limits configured</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#14261c] tracking-tight">{t('budgets_page_title')}</h1>
+          <p className="text-[#65776c] text-sm mt-0.5 font-medium">{budgets.length} {state.language === 'el' ? 'ενεργά όρια εξόδων' : 'budget limits configured'}</p>
         </div>
         <button
           onClick={() => { setEditBudget(null); setShowForm(true); }}
           className="flex items-center gap-2 px-5 py-2.5 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white rounded-xl text-sm font-bold shadow-md shadow-[#1b4332]/25 transition-all cursor-pointer self-start sm:self-auto"
         >
           <Plus size={16} strokeWidth={2.8} />
-          <span>Add Budget</span>
+          <span>{t('budget_add_btn')}</span>
         </button>
       </div>
 
@@ -52,7 +52,7 @@ export default function Budgets() {
           <div>
             <div className="flex items-center gap-2">
               <Wallet size={18} className="text-[#1b4332]" />
-              <p className="text-sm font-bold text-[#14261c]">Monthly Expected Income</p>
+              <p className="text-sm font-bold text-[#14261c]">{state.language === 'el' ? 'Αναμενόμενα Μηνιαία Έσοδα' : 'Monthly Expected Income'}</p>
             </div>
             <p className="text-xs text-[#6e8074] mt-0.5 font-medium">
               {incomeSources && incomeSources.length > 0
@@ -87,9 +87,9 @@ export default function Budgets() {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { label: 'Total Allocated Budget', value: formatMoney(totalBudget), color: '#1b4332', bg: 'bg-[#eaf4ee]', border: 'border-[#cce3d5]' },
-          { label: 'Total Spent This Month', value: formatMoney(totalSpent), color: '#991b1b', bg: 'bg-[#fef2f2]', border: 'border-[#fecaca]' },
-          { label: 'Remaining Balance', value: formatMoney(Math.max(0, totalBudget - totalSpent)), color: '#15803d', bg: 'bg-[#f0fdf4]', border: 'border-[#bbf7d0]' },
+          { label: state.language === 'el' ? 'Συνολικός Προϋπολογισμός' : 'Total Allocated Budget', value: formatMoney(totalBudget), color: '#1b4332', bg: 'bg-[#eaf4ee]', border: 'border-[#cce3d5]' },
+          { label: state.language === 'el' ? 'Ξοδεύτηκαν Αυτόν τον Μήνα' : 'Total Spent This Month', value: formatMoney(totalSpent), color: '#991b1b', bg: 'bg-[#fef2f2]', border: 'border-[#fecaca]' },
+          { label: state.language === 'el' ? 'Υπόλοιπο Προϋπολογισμού' : 'Remaining Balance', value: formatMoney(Math.max(0, totalBudget - totalSpent)), color: '#15803d', bg: 'bg-[#f0fdf4]', border: 'border-[#bbf7d0]' },
         ].map(({ label, value, color, bg, border }) => (
           <div key={label} className={`rounded-2xl bg-[#ffffff] border ${border} p-4 shadow-xs`}>
             <p className="text-xs text-[#6e8074] font-bold uppercase tracking-wider mb-1">{label}</p>
@@ -136,7 +136,7 @@ export default function Budgets() {
                     {b.cat.icon}
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-[#14261c]">{b.cat.name}</p>
+                    <p className="text-sm font-bold text-[#14261c]">{getCategoryName(b.cat, state.language)}</p>
                     <p className="text-xs text-[#718578] capitalize font-medium">{b.period} limit</p>
                   </div>
                 </div>

@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
 import { Sparkles, Check, Flame } from 'lucide-react';
+import { useApp } from '../store';
 
 export default function StreakCelebrationModal({ streak = 1, isOpen, onClose }) {
+  const { t } = useApp();
   useEffect(() => {
     if (!isOpen) return;
 
@@ -37,15 +39,15 @@ export default function StreakCelebrationModal({ streak = 1, isOpen, onClose }) 
         <div className="space-y-1">
           <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#fef3c7] text-[#92400e] text-[11px] font-black uppercase tracking-wider">
             <Sparkles size={12} />
-            <span>Habit Level Up!</span>
+            <span>{t('streak_celeb_levelup')}</span>
           </div>
           <h3 className="text-xl sm:text-2xl font-black text-[#14261c] tracking-tight">
-            {streak > 1 ? `${streak}-Day Streak!` : 'Day 1 Streak Started!'}
+            {streak > 1 ? t('streak_celeb_days_title', { count: streak }) : t('streak_celeb_day1_title')}
           </h3>
           <p className="text-xs text-[#5f7366] max-w-xs mx-auto leading-relaxed font-medium">
             {streak > 1
-              ? `You're on fire! You have logged your expenses for ${streak} consecutive days.`
-              : "Great job logging today's spending! Consistent tracking makes staying on budget effortless."}
+              ? t('streak_celeb_days_desc', { count: streak })
+              : t('streak_celeb_day1_desc')}
           </p>
         </div>
 
@@ -56,7 +58,7 @@ export default function StreakCelebrationModal({ streak = 1, isOpen, onClose }) 
             data-testid="awesome-keep-going-btn"
             className="w-full py-3 bg-gradient-to-r from-[#1b4332] to-[#2d6a4f] hover:from-[#245740] hover:to-[#388563] active:scale-95 text-white rounded-2xl text-xs sm:text-sm font-extrabold shadow-md shadow-[#1b4332]/25 transition-all cursor-pointer flex items-center justify-center gap-2"
           >
-            <span>Awesome! Keep Going</span>
+            <span>{t('streak_celeb_btn')}</span>
             <Sparkles size={15} />
           </button>
         </div>

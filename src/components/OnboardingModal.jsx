@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useApp } from '../store';
 import { ArrowRight, User, Check, Sparkles, Wallet, Bell, Clock } from 'lucide-react';
 import { requestNotificationPermission, scheduleAppNotifications } from '../utils/notifications';
+import LanguageToggle from './LanguageToggle';
 
 // Paycheck day helpers: a month has at most 31 days
 const MIN_PAY_DAY = 1;
@@ -22,7 +23,7 @@ function isValidPayDay(value) {
 }
 
 export default function OnboardingModal({ onComplete }) {
-  const { dispatch } = useApp();
+  const { state, dispatch, t } = useApp();
 
   // Wizard steps:
   // 1 = Name
@@ -38,7 +39,7 @@ export default function OnboardingModal({ onComplete }) {
   const [currentAmount, setCurrentAmount] = useState('');
 
   // Step 3: Pay Schedule
-  // Options: 'twice_month' (Every 15 days), 'monthly_1' (Once a month), 'weekly' (Every week)
+  // Options: 'twice_month' (Every 15 days), 'monthly_1' ({t('onboarding_schedule_monthly')}), 'weekly' (Every week)
   const [paySchedule, setPaySchedule] = useState('twice_month');
   const [payDay1, setPayDay1] = useState('1');
   const [payDay2, setPayDay2] = useState('15');
@@ -157,7 +158,7 @@ export default function OnboardingModal({ onComplete }) {
       generatedSources = [
         {
           id: 'inc-pay-weekly',
-          name: 'Weekly Salary / Earnings',
+          name: state.language === 'el' ? 'Εβδομαδιαίος Μισθός' : 'Weekly Salary',
           amount: parsedAmount,
           frequency: 'weekly',
           icon: '💼',
@@ -226,14 +227,14 @@ export default function OnboardingModal({ onComplete }) {
             {step === 1 ? '👋' : step === 2 ? '💳' : step === 3 ? '🗓️' : step === 4 ? '💰' : '🔔'}
           </div>
           <h2 className="text-lg sm:text-xl font-black tracking-tight">
-            {step === 1 && 'Welcome to Spendy!'}
+            {step === 1 && t('onboarding_welcome')}
             {step === 2 && 'How much money do you have now?'}
             {step === 3 && 'How often do you get paid?'}
             {step === 4 && 'Salary & Variable Pay'}
             {step === 5 && 'Reminders & Notifications'}
           </h2>
           <p className="text-xs text-white/80 mt-1 font-medium max-w-sm mx-auto">
-            {step === 1 && "Let's personalize your budgeting experience in 5 quick steps."}
+            {step === 1 && t('onboarding_sub')}
             {step === 2 && 'Enter your current funds across cash & bank accounts.'}
             {step === 3 && 'Set your pay schedule so Spendy can notify you on payday.'}
             {step === 4 && (isVariable ? 'Confirm variable paycheck tracking.' : 'Enter your fixed paycheck amount.')}
@@ -685,7 +686,7 @@ export default function OnboardingModal({ onComplete }) {
                   className="flex-1 py-3 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white rounded-2xl text-sm font-extrabold shadow-md shadow-[#1b4332]/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
                 >
                   <Sparkles size={16} />
-                  <span>Start Budgeting</span>
+                  <span>{t('onboarding_start_btn')}</span>
                 </button>
               </div>
             </form>

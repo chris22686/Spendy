@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useApp } from '../store';
+import { useApp, getCategoryName, getGroupName } from '../store';
 import { v4 as uuidv4 } from 'uuid';
 import { Plus, Pencil, Trash2, X, Check, Tag, FolderPlus, Layers, AlertCircle } from 'lucide-react';
 
@@ -7,7 +7,7 @@ const AVAILABLE_ICONS = ['🍔','🚗','🏠','⚡','💊','🛍️','🎬','�
 const COLORS = ['#1b4332','#2d6a4f','#40916c','#52b788','#d97706','#b45309','#0284c7','#2563eb','#7c3aed','#c026d3','#e11d48','#dc2626','#475569','#0d9488','#15803d','#65a30d'];
 
 export default function Categories() {
-  const { state, dispatch } = useApp();
+  const { state, dispatch, t } = useApp();
   const { categories, categoryGroups = ['Essentials', 'Lifestyle', 'Subscriptions', 'Finance', 'Other'] } = state;
   const [showForm, setShowForm] = useState(false);
   const [showGroupModal, setShowGroupModal] = useState(false);
@@ -20,7 +20,7 @@ export default function Categories() {
     }
     const count = (state.expenses || []).filter(e => e.category === cat.id).length;
     const msg = count > 0
-      ? `Delete category "${cat.name}"? It is linked to ${count} transaction(s).`
+      ? `Delete category "${getCategoryName(cat, state.language)}"? It is linked to ${count} transaction(s).`
       : `Delete category "${cat.name}"?`;
     if (window.confirm(msg)) {
       dispatch({ type: 'DELETE_CATEGORY', payload: cat.id });
@@ -44,10 +44,10 @@ export default function Categories() {
         <div>
           <div className="flex items-center gap-2">
             <Tag size={20} className="text-[#1b4332]" />
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#14261c] tracking-tight">Manage Categories</h1>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#14261c] tracking-tight">{t('cat_page_title')}</h1>
           </div>
           <p className="text-[#65776c] text-xs sm:text-sm mt-1 font-medium">
-            Customize your spending categories and organize them into custom groups
+            {t('cat_page_sub')}
           </p>
         </div>
         
@@ -57,7 +57,7 @@ export default function Categories() {
             className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 bg-[#eaf4ee] hover:bg-[#d9ede0] border border-[#cde2d6] text-[#1b4332] rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer active:scale-98"
           >
             <Layers size={16} strokeWidth={2.4} />
-            <span>Manage Groups</span>
+            <span>{t('cat_manage_groups')}</span>
           </button>
 
           <button
@@ -65,13 +65,13 @@ export default function Categories() {
             className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white rounded-2xl text-xs sm:text-sm font-extrabold shadow-md shadow-[#1b4332]/25 transition-all cursor-pointer"
           >
             <Plus size={16} strokeWidth={2.8} />
-            <span>Add Category</span>
+            <span>{t('cat_add_btn')}</span>
           </button>
         </div>
       </div>
 
       {Object.entries(grouped).map(([group, cats]) => (
-        <div key={group} className="space-y-3">
+        <div key={getGroupName(group, state.language)} className="space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[#1b4332]" />
@@ -105,7 +105,7 @@ export default function Categories() {
                     <p className="text-sm font-bold text-[#14261c] truncate">{cat.name}</p>
                     <div className="flex items-center gap-2 mt-1">
                       <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cat.color }} />
-                      <span className="text-xs text-[#718578] font-medium">{cat.group}</span>
+                      <span className="text-xs text-[#718578] font-medium">{getGroupName(cat.group, state.language)}</span>
                     </div>
                   </div>
 
@@ -218,7 +218,7 @@ function CategoryModal({ initial, groups, onSave, onClose }) {
           </div>
 
           <div>
-            <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">Group</label>
+            <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">{t('cat_group_label')}</label>
             <div className="flex flex-wrap gap-2">
               {groups.map(g => (
                 <button
@@ -238,7 +238,7 @@ function CategoryModal({ initial, groups, onSave, onClose }) {
           </div>
 
           <div>
-            <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">Choose Icon</label>
+            <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">{t('cat_icon_label')}</label>
             <div className="grid grid-cols-6 sm:grid-cols-10 gap-2 p-2 bg-[#f8f7f2] rounded-xl border border-[#e4dfd3]">
               {AVAILABLE_ICONS.map(icon => (
                 <button
@@ -258,7 +258,7 @@ function CategoryModal({ initial, groups, onSave, onClose }) {
           </div>
 
           <div>
-            <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">Choose Color</label>
+            <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">{t('cat_color_label')}</label>
             <div className="flex flex-wrap gap-2.5">
               {COLORS.map(color => (
                 <button
@@ -277,7 +277,7 @@ function CategoryModal({ initial, groups, onSave, onClose }) {
 
         {/* Fixed Footer */}
         <div className="shrink-0 p-4 border-t border-[#eeebe2] bg-[#fbfaf6] flex gap-3">
-          <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-[#e4dfd3] text-sm font-semibold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer">Cancel</button>
+          <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-[#e4dfd3] text-sm font-semibold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer">{t('cancel')}</button>
           <button onClick={handleSave} className="flex-1 px-4 py-2.5 rounded-xl bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-sm font-bold text-white shadow-md shadow-[#1b4332]/25 cursor-pointer">
             {initial ? 'Save Changes' : 'Create Category'}
           </button>

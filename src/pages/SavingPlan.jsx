@@ -70,8 +70,8 @@ export default function SavingPlan() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#14261c] tracking-tight">Smart Saving Plan</h1>
-          <p className="text-[#65776c] text-sm mt-0.5 font-medium">Algorithmic reduction targets tailored to your habits</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#14261c] tracking-tight">{state.language === 'el' ? 'Έξυπνο Πλάνο Αποταμίευσης' : 'Smart Saving Plan'}</h1>
+          <p className="text-[#65776c] text-sm mt-0.5 font-medium">{state.language === 'el' ? 'Στοχευμένες μειώσεις εξόδων προσαρμοσμένες στις συνήθειές σου' : 'Algorithmic reduction targets tailored to your habits'}</p>
         </div>
         <div className="flex gap-1.5 bg-[#ffffff] border border-[#e7e4da] rounded-xl p-1 shadow-2xs self-start sm:self-auto">
           {[7, 30].map(d => (
@@ -80,7 +80,7 @@ export default function SavingPlan() {
                 planDays === d ? 'bg-[#1b4332] text-white shadow-xs' : 'text-[#6e8074] hover:text-[#1b4332]'
               }`}
             >
-              {d}-Day Plan
+              {state.language === 'el' ? `Πλάνο ${d} Ημερών` : `${d}-Day Plan`}
             </button>
           ))}
         </div>

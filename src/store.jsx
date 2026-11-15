@@ -1,5 +1,6 @@
 import { createContext, useContext, useReducer, useEffect } from 'react';
 import { format, subDays } from 'date-fns';
+import { t, getCategoryName, getGroupName, getPresetTitle, formatLocalizedMonth, formatLocalizedDayName } from './i18n';
 
 // ─── Default Categories ───────────────────────────────────────────────────────
 export const DEFAULT_CATEGORIES = [
@@ -366,6 +367,8 @@ function reducer(state, action) {
         notificationSettings: action.payload.notificationSettings || state.notificationSettings || DEFAULT_NOTIFICATION_SETTINGS,
       };
     }
+    case 'SET_LANGUAGE':
+      return { ...state, language: action.payload === 'en' ? 'en' : 'el' };
     case 'UPDATE_NOTIFICATION_SETTINGS':
       return {
         ...state,
@@ -440,6 +443,9 @@ function loadState() {
       ) {
         parsed.quickPresets = DEFAULT_QUICK_PRESETS;
       }
+      if (!parsed.language) {
+        parsed.language = 'el';
+      }
       if (parsed.longestStreak === undefined) {
         parsed.longestStreak = calculateStreak(parsed.expenses || []).currentStreak;
       }
@@ -475,6 +481,7 @@ const initialState = loadState() || {
   notificationSettings: DEFAULT_NOTIFICATION_SETTINGS,
   quickPresets: DEFAULT_QUICK_PRESETS,
   longestStreak: 0,
+  language: 'el',
 };
 
 // ─── Context ──────────────────────────────────────────────────────────────────
@@ -487,8 +494,21 @@ export function AppProvider({ children }) {
     saveState(state);
   }, [state]);
 
+  const lang = state.language || 'el';
+  const tBound = (key, params) => t(key, lang, params);
+  const getCatName = (cat) => getCategoryName(cat, lang);
+  const getGrpName = (grp) => getGroupName(grp, lang);
+  const getPresTitle = (preset) => getPresetTitle(preset, lang);
+
   return (
-    <AppContext.Provider value={{ state, dispatch }}>
+    <AppContext.Provider value={{
+      state,
+      dispatch,
+      t: tBound,
+      getCategoryName: getCatName,
+      getGroupName: getGrpName,
+      getPresetTitle: getPresTitle,
+    }}>
       {children}
     </AppContext.Provider>
   );
@@ -533,3 +553,7 @@ export function getCategoryTotals(expenses, categories) {
     .map(([id, amount]) => ({ ...getCategoryById(categories, id), amount }))
     .sort((a, b) => b.amount - a.amount);
 }
+
+
+// ─── i18n Re-exports ──────────────────────────────────────────────────────────
+export { t, getCategoryName, getGroupName, getPresetTitle, formatLocalizedMonth, formatLocalizedDayName } from './i18n';

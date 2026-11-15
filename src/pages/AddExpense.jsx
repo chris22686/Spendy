@@ -1,13 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useApp, formatMoney, calculateStreak } from '../store';
+import { useApp, formatMoney, calculateStreak, getCategoryName } from '../store';
 import { v4 as uuidv4 } from 'uuid';
 import { CheckCircle, RefreshCw, Calendar, Tag, FileText, ChevronLeft, Plus, ArrowRight, X, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import StreakCelebrationModal from '../components/StreakCelebrationModal';
 
 export default function AddExpense() {
-  const { state, dispatch } = useApp();
+  const { state, dispatch, t } = useApp();
   const { categories } = state;
   const navigate = useNavigate();
 
@@ -392,7 +392,7 @@ export default function AddExpense() {
           ) : (
             <>
               <Plus size={18} strokeWidth={2.8} />
-              <span>Save Expense</span>
+              <span>{t('btn_save_expense')}</span>
             </>
           )}
         </button>

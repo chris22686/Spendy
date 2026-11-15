@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useApp, formatMoney } from '../store';
+import { useApp, formatMoney, getCategoryName, formatLocalizedMonth } from '../store';
+import { el } from 'date-fns/locale';
 import TransactionCard from '../components/TransactionCard';
 import { Search, X, Plus } from 'lucide-react';
 import { format } from 'date-fns';
@@ -16,7 +17,7 @@ function formatGroupDate(dateStr) {
 }
 
 export default function Expenses() {
-  const { state, dispatch } = useApp();
+  const { state, dispatch, t } = useApp();
   const { expenses, categories } = state;
   const navigate = useNavigate();
   const [search, setSearch]   = useState('');
@@ -50,15 +51,15 @@ export default function Expenses() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#14261c] tracking-tight">Expenses</h1>
-          <p className="text-[#65776c] text-sm mt-0.5 font-medium">{filtered.length} transactions · {formatMoney(totalFiltered)} total</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#14261c] tracking-tight">{t('expenses_title')}</h1>
+          <p className="text-[#65776c] text-sm mt-0.5 font-medium">{filtered.length} {state.language === 'el' ? 'συναλλαγές' : 'transactions'} · {formatMoney(totalFiltered)} {state.language === 'el' ? 'σύνολο' : 'total'}</p>
         </div>
         <button
           onClick={() => navigate('/add')}
           className="flex items-center gap-2 px-5 py-2.5 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white rounded-xl text-sm font-bold shadow-md shadow-[#1b4332]/25 transition-all cursor-pointer self-start sm:self-auto"
         >
           <Plus size={16} strokeWidth={2.8} />
-          <span>Add Expense</span>
+          <span>{t('add_expense_btn')}</span>
         </button>
       </div>
 
@@ -68,7 +69,7 @@ export default function Expenses() {
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Search transactions..."
+            placeholder={t('search_placeholder')}
             className="w-full bg-[#ffffff] border border-[#e7e4da] rounded-xl pl-10 pr-9 py-2.5 text-base sm:text-sm text-[#14261c] placeholder-[#94a399] focus:outline-none focus:border-[#1b4332] shadow-2xs"
           />
           {search && (
@@ -84,8 +85,8 @@ export default function Expenses() {
             onChange={e => setCat(e.target.value)}
             className="flex-1 sm:flex-initial bg-[#ffffff] border border-[#e7e4da] rounded-xl px-3 sm:px-3.5 py-2.5 text-base sm:text-sm font-medium text-[#14261c] focus:outline-none focus:border-[#1b4332] cursor-pointer shadow-2xs"
           >
-            <option value="all">All Categories</option>
-            {categories.map(c => <option key={c.id} value={c.id}>{c.icon} {c.name}</option>)}
+            <option value="all">{t('all_categories')}</option>
+            {categories.map(c => <option key={c.id} value={c.id}>{c.icon} {getCategoryName(c, state.language)}</option>)}
           </select>
 
           <select
@@ -93,9 +94,9 @@ export default function Expenses() {
             onChange={e => setSort(e.target.value)}
             className="flex-1 sm:flex-initial bg-[#ffffff] border border-[#e7e4da] rounded-xl px-3 sm:px-3.5 py-2.5 text-base sm:text-sm font-medium text-[#14261c] focus:outline-none focus:border-[#1b4332] cursor-pointer shadow-2xs"
           >
-            <option value="date">Sort: Date</option>
-            <option value="amount">Sort: Amount</option>
-            <option value="name">Sort: Name</option>
+            <option value="date">{state.language === 'el' ? 'Ταξινόμηση: Ημερομηνία' : 'Sort: Date'}</option>
+            <option value="amount">{state.language === 'el' ? 'Ταξινόμηση: Ποσό' : 'Sort: Amount'}</option>
+            <option value="name">{state.language === 'el' ? 'Ταξινόμηση: Όνομα' : 'Sort: Name'}</option>
           </select>
         </div>
       </div>

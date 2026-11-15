@@ -1,4 +1,5 @@
-import { getCategoryById, formatMoney } from '../store';
+import { getCategoryById, formatMoney, useApp, getCategoryName } from '../store';
+import { el } from 'date-fns/locale';
 import { Trash2, RefreshCw } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -7,12 +8,14 @@ function formatCardDate(dateStr) {
     if (!dateStr) return '';
     const safeStr = dateStr.includes('T') ? dateStr : `${dateStr}T00:00:00`;
     const d = new Date(safeStr);
-    if (!isNaN(d.getTime())) return format(d, 'MMM d, yyyy');
+    if (!isNaN(d.getTime())) return isEl ? format(d, 'd MMM yyyy', { locale: el }) : format(d, 'MMM d, yyyy');
   } catch {}
   return dateStr;
 }
 
 export default function TransactionCard({ expense, categories, onDelete, onClick }) {
+  const { state } = useApp();
+  const isEl = state?.language === 'el';
   const cat = getCategoryById(categories, expense.category);
 
   const handleDelete = (e) => {
@@ -42,12 +45,12 @@ export default function TransactionCard({ expense, categories, onDelete, onClick
           {expense.recurring && (
             <span className="flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-[#1b4332] bg-[#eaf4ee] border border-[#d2e7d8] px-1.5 sm:px-2 py-0.5 rounded-full flex-shrink-0">
               <RefreshCw size={10} className="stroke-[2.5]" />
-              <span className="hidden xs:inline">Recurring</span>
+              <span className="hidden xs:inline">{isEl ? 'Μηνιαίο' : 'Recurring'}</span>
             </span>
           )}
         </div>
         <div className="flex items-center gap-1.5 sm:gap-2 mt-0.5">
-          <span className="text-[11px] sm:text-xs font-medium text-[#65776c] truncate max-w-[100px] sm:max-w-none">{cat.name}</span>
+          <span className="text-[11px] sm:text-xs font-medium text-[#65776c] truncate max-w-[100px] sm:max-w-none">{getCategoryName(cat, state?.language)}</span>
           <span className="text-[#c1cbc4]">·</span>
           <span className="text-[11px] sm:text-xs text-[#809186] shrink-0">
             {formatCardDate(expense.date)}

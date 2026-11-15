@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useApp, formatMoney, getMonthExpenses, getWeekExpenses, getTotalSpent, getCategoryTotals, calculateStreak } from '../store';
+import { useApp, formatMoney, getMonthExpenses, getWeekExpenses, getTotalSpent, getCategoryTotals, calculateStreak, getCategoryName, getPresetTitle, formatLocalizedMonth, formatLocalizedDayName } from '../store';
 import StatCard from '../components/StatCard';
 import TransactionCard from '../components/TransactionCard';
 import ResetModal from '../components/ResetModal';
@@ -8,6 +8,7 @@ import IncomeSourcesModal from '../components/IncomeSourcesModal';
 import AdjustBalanceModal from '../components/AdjustBalanceModal';
 import NotificationModal from '../components/NotificationModal';
 import QuickAddModal from '../components/QuickAddModal';
+import LanguageToggle from '../components/LanguageToggle';
 import StreakModal from '../components/StreakModal';
 import StreakCelebrationModal from '../components/StreakCelebrationModal';
 import { v4 as uuidv4 } from 'uuid';
@@ -20,7 +21,7 @@ import { format, eachDayOfInterval, subDays } from 'date-fns';
 const CHART_COLORS = ['#1b4332','#2d6a4f','#40916c','#52b788','#d97706','#0ea5e9','#e11d48','#7c3aed'];
 
 export default function Dashboard({ onOpenPaydayPrompt }) {
-  const { state, dispatch } = useApp();
+  const { state, dispatch, t } = useApp();
   const { expenses, categories, budgets, monthlyIncome, userName, paydaySettings, currentBalance = 0, quickPresets = [] } = state;
   const navigate = useNavigate();
   const [showReset, setShowReset] = useState(false);
@@ -140,11 +141,12 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl sm:text-3xl font-extrabold text-[#14261c] tracking-tight">
-              {userName ? `Hi, ${userName}` : 'Dashboard'}
+              {userName ? t('greeting', { name: userName }) : t('dashboard_title')}
             </h1>
             <span className="text-[11px] font-semibold text-[#1b4332] bg-[#eaf4ee] border border-[#cce3d5] px-2.5 py-0.5 rounded-full">
-              Live
+              {t('live')}
             </span>
+            <LanguageToggle />
             <button
               type="button"
               onClick={() => setShowStreakModal(true)}
@@ -161,12 +163,12 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
               <span>{streakInfo.currentStreak > 0 ? '🔥' : '✨'}</span>
               <span>
                 {streakInfo.currentStreak > 0
-                  ? `${streakInfo.currentStreak}-Day Streak`
-                  : 'Start Streak'}
+                  ? t('streak_badge_count', { count: streakInfo.currentStreak })
+                  : t('streak_badge_start')}
               </span>
             </button>
           </div>
-          <p className="text-[#65776c] text-xs sm:text-sm mt-0.5 font-medium">{format(new Date(), 'MMMM yyyy')} overview</p>
+          <p className="text-[#65776c] text-xs sm:text-sm mt-0.5 font-medium">{t('month_overview', { month: formatLocalizedMonth(new Date(), state.language) })}</p>
         </div>
         
         <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
@@ -177,7 +179,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
               title="Record paycheck"
             >
               <span>🎉</span>
-              <span className="truncate">Payday Check-In</span>
+              <span className="truncate">{t('payday_checkin_btn')}</span>
             </button>
           )}
 
@@ -187,7 +189,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
             title="Notification Reminders"
           >
             <Bell size={14} />
-            <span>Alerts</span>
+            <span>{t('alerts_btn')}</span>
           </button>
 
           <button
@@ -196,7 +198,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
             title="Reset or clear data"
           >
             <RotateCcw size={14} />
-            <span>Reset</span>
+            <span>{t('reset_btn')}</span>
           </button>
           
           <button
@@ -204,7 +206,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
             className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white rounded-xl text-xs sm:text-sm font-bold shadow-md shadow-[#1b4332]/25 transition-all cursor-pointer"
           >
             <Plus size={16} strokeWidth={2.8} />
-            <span>Add Expense</span>
+            <span>{t('add_expense_btn')}</span>
           </button>
         </div>
       </div>
@@ -213,35 +215,35 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div onClick={() => setShowBalanceModal(true)} data-testid="current-balance-card" className="cursor-pointer transition-transform active:scale-98">
           <StatCard
-            label="Current Balance"
+            label={t('current_balance')}
             value={formatMoney(currentBalance)}
-            sub="Tap to adjust funds"
+            sub={t('tap_to_adjust')}
             icon={Wallet}
             color="#1b4332"
             isHero={true}
           />
         </div>
         <StatCard
-          label="Total Monthly Spending"
+          label={t('total_monthly_spending')}
           value={formatMoney(monthTotal)}
-          sub="Updated today"
+          sub={t('updated_today')}
           icon={TrendingDown}
           color="#2d6a4f"
           trend={-12}
         />
         <div onClick={() => setShowIncomeModal(true)} className="cursor-pointer transition-transform active:scale-98">
           <StatCard
-            label="Monthly Income"
+            label={t('monthly_income')}
             value={formatMoney(monthlyIncome)}
-            sub="Tap to manage sources"
+            sub={t('tap_to_manage_sources')}
             icon={DollarSign}
             color="#40916c"
           />
         </div>
         <StatCard
-          label="Spent This Week"
+          label={t('spent_this_week')}
           value={formatMoney(weekTotal)}
-          sub="Past 7 days"
+          sub={t('past_7_days')}
           icon={CreditCard}
           color="#52b788"
           trend={-5}
@@ -264,7 +266,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5 text-xs font-black text-[#1b4332] uppercase tracking-wider">
                 <CheckCircle size={14} className="text-[#2d6a4f]" />
-                <span>1-Tap Expense Added!</span>
+                <span>{t('quick_toast_title')}</span>
               </div>
               <p className="text-sm font-extrabold text-[#14261c] truncate mt-0.5">
                 {quickToast.title}
@@ -284,7 +286,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
           </div>
 
           <div className="mt-2.5 pt-2.5 border-t border-[#f0ece1] flex items-center justify-between gap-2">
-            <span className="text-[11px] text-[#718578] font-medium">Balance updated</span>
+            <span className="text-[11px] text-[#718578] font-medium">{t('quick_toast_balance_updated')}</span>
             <button
               type="button"
               onClick={handleUndoQuickAdd}
@@ -307,17 +309,17 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
             <div className="min-w-0">
               <p className="text-xs font-black text-[#92400e] truncate">
                 {streakInfo.isPendingToday
-                  ? `Keep your ${streakInfo.currentStreak}-day streak alive!`
-                  : 'Start your gentle daily streak today'}
+                  ? t('streak_banner_keep', { count: streakInfo.currentStreak })
+                  : t('streak_banner_start')}
               </p>
               <p className="text-[11px] text-[#78350f] truncate">
                 {streakInfo.isPendingToday
-                  ? "Tap a quick shortcut below to log today's spending ✨"
-                  : 'Takes 5 seconds. No stress, no guilt, just gentle awareness.'}
+                  ? t('streak_banner_tap')
+                  : t('streak_banner_gentle')}
               </p>
             </div>
           </div>
-          <span className="text-xs font-black text-[#b45309] shrink-0 hover:underline">View Streak →</span>
+          <span className="text-xs font-black text-[#b45309] shrink-0 hover:underline">{t('streak_banner_view')}</span>
         </div>
       )}
 
@@ -329,8 +331,8 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
               <Zap size={15} className="stroke-[2.5]" />
             </div>
             <div>
-              <h2 className="text-sm sm:text-base font-black text-[#14261c] tracking-tight">1-Tap Quick Add</h2>
-              <p className="text-[11px] text-[#6e8074]">Tap any shortcut to log an expense instantly</p>
+              <h2 className="text-sm sm:text-base font-black text-[#14261c] tracking-tight">{t('quick_add_title')}</h2>
+              <p className="text-[11px] text-[#6e8074]">{t('quick_add_sub')}</p>
             </div>
           </div>
 
@@ -342,7 +344,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
             title="Customize quick shortcuts"
           >
             <Pencil size={12} className="group-hover:rotate-12 group-hover:scale-110 transition-transform duration-200" />
-            <span>Customize</span>
+            <span>{t('quick_add_customize')}</span>
           </button>
         </div>
 
@@ -360,7 +362,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
               </span>
               <div className="min-w-0 flex-1">
                 <p className="text-xs sm:text-sm font-extrabold text-[#14261c] truncate">
-                  {preset.title}
+                  {getPresetTitle(preset, state.language)}
                 </p>
                 <p className="text-xs font-black text-[#1b4332] truncate">
                   {formatMoney(preset.amount)}
@@ -417,8 +419,8 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
         <div className="lg:col-span-2 rounded-2xl bg-[#ffffff] border border-[#e7e4da] p-5 shadow-[0_2px_12px_rgba(27,67,50,0.03)]">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-sm font-bold text-[#14261c]">30-Day Spending Trend</h2>
-              <p className="text-xs text-[#6e8074] mt-0.5 font-medium">Daily expense trajectory this past month</p>
+              <h2 className="text-sm font-bold text-[#14261c]">{t('trend_30d_title')}</h2>
+              <p className="text-xs text-[#6e8074] mt-0.5 font-medium">{t('trend_30d_sub')}</p>
             </div>
             <div className="flex items-center gap-1.5 text-xs text-[#1b4332] bg-[#eaf4ee] border border-[#cce3d5] font-semibold px-2.5 py-1 rounded-full">
               <Zap size={12} className="stroke-[2.5]" />
@@ -443,8 +445,8 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
 
         <div className="rounded-2xl bg-[#ffffff] border border-[#e7e4da] p-5 shadow-[0_2px_12px_rgba(27,67,50,0.03)] flex flex-col justify-between">
           <div>
-            <h2 className="text-sm font-bold text-[#14261c] mb-0.5">Category Distribution</h2>
-            <p className="text-xs text-[#6e8074] mb-3 font-medium">Top categories this month</p>
+            <h2 className="text-sm font-bold text-[#14261c] mb-0.5">{t('cat_distribution_title')}</h2>
+            <p className="text-xs text-[#6e8074] mb-3 font-medium">{t('cat_distribution_sub')}</p>
           </div>
           <div className="relative">
             <ResponsiveContainer width="100%" height={170}>
@@ -477,8 +479,8 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
       <div className="rounded-2xl bg-[#ffffff] border border-[#e7e4da] p-5 shadow-[0_2px_12px_rgba(27,67,50,0.03)]">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-sm font-bold text-[#14261c]">This Week's Spending</h2>
-            <p className="text-xs text-[#6e8074] font-medium">Daily distribution over the last 7 days</p>
+            <h2 className="text-sm font-bold text-[#14261c]">{t('week_spending_title')}</h2>
+            <p className="text-xs text-[#6e8074] font-medium">{t('week_spending_sub')}</p>
           </div>
           <span className="text-xs font-bold text-[#1b4332] bg-[#eaf4ee] px-3 py-1 rounded-full border border-[#cce3d5]">
             {formatMoney(weekTotal)} total
@@ -517,14 +519,14 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
       <div className="rounded-2xl bg-[#ffffff] border border-[#e7e4da] p-5 shadow-[0_2px_12px_rgba(27,67,50,0.03)]">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-sm font-bold text-[#14261c]">Recent Transactions</h2>
-            <p className="text-xs text-[#6e8074] font-medium">Your latest logged expenses</p>
+            <h2 className="text-sm font-bold text-[#14261c]">{t('recent_transactions_title')}</h2>
+            <p className="text-xs text-[#6e8074] font-medium">{t('recent_transactions_sub')}</p>
           </div>
           <button
             onClick={() => navigate('/expenses')}
             className="flex items-center gap-1 text-xs font-bold text-[#1b4332] hover:text-[#2d6a4f] transition-colors"
           >
-            <span>View all</span>
+            <span>{t('view_all_link')}</span>
             <ArrowRight size={13} />
           </button>
         </div>

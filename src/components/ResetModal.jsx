@@ -3,7 +3,7 @@ import { useApp } from '../store';
 import { RotateCcw, Trash2, X, CheckCircle } from 'lucide-react';
 
 export default function ResetModal({ isOpen, onClose }) {
-  const { dispatch } = useApp();
+  const { state, dispatch, t } = useApp();
   const [successMsg, setSuccessMsg] = useState('');
 
   useEffect(() => {
@@ -46,8 +46,8 @@ export default function ResetModal({ isOpen, onClose }) {
               <RotateCcw size={20} className="stroke-[2.5]" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-bold text-[#14261c]">Data Management</h2>
-              <p className="text-xs text-[#718578]">Reset or clear your app records</p>
+              <h2 className="text-base sm:text-lg font-bold text-[#14261c]">{t('reset_modal_title')}</h2>
+              <p className="text-xs text-[#718578]">{t('reset_modal_sub')}</p>
             </div>
           </div>
           <button onClick={onClose} className="text-[#7d8f84] hover:text-[#14261c] p-1.5 rounded-lg hover:bg-[#f8f7f2] cursor-pointer">
@@ -71,7 +71,7 @@ export default function ResetModal({ isOpen, onClose }) {
               <Trash2 size={18} />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-bold text-[#991b1b]">Clear All Data (Start Fresh)</p>
+              <p className="text-sm font-bold text-[#991b1b]">{t('reset_clear_btn')} (Start Fresh)</p>
               <p className="text-xs text-[#7f8e83] mt-0.5">
                 Wipes all 30 sample expenses to zero. Perfect when you're ready to start tracking your own real finances.
               </p>

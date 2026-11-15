@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useApp } from '../store';
 import { LayoutDashboard, CreditCard, Plus, Tag, MoreHorizontal, Target, BarChart3, Sparkles, BookOpen, RotateCcw, X } from 'lucide-react';
 import ResetModal from './ResetModal';
 import NotificationModal from './NotificationModal';
+import LanguageToggle from './LanguageToggle';
 import { Bell } from 'lucide-react';
 
 export default function BottomNav() {
+  const { state, t } = useApp();
   const location = useLocation();
   const navigate = useNavigate();
   const [showMore, setShowMore] = useState(false);
@@ -22,17 +25,17 @@ export default function BottomNav() {
   }, [showMore]);
 
   const mainNav = [
-    { to: '/',           icon: LayoutDashboard, label: 'Home' },
-    { to: '/expenses',   icon: CreditCard,      label: 'Expenses' },
-    { to: '/add',        icon: Plus,            label: 'Add', isCenter: true },
-    { to: '/categories', icon: Tag,             label: 'Categories' },
+    { to: '/',           icon: LayoutDashboard, label: t('nav_home') },
+    { to: '/expenses',   icon: CreditCard,      label: t('nav_expenses') },
+    { to: '/add',        icon: Plus,            label: t('nav_add'), isCenter: true },
+    { to: '/categories', icon: Tag,             label: t('nav_categories') },
   ];
 
   const moreItems = [
-    { to: '/budgets',   icon: Target,     label: 'Budgets',       desc: 'Monthly & weekly category caps' },
-    { to: '/insights',  icon: BarChart3,  label: 'Insights',      desc: 'Visual charts & savings potential' },
-    { to: '/plan',      icon: Sparkles,   label: 'Saving Plan',   desc: '7-day & 30-day adaptive targets' },
-    { to: '/story',     icon: BookOpen,   label: 'Monthly Story', desc: 'Narrative summary & report export' },
+    { to: '/budgets',   icon: Target,     label: t('nav_budgets'),       desc: state.language === 'el' ? 'Μηνιαία όρια εξόδων ανά κατηγορία' : 'Monthly & weekly category caps' },
+    { to: '/insights',  icon: BarChart3,  label: t('nav_insights'),      desc: state.language === 'el' ? 'Διαγράμματα και συνήθειες εξόδων' : 'Visual charts & savings potential' },
+    { to: '/plan',      icon: Sparkles,   label: t('nav_plan'),   desc: state.language === 'el' ? 'Στόχοι και πρόοδος αποταμίευσης' : '7-day & 30-day adaptive targets' },
+    { to: '/story',     icon: BookOpen,   label: t('nav_story'), desc: state.language === 'el' ? 'Μηνιαία σύνοψη και αναφορά' : 'Narrative summary & report export' },
   ];
 
   return (
@@ -53,7 +56,7 @@ export default function BottomNav() {
                   <Plus size={24} strokeWidth={2.8} />
                 </div>
                 <span className="text-[10px] sm:text-[11px] font-bold text-[#1b4332] mt-0.5">
-                  Add
+                  {item.label}
                 </span>
               </NavLink>
             );

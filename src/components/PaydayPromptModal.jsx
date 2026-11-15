@@ -4,7 +4,7 @@ import { Check, X, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function PaydayPromptModal({ onClose }) {
-  const { state, dispatch } = useApp();
+  const { state, dispatch, t } = useApp();
   const { incomeSources = [], userName } = state;
 
   const [exactAmount, setExactAmount] = useState('');

@@ -3,7 +3,7 @@ import { useApp, formatMoney } from '../store';
 import { Wallet, X, Check, ArrowRight } from 'lucide-react';
 
 export default function AdjustBalanceModal({ isOpen, onClose }) {
-  const { state, dispatch } = useApp();
+  const { state, dispatch, t } = useApp();
   const currentBalance = state.currentBalance !== undefined ? state.currentBalance : 0;
 
   const [amount, setAmount] = useState('');
@@ -50,7 +50,7 @@ export default function AdjustBalanceModal({ isOpen, onClose }) {
               <Wallet size={20} className="stroke-[2.5]" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-bold text-[#14261c]">Adjust Current Balance</h2>
+              <h2 className="text-base sm:text-lg font-bold text-[#14261c]">{t('balance_modal_title')}</h2>
               <p className="text-xs text-[#718578]">Update available funds across cash & bank</p>
             </div>
           </div>
@@ -108,7 +108,7 @@ export default function AdjustBalanceModal({ isOpen, onClose }) {
               className="flex-1 py-3 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white rounded-xl text-xs font-extrabold shadow-md shadow-[#1b4332]/25 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <Check size={15} strokeWidth={2.8} />
-              <span>Save Balance</span>
+              <span>{t('balance_save_btn')}</span>
             </button>
           </div>
         </form>

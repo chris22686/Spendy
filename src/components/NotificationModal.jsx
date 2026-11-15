@@ -4,7 +4,7 @@ import { Bell, Check, X, Clock, CheckCircle } from 'lucide-react';
 import { requestNotificationPermission, scheduleAppNotifications } from '../utils/notifications';
 
 export default function NotificationModal({ isOpen, onClose }) {
-  const { state, dispatch } = useApp();
+  const { state, dispatch, t } = useApp();
   const { notificationSettings = {}, paydaySettings } = state;
 
   const [notifyOnPayday, setNotifyOnPayday] = useState(notificationSettings.notifyOnPayday ?? true);
@@ -88,7 +88,7 @@ export default function NotificationModal({ isOpen, onClose }) {
         )}
 
         <form onSubmit={handleSave} className="space-y-4">
-          {/* Payday Notifications */}
+          {/* {t('notif_payday')}s */}
           <div
             onClick={() => setNotifyOnPayday(!notifyOnPayday)}
             className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-start gap-3 ${
@@ -148,7 +148,7 @@ export default function NotificationModal({ isOpen, onClose }) {
             </div>
           </div>
 
-          {/* Daily Reminder Time Picker */}
+          {/* Daily {t('notif_time_label')} Picker */}
           {notifyDaily && (
             <div className="p-3.5 sm:p-4 bg-[#f8f7f2] border border-[#e4dfd3] rounded-2xl space-y-3 animate-in fade-in duration-200">
               <div className="flex items-center justify-between gap-3">
@@ -201,7 +201,7 @@ export default function NotificationModal({ isOpen, onClose }) {
               type="submit"
               className="px-5 py-2.5 bg-[#1b4332] hover:bg-[#245740] active:scale-98 text-white rounded-xl text-xs font-extrabold shadow-md shadow-[#1b4332]/25 transition-all cursor-pointer"
             >
-              Save Preferences
+              {t('notif_save')}
             </button>
           </div>
         </form>
