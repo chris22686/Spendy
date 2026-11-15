@@ -56,8 +56,8 @@ export default function Budgets() {
             </div>
             <p className="text-xs text-[#6e8074] mt-0.5 font-medium">
               {incomeSources && incomeSources.length > 0
-                ? `${incomeSources.length} income sources configured (salary, 15-day pay, transfers)`
-                : 'Used to calculate target limits & savings rate'}
+                ? (state.language === 'el' ? `${incomeSources.length} πηγές εσόδων (μισθός, προκαταβολή, μεταφορές)` : `${incomeSources.length} income sources configured`)
+                : (state.language === 'el' ? 'Χρησιμοποιείται για τον υπολογισμό στόχων & αποταμίευσης' : 'Used to calculate target limits & savings rate')}
             </p>
           </div>
           <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
@@ -66,7 +66,7 @@ export default function Budgets() {
               className="flex items-center gap-1.5 px-3.5 py-2 bg-[#eaf4ee] hover:bg-[#d9ede0] border border-[#cde2d6] rounded-xl text-xs font-bold text-[#1b4332] transition-colors cursor-pointer"
             >
               <Settings2 size={14} />
-              <span>Manage Categories / Sources</span>
+              <span>{state.language === 'el' ? 'Διαχείριση Πηγών Εσόδων' : 'Manage Sources'}</span>
             </button>
             <div className="flex items-center gap-2">
               <div className="relative">
@@ -103,13 +103,13 @@ export default function Budgets() {
           {overBudget > 0 && (
             <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#fee2e2] border border-[#fca5a5] text-[#991b1b] text-xs font-bold shadow-2xs">
               <AlertTriangle size={15} />
-              <span>{overBudget} budget limit{overBudget > 1 ? 's' : ''} exceeded</span>
+              <span>{state.language === 'el' ? `${overBudget} όριο${overBudget > 1 ? 'α' : ''} ξεπεράστηκε` : `${overBudget} budget limit${overBudget > 1 ? 's' : ''} exceeded`}</span>
             </div>
           )}
           {warningBudget > 0 && (
             <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#ffedd5] border border-[#fed7aa] text-[#9a3412] text-xs font-bold shadow-2xs">
               <AlertTriangle size={15} />
-              <span>{warningBudget} budget{warningBudget > 1 ? 's' : ''} near 80% threshold</span>
+              <span>{state.language === 'el' ? `${warningBudget} όριο${warningBudget > 1 ? 'α' : ''} κοντά στο 80%` : `${warningBudget} budget${warningBudget > 1 ? 's' : ''} near 80% threshold`}</span>
             </div>
           )}
         </div>
@@ -137,7 +137,7 @@ export default function Budgets() {
                   </div>
                   <div>
                     <p className="text-sm font-bold text-[#14261c]">{getCategoryName(b.cat, state.language)}</p>
-                    <p className="text-xs text-[#718578] capitalize font-medium">{b.period} limit</p>
+                    <p className="text-xs text-[#718578] capitalize font-medium">{state.language === 'el' ? (b.period === 'weekly' ? 'Εβδομαδιαίο όριο' : 'Μηνιαίο όριο') : `${b.period} limit`}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">
@@ -161,7 +161,7 @@ export default function Budgets() {
               <div className="space-y-2">
                 <div className="flex justify-between text-xs">
                   <span className="text-[#55695e] font-medium">
-                    {formatMoney(b.spent)} <span className="text-[#88998e]">of</span> {formatMoney(b.limit)}
+                    {formatMoney(b.spent)} <span className="text-[#88998e]">{state.language === 'el' ? 'από' : 'of'}</span> {formatMoney(b.limit)}
                   </span>
                   <span className={`font-bold ${isOver ? 'text-[#dc2626]' : isWarning ? 'text-[#ea580c]' : 'text-[#1b4332]'}`}>
                     {b.rawPct.toFixed(0)}%
@@ -174,7 +174,9 @@ export default function Budgets() {
                   />
                 </div>
                 <p className={`text-xs font-bold ${b.remaining >= 0 ? 'text-[#1b4332]' : 'text-[#dc2626]'}`}>
-                  {b.remaining >= 0 ? `${formatMoney(b.remaining)} remaining` : `${formatMoney(Math.abs(b.remaining))} over limit`}
+                  {b.remaining >= 0
+                    ? (state.language === 'el' ? `${formatMoney(b.remaining)} απομένουν` : `${formatMoney(b.remaining)} remaining`)
+                    : (state.language === 'el' ? `${formatMoney(Math.abs(b.remaining))} υπέρβαση` : `${formatMoney(Math.abs(b.remaining))} over limit`)}
                 </p>
               </div>
             </div>
@@ -186,6 +188,7 @@ export default function Budgets() {
         <BudgetModal
           initial={editBudget}
           categories={categories}
+          state={state}
           onSave={(b) => {
             dispatch({ type: 'SET_BUDGET', payload: editBudget ? b : { ...b, id: uuidv4() } });
             setShowForm(false);
@@ -201,7 +204,7 @@ export default function Budgets() {
   );
 }
 
-function BudgetModal({ initial, categories, onSave, onClose }) {
+function BudgetModal({ initial, categories, onSave, onClose, state }) {
   const [form, setForm] = useState(initial ? { ...initial, limit: initial.limit?.toString() || '' } : { category: categories[0]?.id || '', limit: '', period: 'monthly' });
   const [error, setError] = useState('');
   const set = (k, v) => {
@@ -237,7 +240,7 @@ function BudgetModal({ initial, categories, onSave, onClose }) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4 sm:mb-5">
-          <h2 className="text-base sm:text-lg font-bold text-[#14261c]">{initial ? 'Edit' : 'New'} Budget</h2>
+          <h2 className="text-base sm:text-lg font-bold text-[#14261c]">{initial ? (state?.language === 'el' ? 'Επεξεργασία Ορίου' : 'Edit Budget') : (state?.language === 'el' ? 'Νέο Όριο Εξόδων' : 'New Budget')}</h2>
           <button onClick={onClose} className="text-[#7d8f84] hover:text-[#14261c] p-1 cursor-pointer"><X size={18}/></button>
         </div>
 
@@ -249,17 +252,17 @@ function BudgetModal({ initial, categories, onSave, onClose }) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">Category</label>
+            <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">{state?.language === 'el' ? 'Κατηγορία' : 'Category'}</label>
             <select
               value={form.category}
               onChange={e => set('category', e.target.value)}
               className="w-full bg-[#f8f7f2] border border-[#e4dfd3] rounded-xl px-4 py-2.5 text-base sm:text-sm text-[#14261c] focus:outline-none focus:border-[#1b4332]"
             >
-              {categories.map(c => <option key={c.id} value={c.id}>{c.icon} {c.name}</option>)}
+              {categories.map(c => <option key={c.id} value={c.id}>{c.icon} {getCategoryName(c, state?.language)}</option>)}
             </select>
           </div>
           <div>
-            <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">Budget Limit (€)</label>
+            <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">{state?.language === 'el' ? 'Όριο Προϋπολογισμού (€)' : 'Budget Limit (€)'}</label>
             <input
               type="number"
               step="any"
@@ -272,26 +275,26 @@ function BudgetModal({ initial, categories, onSave, onClose }) {
             />
           </div>
           <div>
-            <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">Period</label>
+            <label className="text-xs font-bold text-[#55695e] uppercase tracking-wider mb-1.5 block">{state?.language === 'el' ? 'Περίοδος' : 'Period'}</label>
             <div className="flex gap-2">
               {['weekly','monthly'].map(p => (
                 <button
-                  key={p}
+                  key={state?.language === 'el' ? (p === 'weekly' ? 'Εβδομαδιαίο' : 'Μηνιαίο') : p}
                   type="button"
                   onClick={() => set('period', p)}
                   className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all capitalize cursor-pointer ${
                     form.period === p ? 'bg-[#1b4332] text-white shadow-xs' : 'bg-[#f8f7f2] border border-[#e4dfd3] text-[#55695e]'
                   }`}
                 >
-                  {p}
+                  {state?.language === 'el' ? (p === 'weekly' ? 'Εβδομαδιαίο' : 'Μηνιαίο') : p}
                 </button>
               ))}
             </div>
           </div>
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-[#e4dfd3] text-sm font-semibold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer">Cancel</button>
+            <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-[#e4dfd3] text-sm font-semibold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer">{state?.language === 'el' ? 'Ακύρωση' : 'Cancel'}</button>
             <button type="submit" className="flex-1 px-4 py-2.5 rounded-xl bg-[#1b4332] hover:bg-[#245740] text-sm font-bold text-white shadow-md shadow-[#1b4332]/25 cursor-pointer">
-              {initial ? 'Save Changes' : 'Create Budget'}
+              {initial ? (state?.language === 'el' ? 'Αποθήκευση Αλλαγών' : 'Save Changes') : (state?.language === 'el' ? 'Δημιουργία Ορίου' : 'Create Budget')}
             </button>
           </div>
         </form>

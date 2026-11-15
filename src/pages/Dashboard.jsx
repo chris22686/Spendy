@@ -252,8 +252,7 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
 
       {/* Floating 1-Tap Confirmation Toast */}
       {quickToast && (
-        <aside
-          role="status"
+        <aside data-testid="quickadd-toast" role="status"
           aria-live="polite"
           aria-label="Quick expense logged"
           className="fixed top-4 left-3 right-3 sm:left-auto sm:right-6 sm:w-[380px] z-[999] bg-[#ffffff] border-2 border-[#1b4332] rounded-2xl p-4 shadow-2xl shadow-[#1b4332]/25 transition-all duration-300 animate-fade-in"
@@ -290,9 +289,10 @@ export default function Dashboard({ onOpenPaydayPrompt }) {
             <button
               type="button"
               onClick={handleUndoQuickAdd}
+              data-testid="quickadd-undo-btn"
               className="px-3 py-1 rounded-lg bg-[#fee2e2] hover:bg-[#fed7d7] text-[#991b1b] text-xs font-extrabold transition-colors cursor-pointer active:scale-95"
             >
-              Undo
+              {t('quick_toast_undo')}
             </button>
           </div>
         </aside>

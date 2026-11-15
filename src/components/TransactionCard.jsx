@@ -3,7 +3,7 @@ import { el } from 'date-fns/locale';
 import { Trash2, RefreshCw } from 'lucide-react';
 import { format } from 'date-fns';
 
-function formatCardDate(dateStr) {
+function formatCardDate(dateStr, isEl) {
   try {
     if (!dateStr) return '';
     const safeStr = dateStr.includes('T') ? dateStr : `${dateStr}T00:00:00`;
@@ -21,8 +21,9 @@ export default function TransactionCard({ expense, categories, onDelete, onClick
   const handleDelete = (e) => {
     e.stopPropagation();
     if (!onDelete) return;
-    const desc = expense.description || 'this expense';
-    if (window.confirm(`Delete "${desc}"?`)) {
+    const desc = expense.description || (isEl ? 'αυτό το έξοδο' : 'this expense');
+    const msg = isEl ? `Διαγραφή "${desc}";` : `Delete "${desc}"?`;
+    if (window.confirm(msg)) {
       onDelete(expense.id);
     }
   };
@@ -53,7 +54,7 @@ export default function TransactionCard({ expense, categories, onDelete, onClick
           <span className="text-[11px] sm:text-xs font-medium text-[#65776c] truncate max-w-[100px] sm:max-w-none">{getCategoryName(cat, state?.language)}</span>
           <span className="text-[#c1cbc4]">·</span>
           <span className="text-[11px] sm:text-xs text-[#809186] shrink-0">
-            {formatCardDate(expense.date)}
+            {formatCardDate(expense.date, isEl)}
           </span>
           {expense.notes && (
             <>
@@ -73,7 +74,7 @@ export default function TransactionCard({ expense, categories, onDelete, onClick
             type="button"
             onClick={handleDelete}
             className="p-1 sm:p-1.5 rounded-lg text-[#94a399] hover:text-[#b91c1c] hover:bg-[#fee2e2] transition-all cursor-pointer"
-            title="Delete expense"
+            title={isEl ? 'Διαγραφή εξόδου' : 'Delete expense'}
           >
             <Trash2 size={15} />
           </button>

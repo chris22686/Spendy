@@ -15,13 +15,14 @@ export default function Categories() {
 
   const handleDeleteCategory = (cat) => {
     if (categories.length <= 1) {
-      alert('You must keep at least one category.');
+      alert(state.language === 'el' ? 'Πρέπει να διατηρήσεις τουλάχιστον μία κατηγορία.' : 'You must keep at least one category.');
       return;
     }
     const count = (state.expenses || []).filter(e => e.category === cat.id).length;
-    const msg = count > 0
-      ? `Delete category "${getCategoryName(cat, state.language)}"? It is linked to ${count} transaction(s).`
-      : `Delete category "${cat.name}"?`;
+    const catName = getCategoryName(cat, state.language);
+    const msg = state.language === 'el'
+      ? (count > 0 ? `Διαγραφή κατηγορίας "${catName}"; Συνδέεται με ${count} έξοδο(α).` : `Διαγραφή κατηγορίας "${catName}";`)
+      : (count > 0 ? `Delete category "${catName}"? It is linked to ${count} transaction(s).` : `Delete category "${catName}"?`);
     if (window.confirm(msg)) {
       dispatch({ type: 'DELETE_CATEGORY', payload: cat.id });
     }
@@ -75,7 +76,7 @@ export default function Categories() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[#1b4332]" />
-              <h2 className="text-xs sm:text-sm font-extrabold text-[#14261c] uppercase tracking-wider">{group}</h2>
+              <h2 className="text-xs sm:text-sm font-extrabold text-[#14261c] uppercase tracking-wider">{getGroupName(group, state.language)}</h2>
               <span className="text-[11px] font-bold text-[#65776c] bg-[#f1efe8] px-2 py-0.5 rounded-full">
                 {cats.length}
               </span>
@@ -84,7 +85,7 @@ export default function Categories() {
 
           {cats.length === 0 ? (
             <div className="p-4 rounded-2xl border border-dashed border-[#dcd7cb] bg-[#faf9f5] text-center text-xs text-[#899c90] font-medium">
-              No categories in this group. Tap "+ Add Category" to assign one here.
+              {state.language === 'el' ? 'Δεν υπάρχουν κατηγορίες σε αυτή την ομάδα. Πάτησε "+ Νέα Κατηγορία" για να προσθέσεις.' : 'No categories in this group. Tap "+ Add Category" to assign one here.'}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -102,7 +103,7 @@ export default function Categories() {
                   </div>
                   
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-[#14261c] truncate">{cat.name}</p>
+                    <p className="text-sm font-bold text-[#14261c] truncate">{getCategoryName(cat, state.language)}</p>
                     <div className="flex items-center gap-2 mt-1">
                       <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cat.color }} />
                       <span className="text-xs text-[#718578] font-medium">{getGroupName(cat.group, state.language)}</span>

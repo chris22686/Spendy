@@ -47,9 +47,9 @@ export default function AddExpense() {
 
   const validate = () => {
     const e = {};
-    if (!form.description.trim()) e.description = 'Description is required';
-    if (!form.amount || isNaN(parseFloat(form.amount)) || parseFloat(form.amount) <= 0) e.amount = 'Enter a valid amount';
-    if (!form.date) e.date = 'Date is required';
+    if (!form.description.trim()) e.description = state.language === 'el' ? 'Συμπλήρωσε μια περιγραφή' : 'Description is required';
+    if (!form.amount || isNaN(parseFloat(form.amount)) || parseFloat(form.amount) <= 0) e.amount = state.language === 'el' ? 'Συμπλήρωσε ένα έγκυρο ποσό' : 'Enter a valid amount';
+    if (!form.date) e.date = state.language === 'el' ? 'Επίλεξε ημερομηνία' : 'Date is required';
     return e;
   };
 
@@ -189,8 +189,8 @@ export default function AddExpense() {
           <ChevronLeft size={20} />
         </button>
         <div>
-          <h1 className="text-2xl font-extrabold text-[#14261c] tracking-tight">Add Expense</h1>
-          <p className="text-[#65776c] text-xs sm:text-sm mt-0.5 font-medium">Record a new payment or purchase</p>
+          <h1 className="text-2xl font-extrabold text-[#14261c] tracking-tight">{t('add_page_title')}</h1>
+          <p className="text-[#65776c] text-xs sm:text-sm mt-0.5 font-medium">{t('add_page_sub')}</p>
         </div>
       </div>
 
@@ -217,12 +217,10 @@ export default function AddExpense() {
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="rounded-3xl bg-gradient-to-br from-[#133928] via-[#1b4332] to-[#2d6a4f] border border-[#2d6a4f]/50 p-6 sm:p-8 text-center text-white shadow-xl shadow-[#1b4332]/20 relative overflow-hidden">
-          <p className="text-xs font-bold text-[#a0cfb2] uppercase tracking-wider mb-2">Total Amount Spent</p>
+          <p className="text-xs font-bold text-[#a0cfb2] uppercase tracking-wider mb-2">{t('field_amount')}</p>
           <div className="flex items-center justify-center gap-1 sm:gap-2">
             <span className="text-3xl sm:text-4xl font-light text-[#86bfa0]">€</span>
-            <input
-              type="number"
-              value={form.amount}
+            <input data-testid="expense-amount-input" type="number" value={form.amount}
               onChange={e => set('amount', e.target.value)}
               placeholder="0.00"
               step="0.01"
@@ -237,12 +235,10 @@ export default function AddExpense() {
           <div>
             <label className="flex items-center gap-2 text-xs font-bold text-[#55695e] uppercase tracking-wider mb-2">
               <FileText size={14} className="text-[#1b4332]" />
-              Description
+              {t('field_description')}
             </label>
-            <input
-              value={form.description}
-              onChange={e => set('description', e.target.value)}
-              placeholder="e.g. Organic Groceries, Coffee, Uber ride..."
+            <input data-testid="expense-desc-input" value={form.description} onChange={e => set('description', e.target.value)}
+              placeholder={t('field_desc_placeholder')}
               className={`w-full bg-[#f8f7f2] border ${errors.description ? 'border-[#dc2626]' : 'border-[#e4dfd3]'} rounded-xl px-4 py-3 text-sm text-[#14261c] placeholder-[#94a399] focus:outline-none focus:border-[#1b4332] focus:bg-[#ffffff] transition-all`}
             />
             {errors.description && <p className="text-[#dc2626] text-xs mt-1.5 font-medium">{errors.description}</p>}
@@ -252,7 +248,7 @@ export default function AddExpense() {
             <div className="flex items-center justify-between mb-2">
               <label className="flex items-center gap-2 text-xs font-bold text-[#55695e] uppercase tracking-wider">
                 <Tag size={14} className="text-[#1b4332]" />
-                Category
+                {t('field_category')}
               </label>
               <button
                 type="button"
@@ -260,7 +256,7 @@ export default function AddExpense() {
                 className="text-xs font-bold text-[#1b4332] hover:text-[#2d6a4f] bg-[#eaf4ee] hover:bg-[#d8edd0] border border-[#cce3d5] px-2.5 py-1 rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
               >
                 <Plus size={13} strokeWidth={2.8} />
-                <span>Add / Manage</span>
+                <span>{state.language === 'el' ? 'Διαχείριση' : 'Add / Manage'}</span>
               </button>
             </div>
             
@@ -280,7 +276,7 @@ export default function AddExpense() {
                   >
                     <span className="text-xl sm:text-2xl">{cat.icon}</span>
                     <span className={`text-[10px] font-bold leading-tight truncate w-full ${isSelected ? 'text-[#1b4332]' : 'text-[#6e8074]'}`}>
-                      {cat.name.split(' ')[0]}
+                      {getCategoryName(cat, state.language).split(' ')[0]}
                     </span>
                   </button>
                 );
@@ -295,7 +291,7 @@ export default function AddExpense() {
                   <Plus size={16} strokeWidth={2.8} />
                 </div>
                 <span className="text-[10px] font-bold leading-tight text-[#1b4332]">
-                  New
+                  {state.language === 'el' ? 'Νέα' : 'New'}
                 </span>
               </button>
             </div>
@@ -305,7 +301,7 @@ export default function AddExpense() {
             <div>
               <label className="flex items-center gap-2 text-xs font-bold text-[#55695e] uppercase tracking-wider mb-2">
                 <Calendar size={14} className="text-[#1b4332]" />
-                Date
+                {t('field_date')}
               </label>
               <input
                 type="date"
@@ -317,12 +313,12 @@ export default function AddExpense() {
             <div>
               <label className="flex items-center gap-2 text-xs font-bold text-[#55695e] uppercase tracking-wider mb-2">
                 <FileText size={14} className="text-[#1b4332]" />
-                Notes (Optional)
+                {t('field_notes')}
               </label>
               <input
                 value={form.notes}
                 onChange={e => set('notes', e.target.value)}
-                placeholder="Details, receipt notes..."
+                placeholder={t('field_notes_placeholder')}
                 className="w-full bg-[#f8f7f2] border border-[#e4dfd3] rounded-xl px-4 py-3 text-sm text-[#14261c] placeholder-[#94a399] focus:outline-none focus:border-[#1b4332] focus:bg-[#ffffff]"
               />
             </div>
@@ -334,8 +330,8 @@ export default function AddExpense() {
                 <RefreshCw size={16} className="stroke-[2.5]" />
               </div>
               <div>
-                <p className="text-xs sm:text-sm font-bold text-[#14261c]">Recurring Expense</p>
-                <p className="text-[11px] text-[#6e8074]">Subscription or regular monthly payment</p>
+                <p className="text-xs sm:text-sm font-bold text-[#14261c]">{t('field_recurring')}</p>
+                <p className="text-[11px] text-[#6e8074]">{t('field_recurring_sub')}</p>
               </div>
             </div>
             <button
@@ -356,7 +352,7 @@ export default function AddExpense() {
 
         {form.description && form.amount && (
           <div className="rounded-2xl bg-[#ffffff] border border-[#e8e4da] p-4 shadow-xs">
-            <p className="text-[11px] font-bold text-[#718578] uppercase tracking-wider mb-2.5">Live Preview</p>
+            <p className="text-[11px] font-bold text-[#718578] uppercase tracking-wider mb-2.5">{state.language === 'el' ? 'Προεπισκόπηση' : 'Live Preview'}</p>
             <div className="flex items-center gap-3">
               <div
                 className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl flex-shrink-0"
@@ -375,9 +371,7 @@ export default function AddExpense() {
           </div>
         )}
 
-        <button
-          type="submit"
-          disabled={saved}
+        <button data-testid="expense-submit-btn" type="submit" disabled={saved}
           className={`w-full py-4 font-extrabold rounded-2xl transition-all shadow-lg text-sm flex items-center justify-center gap-2 ${
             saved
               ? 'bg-[#2d6a4f] text-white shadow-[#2d6a4f]/30 scale-[1.01] pointer-events-none select-none'
@@ -387,7 +381,7 @@ export default function AddExpense() {
           {saved ? (
             <>
               <CheckCircle size={19} strokeWidth={2.8} className="animate-bounce text-[#a0cfb2]" />
-              <span>Expense Added Successfully! ✓</span>
+              <span>{t('toast_expense_saved')} ✓</span>
             </>
           ) : (
             <>

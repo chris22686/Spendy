@@ -6,12 +6,12 @@ import { Search, X, Plus } from 'lucide-react';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 
-function formatGroupDate(dateStr) {
+function formatGroupDate(dateStr, isEl) {
   try {
-    if (!dateStr) return 'Unknown Date';
+    if (!dateStr) return isEl ? 'Άγνωστη Ημερομηνία' : 'Unknown Date';
     const safe = dateStr.includes('T') ? dateStr : `${dateStr}T00:00:00`;
     const d = new Date(safe);
-    if (!isNaN(d.getTime())) return format(d, 'EEEE, MMMM d, yyyy');
+    if (!isNaN(d.getTime())) return isEl ? format(d, 'EEEE, d MMMM yyyy', { locale: el }) : format(d, 'EEEE, MMMM d, yyyy');
   } catch {}
   return dateStr;
 }
@@ -104,8 +104,8 @@ export default function Expenses() {
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-[#6e8074] bg-[#ffffff] rounded-2xl border border-[#e7e4da]">
           <span className="text-4xl mb-3">🔍</span>
-          <p className="font-bold text-[#14261c]">No expenses found</p>
-          <p className="text-xs text-[#809186] mt-1">Try adjusting your filters or search terms</p>
+          <p className="font-bold text-[#14261c]">{state.language === 'el' ? 'Δεν βρέθηκαν έξοδα' : 'No expenses found'}</p>
+          <p className="text-xs text-[#809186] mt-1">{state.language === 'el' ? 'Δοκίμασε να αλλάξεις τα φίλτρα ή την αναζήτηση' : 'Try adjusting your filters or search terms'}</p>
         </div>
       ) : grouped ? (
         <div className="space-y-6">
@@ -113,7 +113,7 @@ export default function Expenses() {
             <div key={date}>
               <div className="flex items-center justify-between mb-3 px-1">
                 <h3 className="text-xs font-bold text-[#55695e] uppercase tracking-wider">
-                  {formatGroupDate(date)}
+                  {formatGroupDate(date, state.language === "el")}
                 </h3>
                 <span className="text-xs font-bold text-[#1b4332] bg-[#eaf4ee] px-2.5 py-0.5 rounded-full border border-[#cce3d5]">
                   {formatMoney(exps.reduce((s, e) => s + e.amount, 0))}
@@ -151,6 +151,8 @@ export default function Expenses() {
         <ExpenseModal
           expense={editExp}
           categories={categories}
+          state={state}
+          t={t}
           onSave={(updated) => { dispatch({ type: 'UPDATE_EXPENSE', payload: updated }); setEditExp(null); }}
           onClose={() => setEditExp(null)}
         />
@@ -159,7 +161,7 @@ export default function Expenses() {
   );
 }
 
-function ExpenseModal({ expense, categories, onSave, onClose }) {
+function ExpenseModal({ expense, categories, onSave, onClose, state, t }) {
   const [form, setForm] = useState({
     ...expense,
     amount: expense.amount !== undefined ? expense.amount.toString() : '',
@@ -180,16 +182,16 @@ function ExpenseModal({ expense, categories, onSave, onClose }) {
   const handleSubmit = (e) => {
     e?.preventDefault();
     if (!form.description?.trim()) {
-      setError('Please enter a description');
+      setError(state?.language === 'el' ? 'Συμπλήρωσε μια περιγραφή' : 'Please enter a description');
       return;
     }
     const val = parseFloat(form.amount);
     if (isNaN(val) || val <= 0) {
-      setError('Please enter a valid amount greater than 0');
+      setError(state?.language === 'el' ? 'Συμπλήρωσε ένα έγκυρο ποσό μεγαλύτερο από 0' : 'Please enter a valid amount greater than 0');
       return;
     }
     if (!form.date) {
-      setError('Please choose a valid date');
+      setError(state?.language === 'el' ? 'Επίλεξε μια έγκυρη ημερομηνία' : 'Please choose a valid date');
       return;
     }
     onSave({
@@ -206,7 +208,7 @@ function ExpenseModal({ expense, categories, onSave, onClose }) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4 sm:mb-5">
-          <h2 className="text-base sm:text-lg font-bold text-[#14261c]">Edit Expense</h2>
+          <h2 className="text-base sm:text-lg font-bold text-[#14261c]">{state?.language === 'el' ? 'Επεξεργασία Εξόδου' : 'Edit Expense'}</h2>
           <button onClick={onClose} className="text-[#7d8f84] hover:text-[#14261c] p-1 cursor-pointer"><X size={18}/></button>
         </div>
 
@@ -218,7 +220,7 @@ function ExpenseModal({ expense, categories, onSave, onClose }) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="text-xs font-bold text-[#55695e] mb-1.5 block uppercase tracking-wider">Description</label>
+            <label className="text-xs font-bold text-[#55695e] mb-1.5 block uppercase tracking-wider">{t ? t('field_description') : 'Description'}</label>
             <input
               type="text"
               value={form.description}
@@ -229,7 +231,7 @@ function ExpenseModal({ expense, categories, onSave, onClose }) {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-bold text-[#55695e] mb-1.5 block uppercase tracking-wider">Amount (€)</label>
+              <label className="text-xs font-bold text-[#55695e] mb-1.5 block uppercase tracking-wider">{t ? t('field_amount') : 'Amount (€)'}</label>
               <input
                 type="number"
                 step="any"
@@ -242,7 +244,7 @@ function ExpenseModal({ expense, categories, onSave, onClose }) {
               />
             </div>
             <div>
-              <label className="text-xs font-bold text-[#55695e] mb-1.5 block uppercase tracking-wider">Date</label>
+              <label className="text-xs font-bold text-[#55695e] mb-1.5 block uppercase tracking-wider">{t ? t('field_date') : 'Date'}</label>
               <input
                 type="date"
                 value={form.date}
@@ -252,17 +254,17 @@ function ExpenseModal({ expense, categories, onSave, onClose }) {
             </div>
           </div>
           <div>
-            <label className="text-xs font-bold text-[#55695e] mb-1.5 block uppercase tracking-wider">Category</label>
+            <label className="text-xs font-bold text-[#55695e] mb-1.5 block uppercase tracking-wider">{t ? t('field_category') : 'Category'}</label>
             <select
               value={form.category}
               onChange={e => set('category', e.target.value)}
               className="w-full bg-[#f8f7f2] border border-[#e4dfd3] rounded-xl px-4 py-2.5 text-base sm:text-sm text-[#14261c] focus:outline-none focus:border-[#1b4332]"
             >
-              {categories.map(c => <option key={c.id} value={c.id}>{c.icon} {c.name}</option>)}
+              {categories.map(c => <option key={c.id} value={c.id}>{c.icon} {getCategoryName(c, state?.language)}</option>)}
             </select>
           </div>
           <div>
-            <label className="text-xs font-bold text-[#55695e] mb-1.5 block uppercase tracking-wider">Notes (optional)</label>
+            <label className="text-xs font-bold text-[#55695e] mb-1.5 block uppercase tracking-wider">{t ? t('field_notes') : 'Notes (optional)'}</label>
             <input
               value={form.notes||''}
               onChange={e => set('notes', e.target.value)}
@@ -276,11 +278,13 @@ function ExpenseModal({ expense, categories, onSave, onClose }) {
               onClick={() => set('recurring', !form.recurring)}>
               <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${form.recurring ? 'translate-x-5' : ''}`} />
             </div>
-            <span className="text-sm font-semibold text-[#14261c]">Recurring expense</span>
+            <span className="text-sm font-semibold text-[#14261c]">{t ? t('field_recurring') : 'Recurring expense'}</span>
           </label>
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-[#e4dfd3] text-sm font-semibold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer">Cancel</button>
-            <button type="submit" className="flex-1 px-4 py-2.5 rounded-xl bg-[#1b4332] hover:bg-[#245740] text-sm font-bold text-white shadow-md shadow-[#1b4332]/25 cursor-pointer">Save Changes</button>
+            <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-[#e4dfd3] text-sm font-semibold text-[#65776c] hover:bg-[#f8f7f2] cursor-pointer">{state?.language === 'el' ? 'Ακύρωση' : 'Cancel'}</button>
+            <button type="submit" className="flex-1 px-4 py-2.5 rounded-xl bg-[#1b4332] hover:bg-[#245740] text-sm font-bold text-white shadow-md shadow-[#1b4332]/25 cursor-pointer">
+              {state?.language === 'el' ? 'Αποθήκευση Αλλαγών' : 'Save Changes'}
+            </button>
           </div>
         </form>
       </div>
