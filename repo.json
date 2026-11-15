@@ -19,12 +19,20 @@
       "iconURL": "https://raw.githubusercontent.com/chris22686/Spendy/main/public/icon.png",
       "tintColor": "#1b4332",
       "category": "finance",
-      "version": "1.1.11",
-      "versionDate": "2026-11-15T18:32:40Z",
-      "versionDescription": "Fix bugs: TransactionCard date scope, QuickAdd undo i18n, and complete Greek translations",
-      "downloadURL": "https://github.com/chris22686/Spendy/releases/download/v1.1.11/Spendy.ipa",
-      "size": 1949030,
+      "version": "1.1.12",
+      "versionDate": "2026-11-15T19:58:09Z",
+      "versionDescription": "Complete 100% Greek translation across all pages, modals, tooltips, and components",
+      "downloadURL": "https://github.com/chris22686/Spendy/releases/download/v1.1.12/Spendy.ipa",
+      "size": 1952887,
       "versions": [
+        {
+          "version": "1.1.12",
+          "date": "2026-11-15T19:58:09Z",
+          "localizedDescription": "Complete 100% Greek translation across all pages, modals, tooltips, and components",
+          "downloadURL": "https://github.com/chris22686/Spendy/releases/download/v1.1.12/Spendy.ipa",
+          "size": 1952887,
+          "minOSVersion": "14.0"
+        },
         {
           "version": "1.1.11",
           "date": "2026-11-15T18:32:40Z",
@@ -55,14 +63,6 @@
           "localizedDescription": "Add customizable 1-Tap Quick Add expense shortcuts on Dashboard with undo toast",
           "downloadURL": "https://github.com/chris22686/Spendy/releases/download/v1.1.6/Spendy.ipa",
           "size": 1932903,
-          "minOSVersion": "14.0"
-        },
-        {
-          "version": "1.1.4",
-          "date": "2026-11-11T00:17:24Z",
-          "localizedDescription": "Do not require estimated paycheck amount when variable pay is selected",
-          "downloadURL": "https://github.com/chris22686/Spendy/releases/download/v1.1.4/Spendy.ipa",
-          "size": 1883290,
           "minOSVersion": "14.0"
         }
       ],
